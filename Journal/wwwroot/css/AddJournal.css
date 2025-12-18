@@ -1,0 +1,103 @@
+.journal-container {
+    max-width: 700px;
+    margin: 50px auto;
+    padding: 30px;
+    background-color: #2a2a2a;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #eee;
+}
+
+    .journal-container h1 {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #f5f5f5;
+    }
+
+    .journal-container .form-group {
+        margin-bottom: 20px;
+        display: flex;
+        flex-direction: column;
+    }
+
+        .journal-container .form-group label {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #ddd;
+        }
+
+        .journal-container .form-group input,
+        .journal-container .form-group textarea {
+            padding: 12px;
+            border: 1px solid #555;
+            border-radius: 10px;
+            font-size: 16px;
+            background-color: #1c1c1c;
+            color: #eee;
+            resize: vertical;
+        }
+
+            .journal-container .form-group input::placeholder,
+            .journal-container .form-group textarea::placeholder {
+                color: #888;
+            }
+
+        .journal-container .form-group textarea {
+            min-height: 200px;
+            resize: none;
+        }
+
+    .journal-container .button-group {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+
+.journal-list-title {
+    margin-top: 40px;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #f5f5f5;
+}
+
+.journal-items {
+    list-style: none;
+    padding: 0;
+}
+
+.journal-item {
+    padding: 20px;
+    margin-bottom: 15px;
+    background-color: #1c1c1c;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+.journal-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #ddd;
+}
+
+.journal-date {
+    font-weight: normal;
+    font-size: 0.9rem;
+    color: #aaa;
+}
+
+.journal-item p {
+    margin: 0;
+    color: #eee;
+}
+
+.error-msg {
+    color: #ff6b6b;
+    font-weight: bold;
+    margin-top: 10px;
+    text-align: center;
+}

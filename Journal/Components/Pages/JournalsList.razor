@@ -1,0 +1,32 @@
+@page "/journal/list"
+@using Project.Models
+
+<div class="journal-list-container">
+    <h1>Your Journals</h1>
+
+    @if (Journal.Journals.Count == 0)
+    {
+        <p class="empty-text">No journal entries yet.</p>
+    }
+    else
+    {
+        <ul class="journal-items">
+            @foreach (var journal in Journal.Journals)
+            {
+                <li class="journal-item">
+                    <div class="journal-header">
+                        <strong>@journal.Title</strong>
+                        <span class="journal-date">@journal.CreatedAt.ToString("g")</span>
+                    </div>
+                    <p>@journal.Content</p>
+                </li>
+            }
+        </ul>
+    }
+
+    <NavLink class="btn primary-btn" href="/journal/add">Add New Journal</NavLink>
+</div>
+
+<style>
+    
+</style>

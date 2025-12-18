@@ -1,0 +1,57 @@
+.journal-list-container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 30px;
+    background-color: #2a2a2a;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #eee;
+}
+
+    .journal-list-container h1 {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #f5f5f5;
+    }
+
+    .journal-list-container.empty-text {
+        text-align: center;
+        color: #888;
+        font-style: italic;
+    }
+
+    .journal-list-container.journal-items {
+        list-style: none;
+        padding: 0;
+        margin-bottom: 30px;
+    }
+
+    .journal-list-container.journal-item {
+        padding: 20px;
+        margin-bottom: 20px;
+        background-color: #1c1c1c;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+
+    .journal-list-container.journal-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-weight: bold;
+        color: #ddd;
+    }
+
+    .journal-list-container.journal-date {
+        font-weight: normal;
+        font-size: 0.9rem;
+        color: #aaa;
+    }
+
+    .journal-list-container.journal-item p {
+        margin: 0;
+        color: #eee;
+    }
+
+    

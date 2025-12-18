@@ -1,0 +1,80 @@
+﻿@page "/journal/add"
+@using Project.Models
+@inject NavigationManager Navigation
+
+<div class="journal-container">
+    <h1>New Journal Entry</h1>
+
+    <div class="form-group">
+        <label for="title">Title</label>
+        <input id="title" @bind="newJournal.Title" type="text" placeholder="Entry title..." />
+    </div>
+
+    <div class="form-group">
+        <label for="content">Content</label>
+        <textarea id="content" @bind="newJournal.Content" placeholder="Write your thoughts..."></textarea>
+    </div>
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <p class="error-msg">@errorMessage</p>
+    }
+
+    <div class="button-group">
+        <button class="btn secondary-btn" @onclick="GoToList">View All Journals</button>
+        <button class="btn primary-btn" @onclick="SaveEntry">Save Entry</button>
+    </div>
+</div>
+
+@if (Journal.Journals.Count > 0)
+{
+    <h2 class="journal-list-title">Your Journals</h2>
+    <ul class="journal-items">
+        @foreach (var journal in Journal.Journals)
+        {
+            <li class="journal-item">
+                <div class="journal-header">
+                    <strong>@journal.Title</strong>
+                    <span class="journal-date">@journal.CreatedAt.ToString("dddd, MMM dd, yyyy HH:mm")</span>
+                </div>
+                <p>@journal.Content</p>
+            </li>
+        }
+    </ul>
+}
+
+
+@code {
+    private Journal newJournal = new Journal();
+    private string errorMessage = string.Empty;
+
+
+
+    private void SaveEntry()
+    {
+        PopulateList();
+
+        var today = DateTime.Now.Date;
+        bool existsToday = Journal.Journals.Exists(j => j.CreatedAt.Date == today);
+
+        if (existsToday)
+        {
+            errorMessage = "You can only create one journal entry per day.";
+            return;
+        }
+
+        if (!string.IsNullOrWhiteSpace(newJournal.Title) && !string.IsNullOrWhiteSpace(newJournal.Content))
+        {
+            newJournal.Save();
+            newJournal = new Journal(); 
+            errorMessage = string.Empty;
+        }
+    }
+
+    private void GoToList()
+    {
+        Navigation.NavigateTo("/journal/list");
+    }
+
+
+}
