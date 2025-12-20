@@ -2,7 +2,7 @@
 @using Project.Models
 
 <div class="journal-list-container">
-    <h1>Your Journals</h1>
+    <h1>Your Journal Entries</h1>
 
     @if (Journal.Journals.Count == 0)
     {
@@ -15,9 +15,28 @@
             {
                 <li class="journal-item">
                     <div class="journal-header">
-                        <strong>@journal.Title</strong>
+                        <strong>@journal.Title</strong
                         <span class="journal-date">@journal.CreatedAt.ToString("g")</span>
                     </div>
+
+                    @if (!string.IsNullOrEmpty(journal.Mood))
+                    {
+                        <div class="journal-mood">
+                            <span class="mood-label">Mood:</span>
+                            <span class="mood">@journal.Mood</span>
+                        </div>
+                    }
+
+                    @if (journal.Tags.Any())
+                    {
+                        <div class="journal-tags">
+                            @foreach (var tag in journal.Tags)
+                            {
+                                <span class="tag">@tag</span>
+                            }
+                        </div>
+                    }
+                    <hr />
                     <p>@journal.Content</p>
                 </li>
             }

@@ -1,103 +1,194 @@
 .journal-container {
-    max-width: 700px;
-    margin: 50px auto;
-    padding: 30px;
-    background-color: #2a2a2a;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #eee;
+    max-width: 720px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: #020617;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+    color: #e5e7eb;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana;
 }
 
-    .journal-container h1 {
-        text-align: center;
-        margin-bottom: 30px;
-        color: #f5f5f5;
+.journal-container h1{
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+    .journal-container h1,
+    .journal-container h2,
+    .journal-container label {
+        color: #e5e7eb;
     }
 
     .journal-container .form-group {
-        margin-bottom: 20px;
-        display: flex;
-        flex-direction: column;
+        margin-bottom: 1.5rem;
     }
 
-        .journal-container .form-group label {
-            font-weight: bold;
-            margin-bottom: 8px;
-            color: #ddd;
+    .journal-container input[type="text"],
+    .journal-container textarea {
+        width: 100%;
+        padding: 0.75rem;
+        font-size: 1rem;
+        border-radius: 8px;
+        border: 1px solid #1e293b;
+        background: #020617;
+        color: #e5e7eb;
+    }
+
+    .journal-container textarea {
+        min-height: 150px;
+        resize: vertical;
+    }
+
+        .journal-container input:focus,
+        .journal-container textarea:focus {
+            outline: none;
+            border-color: #818cf8;
         }
 
-        .journal-container .form-group input,
-        .journal-container .form-group textarea {
-            padding: 12px;
-            border: 1px solid #555;
-            border-radius: 10px;
-            font-size: 16px;
-            background-color: #1c1c1c;
-            color: #eee;
-            resize: vertical;
+        .journal-container input::placeholder,
+        .journal-container textarea::placeholder {
+            color: #94a3b8;
         }
 
-            .journal-container .form-group input::placeholder,
-            .journal-container .form-group textarea::placeholder {
-                color: #888;
-            }
+    .journal-container .tags-container,
+    .journal-container .mood-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
 
-        .journal-container .form-group textarea {
-            min-height: 200px;
-            resize: none;
+    .journal-container .tag-item {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.4rem 0.9rem;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        border: 1px solid #1e293b;
+        background: #020617;
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.2s ease;
+        color: #e5e7eb;
+    }
+
+        .journal-container .tag-item input {
+            display: none;
+        }
+
+        .journal-container .tag-item:hover {
+            background: #020617;
+            border-color: #818cf8;
+        }
+
+        .journal-container .tag-item:has(input:checked) {
+            background: #818cf8;
+            color: #020617;
+            border-color: #818cf8;
         }
 
     .journal-container .button-group {
         display: flex;
         justify-content: space-between;
-        gap: 10px;
-        margin-top: 20px;
+        margin-top: 2rem;
     }
 
+    .journal-container .btn {
+        padding: 0.65rem 1.5rem;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        cursor: pointer;
+        border: none;
+    }
 
-.journal-list-title {
-    margin-top: 40px;
-    margin-bottom: 20px;
-    text-align: center;
-    color: #f5f5f5;
+    .journal-container .primary-btn {
+        background: #818cf8;
+        color: #020617;
+    }
+
+        .journal-container .primary-btn:hover {
+            background: #6366f1;
+        }
+
+    .journal-container .secondary-btn {
+        background: #020617;
+        color: #e5e7eb;
+        border: 1px solid #1e293b;
+    }
+
+        .journal-container .secondary-btn:hover {
+            border-color: #818cf8;
+        }
+
+    .journal-container .error-msg {
+        color: #f87171;
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+ .journal-list-title {
+        max-width: 720px;
+        margin: 2.5rem auto 1rem;
+    }
+
+ .journal-items {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 0;
+        list-style: none;
+    }
+
+.journal-items .journal-item {
+    background: #020617;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.7);
+    color: #e5e7eb;
 }
 
-.journal-items {
-    list-style: none;
-    padding: 0;
-}
+    .journal-items .journal-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+    }
 
-.journal-item {
-    padding: 20px;
-    margin-bottom: 15px;
-    background-color: #1c1c1c;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-}
+    .journal-items .journal-date {
+        font-size: 0.8rem;
+        color: #94a3b8;
+    }
 
-.journal-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-    font-weight: bold;
-    color: #ddd;
-}
+    .journal-items .journal-tags {
+        margin-bottom: 0.5rem;
+    }
 
-.journal-date {
-    font-weight: normal;
-    font-size: 0.9rem;
-    color: #aaa;
-}
+    .journal-items .tag {
+        display: inline-block;
+        padding: 0.25rem 0.6rem;
+        margin-right: 0.3rem;
+        border-radius: 999px;
+        background: #020617;
+        color: #818cf8;
+        font-size: 0.75rem;
+        border: 1px solid #1e293b;
+    }
 
-.journal-item p {
-    margin: 0;
-    color: #eee;
-}
+    .journal-items .journal-mood {
+        margin-bottom: 0.5rem;
+        font-size: 0.85rem;
+    }
 
-.error-msg {
-    color: #ff6b6b;
-    font-weight: bold;
-    margin-top: 10px;
-    text-align: center;
-}
+    .journal-items .mood-label {
+        font-weight: 600;
+        margin-right: 0.5rem;
+        color: #e5e7eb;
+    }
+
+    .journal-items .mood {
+        display: inline-block;
+        padding: 0.25rem 0.6rem;
+        border-radius: 999px;
+        background: #818cf8;
+        color: #020617;
+        font-size: 0.75rem;
+    }

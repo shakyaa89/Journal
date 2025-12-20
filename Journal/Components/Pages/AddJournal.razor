@@ -15,6 +15,41 @@
         <textarea id="content" @bind="newJournal.Content" placeholder="Write your thoughts..."></textarea>
     </div>
 
+    <div class="form-group">
+        <label>Tags</label>
+        <div class="mood-container">
+            @foreach (var tag in AvailableTags)
+            {
+                <label class="tag-item">
+                    <input type="checkbox"
+                           checked="@newJournal.Tags.Contains(tag)"
+                           @onchange="(e) => ToggleTag(tag, (bool)e.Value)" />
+                    @tag
+                </label>
+            }
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Mood</label>
+        <div class="mood-container">
+            @foreach (var mood in MoodsList)
+            {
+                <label class="tag-item">
+                    <input type="radio"
+                           name="mood"
+                           value="@mood"
+                           checked="@(newJournal.Mood == mood)"
+                           @onchange="() => newJournal.Mood = mood" />
+                    @mood
+                </label>
+            }
+        </div>
+    </div>
+
+
+
+
     @if (!string.IsNullOrEmpty(errorMessage))
     {
         <p class="error-msg">@errorMessage</p>
@@ -25,6 +60,8 @@
         <button class="btn primary-btn" @onclick="SaveEntry">Save Entry</button>
     </div>
 </div>
+
+@* Adding Journals List if there are journals *@
 
 @if (Journal.Journals.Count > 0)
 {
@@ -37,6 +74,25 @@
                     <strong>@journal.Title</strong>
                     <span class="journal-date">@journal.CreatedAt.ToString("dddd, MMM dd, yyyy HH:mm")</span>
                 </div>
+
+                @if (!string.IsNullOrEmpty(journal.Mood))
+                {
+                    <div class="journal-mood">
+                        <span class="mood-label">Mood:</span>
+                        <span class="mood">@journal.Mood</span>
+                    </div>
+                }
+
+                @if (journal.Tags.Any())
+                {
+                    <div class="journal-tags">
+                        @foreach (var tag in journal.Tags)
+                        {
+                            <span class="tag">@tag</span>
+                        }
+                    </div>
+                }
+                <hr />
                 <p>@journal.Content</p>
             </li>
         }
@@ -48,11 +104,13 @@
     private Journal newJournal = new Journal();
     private string errorMessage = string.Empty;
 
+    private List<string> AvailableTags = new List<string> {"Work", "Career", "Studies", "Family", "Friends", "Relationships", "Health", "Fitness", "Personal Growth", "Self-care", "Hobbies", "Travel", "Nature", "Finance", "Spirituality", "Birthday", "Holiday", "Vacation", "Celebration", "Exercise", "Reading", "Writing", "Cooking", "Meditation", "Yoga", "Music", "Shopping", "Parenting", "Projects", "Planning", "Reflection"};
+
+    private List<string> MoodsList = new List<string> { "Happy", "Excited", "Relaxed", "Grateful", "Confident", "Calm", "Thoughtful", "Curious", "Nostalgic", "Bored", "Sad", "Angry", "Stressed", "Lonely", "Anxious" };
 
 
     private void SaveEntry()
     {
-        PopulateList();
 
         var today = DateTime.Now.Date;
         bool existsToday = Journal.Journals.Exists(j => j.CreatedAt.Date == today);
@@ -63,12 +121,19 @@
             return;
         }
 
+        if (string.IsNullOrWhiteSpace(newJournal.Mood))
+        {
+            errorMessage = "Please select a mood.";
+            return;
+        }
+
         if (!string.IsNullOrWhiteSpace(newJournal.Title) && !string.IsNullOrWhiteSpace(newJournal.Content))
         {
-            newJournal.Save();
+            newJournal.CreateJournalEntry();
             newJournal = new Journal(); 
             errorMessage = string.Empty;
         }
+
     }
 
     private void GoToList()
@@ -76,5 +141,17 @@
         Navigation.NavigateTo("/journal/list");
     }
 
+    private void ToggleTag(string tag, bool isChecked)
+    {
+        if (isChecked)
+        {
+            if (!newJournal.Tags.Contains(tag))
+                newJournal.Tags.Add(tag);
+        }
+        else
+        {
+            newJournal.Tags.Remove(tag);
+        }
+    }
 
 }
