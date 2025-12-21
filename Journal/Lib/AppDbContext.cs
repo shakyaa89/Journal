@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Journal.Models;
 
 public class AppDbContext : DbContext
 {
@@ -6,5 +7,6 @@ public class AppDbContext : DbContext
     {
     }
 
-    public DbSet<Project.Models.Journal> Journals { get; set; }
+    public DbSet<JournalEntry> Journals { get; set; }
+    public DbSet<User> Users { get; set; }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Journal.Services;
 
 namespace Journal
 {
@@ -21,9 +22,13 @@ namespace Journal
                 });
 
             builder.Services.AddMauiBlazorWebView();
+            builder.Services.AddScoped<JournalService>();
+            builder.Services.AddScoped<AuthService>();
+
+
 
             builder.Services.AddDbContext<AppDbContext>(options =>
-   options.UseNpgsql(builder.Configuration.GetConnectionString("defaultConnection")));
+                options.UseNpgsql(builder.Configuration.GetConnectionString("defaultConnection")));
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();

@@ -1,22 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Project.Models   
+namespace Journal.Models
 {
-    public class Journal
+    public class JournalEntry
     {
-        public string Title { get; set; }
-        public string Content { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        [Key]
+        public int Id { get; set; }  
 
-        public List<string> Tags { get; set; } = new List<string>();
+        [Required]
+        public string Title { get; set; }
+
+        [Required]
+        public string Content { get; set; }
+
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
         public string Mood { get; set; } = string.Empty;
 
-        public static List<Journal> Journals { get; } = new List<Journal>();
+        [Required]
+        public int UserId { get; set; }
 
-        public void CreateJournalEntry()
-        {
-            Journals.Add(this);
-        }
+        [ForeignKey("UserId")]
+        public User? User { get; set; }
     }
 }

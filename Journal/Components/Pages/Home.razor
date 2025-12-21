@@ -1,4 +1,5 @@
 ﻿@page "/"
+@inject NavigationManager Navigation;
 
 <div class="home-container">
         <img src="https://i0.wp.com/dayoneapp.com/wp-content/uploads/2023/05/digital-journaling.png?resize=780%2C520&quality=80&ssl=1" alt="Journaling Illustration" class="illustration" />
@@ -19,9 +20,8 @@
             <p class="subtitle">Today's Date: @date</p>
 
             <div class="actions">
-                <button class="btn primary-btn">Login</button>
-                <button class="btn secondary-btn">Register</button>
-                <NavLink href="journal/list" class="btn secondary-btn">Journal</NavLink>
+                <button @onclick="() => NavigateToLogin()" class="btn primary-btn">Login</button>
+                <button @onclick="() => NavigateToRegister()" class="btn secondary-btn">Register</button>
             </div>
 
             
@@ -42,4 +42,10 @@
         int randomIndex = random.Next(quotes.Count);
         selectedQuote = quotes[randomIndex];
     }
+
+    void NavigateToLogin() => Navigation.NavigateTo("login");
+    
+
+    void NavigateToRegister() => Navigation.NavigateTo("register");
+    
 }

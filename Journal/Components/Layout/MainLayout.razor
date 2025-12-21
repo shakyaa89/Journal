@@ -17,5 +17,5 @@
 </div>
 
 @code {
-    private bool ShowSidebar => Navigation.Uri.Contains("/journal");
+    private bool ShowSidebar => Navigation.Uri.Contains("/journal") || Navigation.Uri.Contains("/dashboard");
 }

@@ -1,6 +1,11 @@
 ﻿@page "/journal/add"
-@using Project.Models
+@using Journal.Models;
+@using Journal.Services;
 @inject NavigationManager Navigation
+@inject JournalService JournalService
+@inject AuthService AuthService
+
+
 
 <div class="journal-container">
     <h1>Today’s Journal</h1>
@@ -25,9 +30,7 @@
             @foreach (var tag in AvailableTags)
             {
                 <label class="tag-item">
-                    <input type="checkbox"
-                           checked="@newJournal.Tags.Contains(tag)"
-                           @onchange="(e) => ToggleTag(tag, (bool)e.Value)" />
+                    <input type="checkbox" />                           
                     @tag
                 </label>
             }
@@ -64,14 +67,14 @@
     </div>
 </div>
 
-@if (Journal.Journals.Count > 0)
+@* @if (JournalEntry.Journals.Count > 0)
 {
     <div class="add-journal">
 
     
         <h2 class="journal-list-title">Your Journals</h2>
         <ul class="journal-items">
-            @foreach (var journal in Journal.Journals)
+            @foreach (var journal in JournalEntry.Journals)
             {
                 <li class="journal-item">
                     <div class="journal-header">
@@ -103,13 +106,13 @@
             }
         </ul>
     </div>
-}
+} *@
 
 
 
 
 @code {
-    private Journal newJournal = new Journal();
+    private JournalEntry newJournal = new JournalEntry();
     private string errorMessage = string.Empty;
 
     private List<string> AvailableTags = new List<string> {"Work", "Career", "Studies", "Family", "Friends", "Relationships", "Health", "Fitness", "Personal Growth", "Self-care", "Hobbies", "Travel", "Nature", "Finance", "Spirituality", "Birthday", "Holiday", "Vacation", "Celebration", "Exercise", "Reading", "Writing", "Cooking", "Meditation", "Yoga", "Music", "Shopping", "Parenting", "Projects", "Planning", "Reflection"};
@@ -117,48 +120,89 @@
     private List<string> MoodsList = new List<string> { "Happy", "Excited", "Relaxed", "Grateful", "Confident", "Calm", "Thoughtful", "Curious", "Nostalgic", "Bored", "Sad", "Angry", "Stressed", "Lonely", "Anxious" };
 
 
+    // private void SaveEntry()
+    // {
+
+    //     var today = DateTime.Now.Date;
+    //     bool existsToday = Journal.Journals.Exists(j => j.CreatedAt.Date == today);
+
+    //     if (existsToday)
+    //     {
+    //         errorMessage = "You can only create one journal entry per day.";
+    //         return;
+    //     }
+
+    //     if (string.IsNullOrWhiteSpace(newJournal.Mood))
+    //     {
+    //         errorMessage = "Please select a mood.";
+    //         return;
+    //     }
+
+    //     if (!string.IsNullOrWhiteSpace(newJournal.Title) && !string.IsNullOrWhiteSpace(newJournal.Content))
+    //     {
+    //         newJournal.CreateJournalEntry();
+    //         newJournal = new Journal(); 
+    //         errorMessage = string.Empty;
+    //     }
+
+    // }
+
     private void SaveEntry()
     {
-
         var today = DateTime.Now.Date;
-        bool existsToday = Journal.Journals.Exists(j => j.CreatedAt.Date == today);
 
-        if (existsToday)
+        try
         {
-            errorMessage = "You can only create one journal entry per day.";
-            return;
-        }
+            bool existsToday = JournalService.GetAllJournals(currentUser.Id)
+                                             .Any(j => j.CreatedAt.Date == today);
 
-        if (string.IsNullOrWhiteSpace(newJournal.Mood))
+            if (existsToday)
+            {
+                errorMessage = "You can only create one journal entry per day.";
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(newJournal.Mood))
+            {
+                errorMessage = "Please select a mood.";
+                return;
+            }
+
+            if (!string.IsNullOrWhiteSpace(newJournal.Title) && !string.IsNullOrWhiteSpace(newJournal.Content))
+            {
+                JournalService.AddJournalEntry(
+                    newJournal.Title,
+                    newJournal.Content,
+                    newJournal.Mood,
+                    currentUser.Id
+                );
+
+                newJournal = new JournalEntry(); 
+                errorMessage = string.Empty;
+                Navigation.NavigateTo("/journal/list");
+            }
+        }
+        catch (Exception ex)
         {
-            errorMessage = "Please select a mood.";
-            return;
+            errorMessage = $"An error occurred: {ex.Message}, {ex.InnerException?.Message}";
+            Console.WriteLine(ex.Message);
         }
+}
 
-        if (!string.IsNullOrWhiteSpace(newJournal.Title) && !string.IsNullOrWhiteSpace(newJournal.Content))
-        {
-            newJournal.CreateJournalEntry();
-            newJournal = new Journal(); 
-            errorMessage = string.Empty;
-        }
 
-    }
+    private void GoToList() => Navigation.NavigateTo("/journal/list");
 
-    private void GoToList()
+
+    private User? currentUser;
+
+    protected override void OnInitialized()
     {
-        Navigation.NavigateTo("/journal/list");
-    }
+        currentUser = AuthService.GetCurrentUser();
 
-    private void ToggleTag(string tag, bool isChecked)
-    {
-        if (isChecked)
+        if (currentUser == null)
         {
-            if (!newJournal.Tags.Contains(tag))
-                newJournal.Tags.Add(tag);
-        }
-        else
-        {
-            newJournal.Tags.Remove(tag);
+            Navigation.NavigateTo("/login");
+            return;
         }
     }
 

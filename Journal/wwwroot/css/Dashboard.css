@@ -1,0 +1,98 @@
+.dashboard-container {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #020617 0%, #0f0f2a 50%, #020617 100%);
+}
+
+.dashboard-content {
+    width: 100%;
+    max-width: 80%;
+    border-radius: 16px;
+    padding: clamp(20px, 4vw, 32px);
+    background-color: #020617;
+    color: #e5e7eb;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+    .dashboard-content .title {
+        font-size: clamp(28px, 5vw, 42px);
+        font-weight: 600;
+        color: #818cf8;
+        margin-bottom: 12px;
+    }
+
+    .dashboard-content .subtitle {
+        font-size: clamp(14px, 2vw, 16px);
+        color: #e5e7eb;
+        margin-bottom: 32px;
+    }
+
+.dashboard-actions {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+}
+
+.dashboard-stats {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 32px;
+}
+
+    .dashboard-stats .stat-card {
+        flex: 1 1 200px;
+        min-width: 180px;
+        background-color: #020617;
+        border-radius: 16px;
+        padding: 24px;
+        text-align: center;
+        border: 1px solid #818cf8;
+    }
+
+        .dashboard-stats .stat-card h3 {
+            font-size: clamp(16px, 2vw, 20px);
+            margin-bottom: 12px;
+            color: #818cf8;
+        }
+
+        .dashboard-stats .stat-card p {
+            font-size: clamp(20px, 3vw, 28px);
+            font-weight: 500;
+            color: #e5e7eb;
+        }
+
+.dashboard-table {
+    width: 100%;
+    margin-top: 40px;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+    .dashboard-table th, .dashboard-table td {
+        padding: 12px 16px;
+        border-bottom: 1px solid #818cf8;
+        color: #e5e7eb;
+    }
+
+    .dashboard-table th {
+        background-color: #020617;
+        color: #818cf8;
+    }
+
+    .dashboard-table td {
+        background-color: #020617;
+    }
+
+    .dashboard-table tr:hover td {
+        background-color: #6366f1;
+        color: #020617;
+    }

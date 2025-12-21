@@ -1,0 +1,83 @@
+@page "/dashboard"
+@using Journal.Models
+@using Journal.Services
+@inject JournalService JournalService
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+
+<div class="dashboard-container">
+    <div class="dashboard-content">
+        <h1 class="title">Welcome, @currentUser?.FullName</h1>
+        <p class="subtitle">Here’s a quick overview of your journal activities.</p>
+
+        <div class="dashboard-actions">
+            <button class="btn primary-btn" @onclick="NavigateToNewJournal">New Journal Entry</button>
+            <button class="btn primary-btn" @onclick="NavigateToJournalList">View All Journals</button>
+        </div>
+
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <h3>Total Entries</h3>
+                <p>@totalJournals</p>
+            </div>
+            <div class="stat-card">
+                <h3>Recent Entry</h3>
+                <p>@recentJournal?.Title</p>
+            </div>
+        </div>
+
+        <table class="dashboard-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var journal in @journals)
+                {
+                    <tr>
+                        <td>@journal.Title</td>
+                        <td>@journal.CreatedAt.ToShortDateString()</td>
+                        <td>
+                            <button class="btn">Edit</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+@code {
+    private User? currentUser;
+    private int totalJournals;
+    private JournalEntry? recentJournal;
+    private List<JournalEntry> journals = new List<JournalEntry>();
+
+    protected override void OnInitialized()
+    {
+        currentUser = AuthService.GetCurrentUser();
+        if (currentUser == null)
+        {
+            Navigation.NavigateTo("/login");
+            return;
+        }
+
+        // Example: fetch journals from a service or DB
+        journals = JournalService.GetAllJournals(currentUser.Id);
+        totalJournals = journals.Count;
+        recentJournal = journals.OrderByDescending(j => j.CreatedAt).FirstOrDefault();
+    }
+
+    private void NavigateToNewJournal() => Navigation.NavigateTo("/journal/add");
+    private void NavigateToJournalList() => Navigation.NavigateTo("/journal/list");
+
+    private void Logout()
+    {
+        AuthService.Logout();
+        Navigation.NavigateTo("/login");
+    }
+}
