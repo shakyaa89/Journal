@@ -1,5 +1,5 @@
 .home-container {
-    height: 100vh;
+    min-height: 100vh;
     width: 100%;
     display: flex;
     justify-content: center;
@@ -7,12 +7,17 @@
 }
 
     .home-container .content {
-        width: 100%;
-        max-width: 980px;
+        width: 50%;
         text-align: center;
         display: flex;
         justify-content: center;
     }
+
+.illustration {
+    width: 50%;
+    height: 100vh; 
+    object-fit: cover; 
+}
 
 .content-inner {
     width: 100%;

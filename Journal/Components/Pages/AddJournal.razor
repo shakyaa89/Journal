@@ -3,21 +3,25 @@
 @inject NavigationManager Navigation
 
 <div class="journal-container">
-    <h1>New Journal Entry</h1>
+    <h1>Today’s Journal</h1>
 
     <div class="form-group">
-        <label for="title">Title</label>
-        <input id="title" @bind="newJournal.Title" type="text" placeholder="Entry title..." />
+        <input type="text"
+               placeholder="Give today a title..."
+               @bind="newJournal.Title" />
     </div>
 
     <div class="form-group">
-        <label for="content">Content</label>
-        <textarea id="content" @bind="newJournal.Content" placeholder="Write your thoughts..."></textarea>
+        <textarea placeholder="Write freely. No rules. No judgment."
+                  @bind="newJournal.Content"></textarea>
     </div>
 
     <div class="form-group">
-        <label>Tags</label>
-        <div class="mood-container">
+        <div class="tag-header">
+            <label>Tags:</label>
+        </div>
+        <hr />
+        <div class="tags-container">
             @foreach (var tag in AvailableTags)
             {
                 <label class="tag-item">
@@ -31,14 +35,16 @@
     </div>
 
     <div class="form-group">
-        <label>Mood</label>
+        <div class="mood-header">
+            <label>Moods</label>
+        </div>
+        <hr />
         <div class="mood-container">
             @foreach (var mood in MoodsList)
             {
                 <label class="tag-item">
                     <input type="radio"
                            name="mood"
-                           value="@mood"
                            checked="@(newJournal.Mood == mood)"
                            @onchange="() => newJournal.Mood = mood" />
                     @mood
@@ -47,57 +53,59 @@
         </div>
     </div>
 
-
-
-
     @if (!string.IsNullOrEmpty(errorMessage))
     {
         <p class="error-msg">@errorMessage</p>
     }
 
     <div class="button-group">
-        <button class="btn secondary-btn" @onclick="GoToList">View All Journals</button>
+        <button class="btn secondary-btn" @onclick="GoToList">Back</button>
         <button class="btn primary-btn" @onclick="SaveEntry">Save Entry</button>
     </div>
 </div>
 
-@* Adding Journals List if there are journals *@
-
 @if (Journal.Journals.Count > 0)
 {
-    <h2 class="journal-list-title">Your Journals</h2>
-    <ul class="journal-items">
-        @foreach (var journal in Journal.Journals)
-        {
-            <li class="journal-item">
-                <div class="journal-header">
-                    <strong>@journal.Title</strong>
-                    <span class="journal-date">@journal.CreatedAt.ToString("dddd, MMM dd, yyyy HH:mm")</span>
-                </div>
+    <div class="add-journal">
 
-                @if (!string.IsNullOrEmpty(journal.Mood))
-                {
-                    <div class="journal-mood">
-                        <span class="mood-label">Mood:</span>
-                        <span class="mood">@journal.Mood</span>
+    
+        <h2 class="journal-list-title">Your Journals</h2>
+        <ul class="journal-items">
+            @foreach (var journal in Journal.Journals)
+            {
+                <li class="journal-item">
+                    <div class="journal-header">
+                        <strong>@journal.Title</strong>
+                        <span class="journal-date">
+                            @journal.CreatedAt.ToString("dddd, MMM dd, yyyy")
+                        </span>
                     </div>
-                }
 
-                @if (journal.Tags.Any())
-                {
-                    <div class="journal-tags">
-                        @foreach (var tag in journal.Tags)
-                        {
-                            <span class="tag">@tag</span>
-                        }
-                    </div>
-                }
-                <hr />
-                <p>@journal.Content</p>
-            </li>
-        }
-    </ul>
+                    @if (!string.IsNullOrEmpty(journal.Mood))
+                    {
+                        <div class="journal-mood">
+                            Mood: <span class="mood">@journal.Mood</span>
+                        </div>
+                    }
+
+                    @if (journal.Tags.Any())
+                    {
+                        <div class="journal-tags">
+                            @foreach (var tag in journal.Tags)
+                            {
+                                <span class="tag">@tag</span>
+                            }
+                        </div>
+                    }
+                    <hr />
+                    <p>@journal.Content</p>
+                </li>
+            }
+        </ul>
+    </div>
 }
+
+
 
 
 @code {

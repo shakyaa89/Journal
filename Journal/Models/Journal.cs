@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Project.Models   // <-- Make sure this is NOT 'Journal'
+namespace Project.Models   
 {
     public class Journal
     {

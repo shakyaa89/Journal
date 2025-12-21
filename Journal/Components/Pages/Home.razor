@@ -1,7 +1,11 @@
 ﻿@page "/"
 
 <div class="home-container">
+        <img src="https://i0.wp.com/dayoneapp.com/wp-content/uploads/2023/05/digital-journaling.png?resize=780%2C520&quality=80&ssl=1" alt="Journaling Illustration" class="illustration" />
     <div class="content">
+
+
+
         <div class="content-inner">
             <h1 class="title">
                 Find Clarity<br />
@@ -9,8 +13,10 @@
             </h1>
 
             <p class="subtitle">
-                Your space for reflection and mindful growth.
+                @selectedQuote
             </p>
+
+            <p class="subtitle">Today's Date: @date</p>
 
             <div class="actions">
                 <button class="btn primary-btn">Login</button>
@@ -22,3 +28,18 @@
         </div>
     </div>
 </div>
+
+@code{
+    string date = DateTime.Now.ToString("D");
+
+    private readonly List<string> quotes = new List<string> { "Write what feels heavy. Read what feels light", "A few words today can clear the mind.", "Your thoughts matter. Put them somewhere safe.", "Small entries make meaningful memories.", "This page is yours—be honest." };
+
+    private string selectedQuote = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        var random = new Random();
+        int randomIndex = random.Next(quotes.Count);
+        selectedQuote = quotes[randomIndex];
+    }
+}
