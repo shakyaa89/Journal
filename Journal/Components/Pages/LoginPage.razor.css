@@ -40,7 +40,7 @@
         display: block;
     }
 
-    .login-page .input {
+    .login-page .custom-input {
         width: 100%;
         padding: 12px;
         border-radius: 8px;

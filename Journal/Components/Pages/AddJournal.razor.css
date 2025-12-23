@@ -4,7 +4,6 @@
     margin: 3rem auto;
     padding: 3rem;
     background: #020617;
-    border-radius: 20px;
     color: #e5e7eb;
     font-family: 'Segoe UI', system-ui;
     box-shadow: 0 25px 50px rgba(0,0,0,0.45);
@@ -69,7 +68,7 @@
     gap: 0.6rem;
 }
 
-.tag-header, .mood-header{
+.tag-header, .mood-header {
     width: 100%;
     display: flex;
     align-items: center;
@@ -226,7 +225,7 @@
     line-height: 1.6;
     font-size: 1rem;
     margin-top: 0.8rem;
-    white-space: pre-wrap; 
+    white-space: pre-wrap;
 }
 
 .add-journal .journal-items .btn.primary-btn {

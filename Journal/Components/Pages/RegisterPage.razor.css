@@ -1,0 +1,95 @@
+.register-page {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+    .register-page .register-container {
+        width: 100%;
+        max-width: 420px;
+        border-radius: 16px;
+        padding: clamp(20px, 4vw, 32px);
+        text-align: center;
+    }
+
+    .register-page h2 {
+        font-size: clamp(24px, 4vw, 32px);
+        font-weight: 500;
+        color: #fff;
+        margin-bottom: 12px;
+    }
+
+    .register-page .subtitle {
+        font-size: clamp(14px, 2vw, 16px);
+        color: #ddd;
+        margin-bottom: 32px;
+    }
+
+    /* Form */
+    .register-page .form-group {
+        margin-bottom: 16px;
+        text-align: left;
+    }
+
+    .register-page label {
+        font-size: 14px;
+        color: #ddd;
+        margin-bottom: 6px;
+        display: block;
+    }
+
+    .register-page .btn {
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        border: none;
+        font-size: 16px;
+        background-color: #4CAF50;
+        color: #fff;
+        cursor: pointer;
+    }
+
+        .register-page .btn:hover {
+            background-color: #45a049;
+        }
+
+    /* Errors & links */
+    .register-page .error {
+        color: #ff6b6b;
+        margin-bottom: 12px;
+    }
+
+    .register-page .register-link {
+        margin-top: 24px;
+        font-size: 14px;
+        color: #ddd;
+    }
+
+        .register-page .register-link a {
+            color: #4CAF50;
+        }
+
+/* Back button */
+.register-page {
+    position: relative;
+}
+
+    .register-page .back-btn {
+        position: absolute;
+        top: 24px;
+        left: 24px;
+        background: transparent;
+        border: none;
+        color: #ddd;
+        font-size: 16px;
+        cursor: pointer;
+        padding: 8px 12px;
+        border-radius: 8px;
+    }
+
+        .register-page .back-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+        }
