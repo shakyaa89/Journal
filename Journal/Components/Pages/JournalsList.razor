@@ -3,18 +3,19 @@
 @using Journal.Services
 @inject JournalService JournalService;
 @inject AuthService AuthService;
+@inject NavigationManager Navigation;
 
 <div class="journal-list-container">
     <h1>Your Journal Entries</h1>
 
-    @if (JournalService.GetAllJournals(currentUser.Id).Count == 0)
+    @if (journals?.Count == 0)
     {
         <p class="empty-text">No journal entries yet.</p>
     }
     else
     {
         <ul class="journal-items">
-            @foreach (var journal in JournalService.GetAllJournals(currentUser.Id))
+            @foreach (var journal in journals!)
             {
                 <li class="journal-item">
                     <div class="journal-header">
@@ -43,8 +44,26 @@
 
 @code {
     private User? currentUser;
-    protected override void OnInitialized()
+    private List<JournalEntry>? journals = new List<JournalEntry>();
+
+    protected async override Task OnInitializedAsync()
     {
         currentUser = AuthService.GetCurrentUser();
+
+        if (currentUser == null)
+        {
+            Navigation.NavigateTo("/login");
+            return;
+        }
+
+        await FetchJournalsAsync();
+    }
+
+    private async Task FetchJournalsAsync()
+    {
+        if (currentUser != null)
+        {
+            journals = await JournalService.GetAllJournalsAsync(currentUser.Id);
+        }
     }
 }

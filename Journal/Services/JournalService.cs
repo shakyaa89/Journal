@@ -13,7 +13,7 @@ namespace Journal.Services
         }
 
         // Add a new journal entry
-        public JournalEntry AddJournalEntry(string title, string content, string mood, int userId)
+        public async Task<JournalEntry> AddJournalEntryAsync(string title, string content, string mood, int userId)
         {
             var journal = new JournalEntry
             {
@@ -23,19 +23,20 @@ namespace Journal.Services
                 UserId = userId
             };
 
-            _context.Journals.Add(journal);
-            _context.SaveChanges();
+            await _context.Journals.AddAsync(journal);
+            await _context.SaveChangesAsync();
 
             return journal;
         }
 
+
         // Get all journal entries
-        public List<JournalEntry> GetAllJournals(int userId)
+        public async Task<List<JournalEntry>> GetAllJournalsAsync(int userId)
         {
-            return _context.Journals
-                .Where(j => j.UserId == userId)
-                .OrderByDescending(j => j.CreatedAt)
-                .ToList();
+            var journals = await _context.Journals
+                             .Where(j => j.UserId == userId)
+                             .ToListAsync();
+            return journals;
         }
 
 

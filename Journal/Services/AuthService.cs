@@ -15,7 +15,7 @@ namespace Journal.Services
         }
 
         // Register a new user
-        public async Task<User> RegisterUser(string fullName, string email, string password)
+        public async Task<User> RegisterUserAsync(string fullName, string email, string password)
         {
             if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
                 throw new Exception("Email and password are required.");
@@ -38,7 +38,7 @@ namespace Journal.Services
             return user;
         }
 
-        public async Task<User?> LoginUser(string email, string password)
+        public async Task<User?> LoginUserAsync(string email, string password)
         {
             var user = await db_context.Users.FirstOrDefaultAsync(u => u.Email == email);
             if (user != null && BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))

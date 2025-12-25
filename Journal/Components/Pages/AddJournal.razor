@@ -63,52 +63,9 @@
 
     <div class="button-group">
         <button class="btn secondary-btn" @onclick="GoToList">Back</button>
-        <button class="btn primary-btn" @onclick="SaveEntry">Save Entry</button>
+        <button class="btn primary-btn" @onclick="SaveEntryAsync">Save Entry</button>
     </div>
 </div>
-
-@* @if (JournalEntry.Journals.Count > 0)
-{
-    <div class="add-journal">
-
-    
-        <h2 class="journal-list-title">Your Journals</h2>
-        <ul class="journal-items">
-            @foreach (var journal in JournalEntry.Journals)
-            {
-                <li class="journal-item">
-                    <div class="journal-header">
-                        <strong>@journal.Title</strong>
-                        <span class="journal-date">
-                            @journal.CreatedAt.ToString("dddd, MMM dd, yyyy")
-                        </span>
-                    </div>
-
-                    @if (!string.IsNullOrEmpty(journal.Mood))
-                    {
-                        <div class="journal-mood">
-                            Mood: <span class="mood">@journal.Mood</span>
-                        </div>
-                    }
-
-                    @if (journal.Tags.Any())
-                    {
-                        <div class="journal-tags">
-                            @foreach (var tag in journal.Tags)
-                            {
-                                <span class="tag">@tag</span>
-                            }
-                        </div>
-                    }
-                    <hr />
-                    <p>@journal.Content</p>
-                </li>
-            }
-        </ul>
-    </div>
-} *@
-
-
 
 
 @code {
@@ -120,41 +77,14 @@
     private List<string> MoodsList = new List<string> { "Happy", "Excited", "Relaxed", "Grateful", "Confident", "Calm", "Thoughtful", "Curious", "Nostalgic", "Bored", "Sad", "Angry", "Stressed", "Lonely", "Anxious" };
 
 
-    // private void SaveEntry()
-    // {
-
-    //     var today = DateTime.Now.Date;
-    //     bool existsToday = Journal.Journals.Exists(j => j.CreatedAt.Date == today);
-
-    //     if (existsToday)
-    //     {
-    //         errorMessage = "You can only create one journal entry per day.";
-    //         return;
-    //     }
-
-    //     if (string.IsNullOrWhiteSpace(newJournal.Mood))
-    //     {
-    //         errorMessage = "Please select a mood.";
-    //         return;
-    //     }
-
-    //     if (!string.IsNullOrWhiteSpace(newJournal.Title) && !string.IsNullOrWhiteSpace(newJournal.Content))
-    //     {
-    //         newJournal.CreateJournalEntry();
-    //         newJournal = new Journal(); 
-    //         errorMessage = string.Empty;
-    //     }
-
-    // }
-
-    private void SaveEntry()
+    private async Task SaveEntryAsync()
     {
         var today = DateTime.Now.Date;
 
         try
         {
-            bool existsToday = JournalService.GetAllJournals(currentUser.Id)
-                                             .Any(j => j.CreatedAt.Date == today);
+            var journals = await JournalService.GetAllJournalsAsync(currentUser!.Id);
+            bool existsToday = journals.Any(j => j.CreatedAt.Date == today);
 
             if (existsToday)
             {
@@ -170,7 +100,7 @@
 
             if (!string.IsNullOrWhiteSpace(newJournal.Title) && !string.IsNullOrWhiteSpace(newJournal.Content))
             {
-                JournalService.AddJournalEntry(
+                await JournalService.AddJournalEntryAsync(
                     newJournal.Title,
                     newJournal.Content,
                     newJournal.Mood,

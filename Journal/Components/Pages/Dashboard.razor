@@ -57,7 +57,7 @@
     private JournalEntry? recentJournal;
     private List<JournalEntry> journals = new List<JournalEntry>();
 
-    protected override void OnInitialized()
+    protected async override Task OnInitializedAsync()
     {
         currentUser = AuthService.GetCurrentUser();
         if (currentUser == null)
@@ -67,7 +67,7 @@
         }
 
         // Example: fetch journals from a service or DB
-        journals = JournalService.GetAllJournals(currentUser.Id);
+        journals = await JournalService.GetAllJournalsAsync(currentUser.Id);
         totalJournals = journals.Count;
         recentJournal = journals.OrderByDescending(j => j.CreatedAt).FirstOrDefault();
     }
