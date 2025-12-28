@@ -1,41 +1,67 @@
 ﻿@using Journal.Services
 @using Journal.Models
 @inject AuthService AuthService
+@inject NavigationManager NavigationManager
 
-<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/">@currentUser?.Id</a>
+<div class="app-sidebar">
+    <div class="app-sidebar-header">
+        <div class="app-user-info">
+            <div class="app-user-avatar">
+                @GetUserInitials()
+            </div>
+            <div class="app-user-details">
+                <span class="app-user-name">@(currentUser?.FullName ?? "Guest")</span>
+                <span class="app-user-id">ID: @currentUser?.Id</span>
+            </div>
+        </div>
     </div>
-</div>
-
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
-
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/dashboard" Match="NavLinkMatch.All">
-                <span aria-hidden="true"></span> Dashboard
-            </NavLink>
-        </div>
-        <div class="nav-item px-3"> 
-            <NavLink class="nav-link" href="/journal/list">
-                <span aria-hidden="true"></span> Journals
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/journal/add">
-                <span aria-hidden="true"></span> New Entry
-            </NavLink>
-        </div>
-       
+    <nav class="app-sidebar-nav">
+        <ul class="app-sidebar-list">
+            <li class="app-sidebar-item">
+                <a href="/dashboard" class="app-sidebar-link" @onclick='() => Navigate("/dashboard")' >
+                    <span class="app-sidebar-icon">📊</span>
+                    <span class="app-sidebar-text">Dashboard</span>
+                </a>
+            </li>
+            <li class="app-sidebar-item">
+                <a href="/journal/list" class="app-sidebar-link" @onclick='() => Navigate("/journal/list")'>
+                    <span class="app-sidebar-icon">📖</span>
+                    <span class="app-sidebar-text">Journals</span>
+                </a>
+            </li>
+            <li class="app-sidebar-item">
+                <a href="/journal/add" class="app-sidebar-link" @onclick='() => Navigate("/journal/add")'>
+                    <span class="app-sidebar-icon">✏️</span>
+                    <span class="app-sidebar-text">New Entry</span>
+                </a>
+            </li>
+        </ul>
     </nav>
 </div>
 
-@code{
+@code {
     private User? currentUser;
 
     protected override void OnInitialized()
     {
         currentUser = AuthService.GetCurrentUser();
     }
+
+    private void Navigate(string path)
+    {
+        NavigationManager.NavigateTo(path);
+    }
+
+    private string GetUserInitials()
+    {
+        if (currentUser?.FullName == null) return "?";
+        var parts = currentUser.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length >= 2)
+        {
+            return $"{parts[0][0]}{parts[1][0]}".ToUpper();
+        }
+        return currentUser.FullName.Length > 0 ? currentUser.FullName[0].ToString().ToUpper() : "?";
+    }
+
+    
 }

@@ -5,65 +5,115 @@
 @inject JournalService JournalService
 @inject AuthService AuthService
 
-
-
 <div class="journal-container">
-    <h1>Today’s Journal</h1>
+    <div class="journal-sidebar">
+        <!-- Date & Time Section -->
+        <div class="sidebar-card">
+            <div class="card-header">
+                <label>DATE & TIME</label>
+            </div>
+            <div class="date-picker">
+                <span class="date-icon">📅</span>
+                <div class="date-info">
+                    <div class="date-text">@DateTime.Now.ToString("MMM dd, yyyy")</div>
+                    <div class="date-subtext">Today</div>
+                </div>
+            </div>
+        </div>
 
-    <div class="form-group">
-        <input type="text"
-               placeholder="Give today a title..."
-               @bind="newJournal.Title" />
+        <!-- Primary Mood Section -->
+        <div class="sidebar-card">
+            <div class="card-header">
+                <label>PRIMARY MOOD <span class="required">*</span></label>
+            </div>
+            <div class="mood-grid">
+                @foreach (var mood in MoodsList)
+                {
+                    <div class="mood-item @(newJournal.Mood == mood ? "active" : "")"
+                         @onclick="() => newJournal.Mood = mood">
+                        <div class="mood-icon">😊</div>
+                        <div class="mood-label">@mood.ToUpper()</div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Secondary Moods Section -->
+        <div class="sidebar-card">
+            <div class="card-header">
+                <label>SECONDARY MOODS <span class="mood-limit">(Max 2)</span></label>
+            </div>
+            <div class="secondary-moods">
+                @foreach (var mood in MoodsList)
+                {
+                    <label class="mood-chip">
+                        <input type="checkbox" />
+                        <span>@mood</span>
+                    </label>
+                }
+                <button class="add-custom-btn">+ Add Custom</button>
+            </div>
+        </div>
+
+        <!-- Tags Section -->
+        <div class="sidebar-card">
+            <div class="card-header">
+                <label>TAGS</label>
+            </div>
+            <div class="tags-section">
+                <input type="text"
+                       class="tag-input"
+                       placeholder="# Add tags (e.g. Health, Hobbies)..." />
+            </div>
+        </div>
+
+        <!-- Action Buttons in Sidebar -->
+        <div class="sidebar-actions">
+            
+        </div>
     </div>
 
-    <div class="form-group">
-        <textarea placeholder="Write freely. No rules. No judgment."
-                  @bind="newJournal.Content"></textarea>
-    </div>
-
-    <div class="form-group">
-        <div class="tag-header">
-            <label>Tags:</label>
+    <div class="journal-main">
+        <!-- Toolbar -->
+        <div class="editor-toolbar">
+            <div class="toolbar-left">
+                <button class="toolbar-btn"><strong>B</strong></button>
+                <button class="toolbar-btn"><em>I</em></button>
+                <button class="toolbar-btn"><u>U</u></button>
+                <span class="toolbar-divider"></span>
+                <button class="toolbar-btn">☰</button>
+                <button class="toolbar-btn">≡</button>
+            </div>
+            <div class="toolbar-right">
+                <button class="toolbar-btn">⊕</button>
+                <button class="toolbar-btn">⤢</button>
+            </div>
         </div>
-        <hr />
-        <div class="tags-container">
-            @foreach (var tag in AvailableTags)
-            {
-                <label class="tag-item">
-                    <input type="checkbox" />                           
-                    @tag
-                </label>
-            }
-        </div>
-    </div>
 
-    <div class="form-group">
-        <div class="mood-header">
-            <label>Moods</label>
-        </div>
-        <hr />
-        <div class="mood-container">
-            @foreach (var mood in MoodsList)
-            {
-                <label class="tag-item">
-                    <input type="radio"
-                           name="mood"
-                           checked="@(newJournal.Mood == mood)"
-                           @onchange="() => newJournal.Mood = mood" />
-                    @mood
-                </label>
-            }
-        </div>
-    </div>
+        <!-- Editor Area -->
+        <div class="editor-container">
+            <input type="text"
+                   class="entry-title"
+                   placeholder="Entry Title..."
+                   @bind="newJournal.Title" />
 
-    @if (!string.IsNullOrEmpty(errorMessage))
-    {
-        <p class="error-msg">@errorMessage</p>
-    }
+            <textarea class="entry-content"
+                      placeholder="Start writing your thoughts here..."
+                      @bind="newJournal.Content"></textarea>
 
-    <div class="button-group">
-        <button class="btn secondary-btn" @onclick="GoToList">Back</button>
-        <button class="btn primary-btn" @onclick="SaveEntryAsync">Save Entry</button>
+            <div class="word-count">0 words</div>
+        </div>
+
+        <button class="btn-save" @onclick="SaveEntryAsync">
+            <span class="btn-icon">🔒</span> Save Entry
+        </button>
+        <button class="btn-cancel" @onclick="GoToList">Cancel</button>
+
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <p class="error-msg">@errorMessage</p>
+        }
     </div>
 </div>
 
@@ -72,7 +122,7 @@
     private JournalEntry newJournal = new JournalEntry();
     private string errorMessage = string.Empty;
 
-    private List<string> AvailableTags = new List<string> {"Work", "Career", "Studies", "Family", "Friends", "Relationships", "Health", "Fitness", "Personal Growth", "Self-care", "Hobbies", "Travel", "Nature", "Finance", "Spirituality", "Birthday", "Holiday", "Vacation", "Celebration", "Exercise", "Reading", "Writing", "Cooking", "Meditation", "Yoga", "Music", "Shopping", "Parenting", "Projects", "Planning", "Reflection"};
+    private List<string> AvailableTags = new List<string> { "Work", "Career", "Studies", "Family", "Friends", "Relationships", "Health", "Fitness", "Personal Growth", "Self-care", "Hobbies", "Travel", "Nature", "Finance", "Spirituality", "Birthday", "Holiday", "Vacation", "Celebration", "Exercise", "Reading", "Writing", "Cooking", "Meditation", "Yoga", "Music", "Shopping", "Parenting", "Projects", "Planning", "Reflection" };
 
     private List<string> MoodsList = new List<string> { "Happy", "Excited", "Relaxed", "Grateful", "Confident", "Calm", "Thoughtful", "Curious", "Nostalgic", "Bored", "Sad", "Angry", "Stressed", "Lonely", "Anxious" };
 
@@ -107,7 +157,7 @@
                     currentUser.Id
                 );
 
-                newJournal = new JournalEntry(); 
+                newJournal = new JournalEntry();
                 errorMessage = string.Empty;
                 Navigation.NavigateTo("/journal/list");
             }
@@ -117,7 +167,7 @@
             errorMessage = $"An error occurred: {ex.Message}, {ex.InnerException?.Message}";
             Console.WriteLine(ex.Message);
         }
-}
+    }
 
 
     private void GoToList() => Navigation.NavigateTo("/journal/list");

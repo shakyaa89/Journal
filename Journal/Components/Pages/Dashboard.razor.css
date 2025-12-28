@@ -12,8 +12,8 @@
     max-width: 80%;
     border-radius: 16px;
     padding: clamp(20px, 4vw, 32px);
-    background-color: #020617;
-    color: #e5e7eb;
+    background-color: var(--secondary-btn-bg);
+    color: var(--text);
     text-align: center;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
@@ -21,13 +21,13 @@
     .dashboard-content .title {
         font-size: clamp(28px, 5vw, 42px);
         font-weight: 600;
-        color: #818cf8;
+        color: var(--link);
         margin-bottom: 12px;
     }
 
     .dashboard-content .subtitle {
         font-size: clamp(14px, 2vw, 16px);
-        color: #e5e7eb;
+        color: var(--text);
         margin-bottom: 32px;
     }
 
@@ -50,23 +50,23 @@
     .dashboard-stats .stat-card {
         flex: 1 1 200px;
         min-width: 180px;
-        background-color: #020617;
+        background-color: var(--secondary-btn-bg);
         border-radius: 16px;
         padding: 24px;
         text-align: center;
-        border: 1px solid #818cf8;
+        border: 1px solid var(--link);
     }
 
         .dashboard-stats .stat-card h3 {
             font-size: clamp(16px, 2vw, 20px);
             margin-bottom: 12px;
-            color: #818cf8;
+            color: var(--link);
         }
 
         .dashboard-stats .stat-card p {
             font-size: clamp(20px, 3vw, 28px);
             font-weight: 500;
-            color: #e5e7eb;
+            color: var(--text);
         }
 
 .dashboard-table {
@@ -76,22 +76,23 @@
     text-align: center;
 }
 
-    .dashboard-table th, .dashboard-table td {
+    .dashboard-table th,
+    .dashboard-table td {
         padding: 12px 16px;
-        border-bottom: 1px solid #818cf8;
-        color: #e5e7eb;
+        border-bottom: 1px solid var(--link);
+        color: var(--text);
     }
 
     .dashboard-table th {
-        background-color: #020617;
-        color: #818cf8;
+        background-color: var(--secondary-btn-bg);
+        color: var(--link);
     }
 
     .dashboard-table td {
-        background-color: #020617;
+        background-color: var(--secondary-btn-bg);
     }
 
     .dashboard-table tr:hover td {
-        background-color: #6366f1;
-        color: #020617;
+        background-color: var(--link);
+        color: var(--secondary-btn-bg);
     }

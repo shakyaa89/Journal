@@ -1,45 +1,64 @@
-@page "/journal/list"
+﻿@page "/journal/list"
 @using Journal.Models
 @using Journal.Services
 @inject JournalService JournalService;
 @inject AuthService AuthService;
 @inject NavigationManager Navigation;
 
-<div class="journal-list-container">
-    <h1>Your Journal Entries</h1>
+<div class="journal-list-page">
+    <div class="list-header">
+        <h1>Your Journal Entries</h1>
+        <p class="header-subtitle">@journals?.Count @(journals?.Count == 1 ? "entry" : "entries") total</p>
+    </div>
 
     @if (journals?.Count == 0)
     {
-        <p class="empty-text">No journal entries yet.</p>
+        <div class="empty-state">
+            <div class="empty-icon">📝</div>
+            <h2>No journal entries yet</h2>
+            <p>Start documenting your thoughts and experiences</p>
+            <a href="/journal/add" class="btn-add-first">Create Your First Entry</a>
+        </div>
     }
     else
     {
-        <ul class="journal-items">
+        <div class="journal-grid">
             @foreach (var journal in journals!)
             {
-                <li class="journal-item">
-                    <div class="journal-header">
-                        <strong>@journal.Title</strong>
-                        <span class="journal-date">@journal.CreatedAt.ToString("g")</span>
+                <div class="journal-card">
+                    <div class="card-top">
+                        <div class="journal-date-badge">
+                            <span class="date-day">@journal.CreatedAt.ToString("dd")</span>
+                            <span class="date-month">@journal.CreatedAt.ToString("MMM")</span>
+                        </div>
+                        @if (!string.IsNullOrEmpty(journal.Mood))
+                        {
+                            <div class="mood-badge">
+                                <span class="mood-emoji">😊</span>
+                                <span class="mood-text">@journal.Mood</span>
+                            </div>
+                        }
                     </div>
 
-                    @if (!string.IsNullOrEmpty(journal.Mood))
-                    {
-                        <div class="journal-mood">
-                            <span class="mood-label">Mood:</span>
-                            <span class="mood">@journal.Mood</span>
-                        </div>
-                    }
+                    <h3 class="journal-title">@journal.Title</h3>
 
-                    
-                    <hr />
-                    <p>@journal.Content</p>
-                </li>
+                    <p class="journal-preview">@GetPreview(journal.Content)</p>
+
+                    <div class="card-footer">
+                        <span class="journal-time">@journal.CreatedAt.ToString("h:mm tt")</span>
+                        <button class="btn-read-more" @onclick="() => ViewJournal(journal.Id)">Read More →</button>
+                    </div>
+                </div>
             }
-        </ul>
+        </div>
     }
 
-    <NavLink class="btn primary-btn" href="/journal/add">Add New Journal</NavLink>
+    <div class="floating-add-btn">
+        <a href="/journal/add" class="btn-add-new">
+            <span class="add-icon">+</span>
+            <span>New Entry</span>
+        </a>
+    </div>
 </div>
 
 @code {
@@ -49,13 +68,11 @@
     protected async override Task OnInitializedAsync()
     {
         currentUser = AuthService.GetCurrentUser();
-
         if (currentUser == null)
         {
             Navigation.NavigateTo("/login");
             return;
         }
-
         await FetchJournalsAsync();
     }
 
@@ -65,5 +82,16 @@
         {
             journals = await JournalService.GetAllJournalsAsync(currentUser.Id);
         }
+    }
+
+    private string GetPreview(string content)
+    {
+        if (string.IsNullOrEmpty(content)) return "";
+        return content.Length > 150 ? content.Substring(0, 150) + "..." : content;
+    }
+
+    private void ViewJournal(int id)
+    {
+        // Navigation.NavigateTo($"/journal/view/{id}");
     }
 }

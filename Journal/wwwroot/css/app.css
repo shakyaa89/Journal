@@ -4,14 +4,24 @@
     box-sizing: border-box;
 }
 
+:root {
+    --primary-bg: #10221d;
+    --secondary-bg: #162E26;
+    --text: #fff;
+    --muted: #7a8c84;
+    --border: #253733;
+    --primary-btn-bg: #162E26;
+    --primary-btn-hover: #10221d;
+    --secondary-btn-bg: #10221d;
+    --secondary-btn-hover: #162E26;
+    --link: #4ade80;
+}
+
 html, body {
     width: 100%;
     min-height: 100%;
-    background: linear-gradient(135deg, #020617 0%, #0f0f2a 50%, #020617 100%);
-    color: #e5e7eb;
+    background: var(--primary-bg);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana;
-    margin: 0;
-    padding: 0;
 }
 
 body {
@@ -31,67 +41,33 @@ body {
 }
 
 .primary-btn {
-    background-color: #818cf8;
-    color: #020617;
+    background-color: var(--primary-btn-bg);
+    color: var(--text);
+    border: 1px solid var(--border);
 }
 
     .primary-btn:hover {
-        background-color: #6366f1;
+        background-color: var(--primary-btn-hover);
+        color: var(--text);
     }
 
 .secondary-btn {
-    background-color: #020617;
-    color: #e5e7eb;
-    border: 1px solid #818cf8;
+    background-color: var(--secondary-btn-bg);
+    color: var(--text);
+    border: 1px solid var(--border);
 }
 
     .secondary-btn:hover {
-        background-color: #6366f1;
-        border-color: #6366f1;
+        background-color: var(--secondary-btn-hover);
+        color: var(--text);
     }
 
-
-.navbar {
-    background-color: #020617;
-    color: #e5e7eb;
-    padding: 1rem;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana;
+.login-page .input,
+.register-page .input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #444;
+    background: transparent;
+    color: var(--text);
 }
-
-.navbar-brand {
-    color: #818cf8;
-    font-weight: 600;
-    text-decoration: none;
-}
-
-.navbar-toggler {
-    display: none; /* Optional: hide actual checkbox */
-}
-
-.nav-scrollable {
-    background-color: #020617;
-    display: flex;
-    flex-direction: column;
-    padding: 1rem 0;
-}
-
-    .nav-scrollable .nav-link {
-        color: #e5e7eb;
-        padding: 0.5rem 1rem;
-        display: flex;
-        align-items: center;
-        border-radius: 8px;
-        text-decoration: none;
-        transition: 0.2s ease;
-    }
-
-        .nav-scrollable .nav-link:hover,
-        .nav-scrollable .nav-link.active {
-            background-color: #818cf8;
-            color: #020617;
-        }
-
-        .nav-scrollable .nav-link span {
-            margin-right: 0.5rem;
-            font-size: 1rem;
-        }

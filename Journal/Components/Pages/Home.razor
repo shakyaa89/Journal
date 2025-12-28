@@ -1,51 +1,171 @@
 ﻿@page "/"
-@inject NavigationManager Navigation;
+@inject NavigationManager Navigation
+@inject AuthService AuthService
 
-<div class="home-container">
-        <img src="https://i0.wp.com/dayoneapp.com/wp-content/uploads/2023/05/digital-journaling.png?resize=780%2C520&quality=80&ssl=1" alt="Journaling Illustration" class="illustration" />
-    <div class="content">
-
-
-
-        <div class="content-inner">
-            <h1 class="title">
-                Find Clarity<br />
-                Through Journaling
-            </h1>
-
-            <p class="subtitle">
-                @selectedQuote
-            </p>
-
-            <p class="subtitle">Today's Date: @date</p>
-
-            <div class="actions">
-                <button @onclick="() => NavigateToLogin()" class="btn primary-btn">Login</button>
-                <button @onclick="() => NavigateToRegister()" class="btn secondary-btn">Register</button>
+<div class="hero-page">
+    <div class="hero-content">
+        <!-- Main Hero Section -->
+        <div class="hero-left">
+            <div class="hero-badge">
+                <span class="badge-dot"></span>
+                Your Digital Sanctuary
             </div>
 
-            
+            <h1 class="hero-title">
+                Where thoughts
+                <span class="title-highlight">become clarity</span>
+            </h1>
+
+            <p class="hero-description">
+                A private space to capture moments, track moods, and discover patterns in your journey.
+            </p>
+
+            <!-- Quote Section -->
+            <div class="hero-quote">
+                <div class="quote-mark">"</div>
+                <p class="quote-content">@selectedQuote</p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="hero-actions">
+                <button class="btn-hero-primary" @onclick="GoToRegister">
+                    Start Your Journey
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+                <button class="btn-hero-ghost" @onclick="GoToLogin">
+                    Already a member?
+                </button>
+            </div>
+        </div>
+
+        <!-- Visual Section -->
+        <div class="hero-right">
+            <div class="journal-mockup">
+                <div class="mockup-header">
+                    <div class="mockup-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <div class="mockup-date">December 28, 2025</div>
+                </div>
+                <div class="mockup-content">
+                    <div class="mockup-title">Today was meaningful...</div>
+                    <div class="mockup-line"></div>
+                    <div class="mockup-line short"></div>
+                    <div class="mockup-line"></div>
+                    <div class="mockup-mood">
+                        <span class="mood-emoji">😊</span>
+                        <span class="mood-text">Happy</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Preview -->
+            <div class="stats-preview">
+                <div class="stat-item">
+                    <div class="stat-number">Insightful Dashboard</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">Intuitive UI Design</div>
+                </div>
+            </div>
         </div>
     </div>
+
+    <div class="activity-card">
+            <div class="card-header-dash">
+            <h2>Journal <span style="color: var(--link);">Examples</span></h2>
+                <span class="card-subtitle">3 entries</span>
+            </div>
+            <div class="activity-list">
+                <div class="activity-item">
+                    <div class="activity-date">
+                        <div class="activity-day">28</div>
+                        <div class="activity-month">Dec</div>
+                    </div>
+                    <div class="activity-content">
+                        <h4>A Productive Day</h4>
+                        <p>Finally completed the project I've been working on for the past few weeks. Feeling accomplished and ready for new challenges...</p>
+                        <div class="activity-meta">
+                            <span class="activity-mood">😊 Happy</span>
+                            <span class="activity-words">425 words</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-date">
+                        <div class="activity-day">27</div>
+                        <div class="activity-month">Dec</div>
+                    </div>
+                    <div class="activity-content">
+                        <h4>Morning Reflections</h4>
+                        <p>Woke up early and did some meditation. The quiet morning time helps me center myself and prepare for the day ahead...</p>
+                        <div class="activity-meta">
+                            <span class="activity-mood">😌 Calm</span>
+                            <span class="activity-words">312 words</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-date">
+                        <div class="activity-day">26</div>
+                        <div class="activity-month">Dec</div>
+                    </div>
+                    <div class="activity-content">
+                        <h4>Holiday Thoughts</h4>
+                        <p>Spending time with family during the holidays reminds me of what's truly important in life. Grateful for these moments...</p>
+                        <div class="activity-meta">
+                            <span class="activity-mood">🙏 Grateful</span>
+                            <span class="activity-words">568 words</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+   
 </div>
 
-@code{
-    string date = DateTime.Now.ToString("D");
-
-    private readonly List<string> quotes = new List<string> { "Write what feels heavy. Read what feels light", "A few words today can clear the mind.", "Your thoughts matter. Put them somewhere safe.", "Small entries make meaningful memories.", "This page is yours—be honest." };
+@code {
+    private readonly List<string> quotes = new List<string>
+    {
+        "Write what feels heavy. Read what feels light",
+        "A few words today can clear the mind.",
+        "Your thoughts matter. Put them somewhere safe.",
+        "Small entries make meaningful memories.",
+        "This page is yours—be honest."
+    };
 
     private string selectedQuote = string.Empty;
 
     protected override void OnInitialized()
     {
+        var currentUser = AuthService.GetCurrentUser();
+        if (currentUser != null)
+        {
+            Navigation.NavigateTo("/dashboard");
+            return;
+        }
+
         var random = new Random();
         int randomIndex = random.Next(quotes.Count);
         selectedQuote = quotes[randomIndex];
     }
 
-    void NavigateToLogin() => Navigation.NavigateTo("login");
-    
+    private void GoToLogin()
+    {
+        Navigation.NavigateTo("/login");
+    }
 
-    void NavigateToRegister() => Navigation.NavigateTo("register");
-    
+    private void GoToRegister()
+    {
+        Navigation.NavigateTo("/register");
+    }
 }

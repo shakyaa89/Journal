@@ -17,13 +17,13 @@
     .login-page h2 {
         font-size: clamp(24px, 4vw, 32px);
         font-weight: 500;
-        color: #fff;
+        color: var(--text);
         margin-bottom: 12px;
     }
 
     .login-page .subtitle {
         font-size: clamp(14px, 2vw, 16px);
-        color: #ddd;
+        color: var(--muted);
         margin-bottom: 32px;
     }
 
@@ -35,19 +35,11 @@
 
     .login-page label {
         font-size: 14px;
-        color: #ddd;
+        color: var(--muted);
         margin-bottom: 6px;
         display: block;
     }
 
-    .login-page .custom-input {
-        width: 100%;
-        padding: 12px;
-        border-radius: 8px;
-        border: 1px solid #444;
-        background: transparent;
-        color: #fff;
-    }
 
     /* Actions */
     .login-page .btn {
@@ -56,13 +48,14 @@
         border-radius: 8px;
         border: none;
         font-size: 16px;
-        background-color: #4CAF50;
-        color: #fff;
+        background-color: var(--primary-btn-bg);
+        color: var(--text);
         cursor: pointer;
+        border: 1px solid var(--border);
     }
 
         .login-page .btn:hover {
-            background-color: #45a049;
+            background-color: var(--primary-btn-hover);
         }
 
     /* Errors & links */
@@ -74,11 +67,13 @@
     .login-page .register-link {
         margin-top: 24px;
         font-size: 14px;
-        color: #ddd;
+        color: var(--muted);
     }
 
         .login-page .register-link a {
-            color: #4CAF50;
+            color: var(--link);
+            cursor: pointer;
+            text-decoration: underline;
         }
 
 /* Back button */
@@ -92,14 +87,13 @@
         left: 24px;
         background: transparent;
         border: none;
-        color: #ddd;
+        color: var(--muted);
         font-size: 16px;
         cursor: pointer;
         padding: 8px 12px;
         border-radius: 8px;
+        border: 1px solid var(--border);
+        
     }
 
-        .login-page .back-btn:hover {
-            background: rgba(255, 255, 255, 0.08);
-            color: #fff;
-        }
+       
