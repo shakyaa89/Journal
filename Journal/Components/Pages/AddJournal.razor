@@ -67,10 +67,7 @@
             </div>
         </div>
 
-        <!-- Action Buttons in Sidebar -->
-        <div class="sidebar-actions">
-            
-        </div>
+      
     </div>
 
     <div class="journal-main">
@@ -80,7 +77,6 @@
                 <button class="toolbar-btn"><strong>B</strong></button>
                 <button class="toolbar-btn"><em>I</em></button>
                 <button class="toolbar-btn"><u>U</u></button>
-                <span class="toolbar-divider"></span>
                 <button class="toolbar-btn">☰</button>
                 <button class="toolbar-btn">≡</button>
             </div>
@@ -104,10 +100,10 @@
             <div class="word-count">0 words</div>
         </div>
 
-        <button class="btn-save" @onclick="SaveEntryAsync">
-            <span class="btn-icon">🔒</span> Save Entry
+        <button class="btn primary-btn btn-save" @onclick="SaveEntryAsync">
+            Save Entry
         </button>
-        <button class="btn-cancel" @onclick="GoToList">Cancel</button>
+        <button class="btn btn-cancel" @onclick="GoToList">Cancel</button>
 
 
         @if (!string.IsNullOrEmpty(errorMessage))

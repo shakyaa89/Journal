@@ -1,25 +1,4 @@
-:root {
-    --primary-bg: #10221d;
-    --secondary-bg: #162E26;
-    --text: #fff;
-    --muted: #7a8c84;
-    --border: #253733;
-    --primary-btn-bg: #162E26;
-    --primary-btn-hover: #10221d;
-    --secondary-btn-bg: #10221d;
-    --secondary-btn-hover: #162E26;
-    --link: #4ade80;
-}
 
-body {
-    background-color: var(--primary-bg);
-    color: var(--text);
-    margin: 0;
-    padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-}
-
-/* Main Layout */
 .journal-container {
     display: grid;
     grid-template-columns: 400px 1fr;
@@ -27,18 +6,18 @@ body {
     min-height: 100vh;
 }
 
-/* Sidebar */
 .journal-sidebar {
-    background-color: var(--secondary-bg);
+    background-color: var(--primary-bg);
     padding: 2rem;
     overflow-y: auto;
     border-right: 1px solid var(--border);
+    border-left: 1px solid var(--border);
     display: flex;
     flex-direction: column;
 }
 
 .sidebar-card {
-    background-color: var(--secondary-btn-bg);
+    background-color: var(--secondary-bg);
     border-radius: 1rem;
     padding: 1.5rem;
     margin-bottom: 1.5rem;
@@ -50,7 +29,7 @@ body {
 }
 
     .card-header label {
-        color: var(--muted);
+        color: var(--link);
         font-size: 0.75rem;
         font-weight: 700;
         letter-spacing: 0.08em;
@@ -58,7 +37,7 @@ body {
     }
 
 .required {
-    color: #ef4444;
+    color: red;
 }
 
 .mood-limit {
@@ -66,21 +45,16 @@ body {
     font-weight: 400;
 }
 
-/* Date Picker */
 .date-picker {
     display: flex;
     align-items: center;
     gap: 1rem;
-    background-color: var(--secondary-bg);
     padding: 1rem;
     border-radius: 0.75rem;
     cursor: pointer;
     transition: background-color 0.2s;
 }
 
-    .date-picker:hover {
-        background-color: var(--secondary-btn-hover);
-    }
 
 .date-icon {
     font-size: 1.5rem;
@@ -101,7 +75,6 @@ body {
     font-size: 0.85rem;
 }
 
-/* Mood Grid */
 .mood-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -115,7 +88,7 @@ body {
     justify-content: center;
     gap: 0.5rem;
     padding: 1rem 0.5rem;
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: var(--primary-bg);
     border-radius: 0.75rem;
     cursor: pointer;
     transition: all 0.2s;
@@ -123,12 +96,12 @@ body {
 }
 
     .mood-item:hover {
-        background-color: rgba(74, 222, 128, 0.1);
+        background-color: rgba(var(--link), 0.5);
         border-color: var(--link);
     }
 
     .mood-item.active {
-        background-color: rgba(74, 222, 128, 0.2);
+        background-color: rgba(var(--link), 0.5);
         border-color: var(--link);
     }
 
@@ -148,7 +121,6 @@ body {
     color: var(--link);
 }
 
-/* Secondary Moods */
 .secondary-moods {
     display: flex;
     flex-wrap: wrap;
@@ -173,7 +145,7 @@ body {
     }
 
     .mood-chip:hover {
-        background-color: rgba(74, 222, 128, 0.1);
+        background-color: rgba(var(--link), 0.3);
         border-color: var(--link);
         color: var(--text);
     }
@@ -200,7 +172,6 @@ body {
         color: var(--link);
     }
 
-/* Tags Section */
 .tags-section {
     display: flex;
     flex-wrap: wrap;
@@ -255,7 +226,6 @@ body {
         border-color: var(--link);
     }
 
-/* Sidebar Actions */
 .sidebar-actions {
     margin-top: auto;
     padding-top: 1.5rem;
@@ -267,47 +237,25 @@ body {
 
 .btn-cancel {
     width: 100%;
-    padding: 0.875rem 1.5rem;
-    background-color: var(--secondary-btn-bg);
+    padding: 12px 28px;
+    background-color: transparent;
     border: 1px solid var(--border);
-    border-radius: 0.5rem;
-    color: var(--text);
-    font-size: 0.95rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
+    border-radius: 5rem;
     margin-top: 0.5rem;
+    color: var(--link);
 }
 
-    .btn-cancel:hover {
-        background-color: var(--secondary-btn-hover);
-        border-color: var(--muted);
-    }
+.btn-cancel:hover{
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
 
 .btn-save {
     width: 100%;
-    padding: 0.875rem 1.5rem;
-    background-color: var(--primary-btn-bg);
-    border: 1px solid var(--border);
-    border-radius: 0.5rem;
-    color: var(--text);
     font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
     margin-top: 0.5rem;
-}
-
-    .btn-save:hover {
-        background-color: var(--primary-btn-hover);
-    }
-
-.btn-icon {
-    font-size: 1rem;
 }
 
 /* Main Content */
@@ -322,7 +270,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 0.75rem 1rem;
-    background-color: var(--secondary-btn-bg);
+    background-color: var(--primary-bg);
     border-radius: 0.75rem;
     margin-bottom: 1.5rem;
     border: 1px solid var(--border);
@@ -347,7 +295,7 @@ body {
 }
 
     .toolbar-btn:hover {
-        background-color: rgba(255, 255, 255, 0.1);
+        background-color: var(--secondary-btn-hover);
         color: var(--text);
     }
 
@@ -358,9 +306,8 @@ body {
     margin: 0 0.25rem;
 }
 
-/* Editor Container */
 .editor-container {
-    background-color: var(--secondary-btn-bg);
+    background-color: var(--primary-bg);
     border-radius: 1rem;
     padding: 2rem;
     border: 1px solid var(--border);
@@ -412,38 +359,15 @@ body {
     font-size: 0.85rem;
 }
 
-/* Error Message */
 .error-msg {
-    color: #ef4444;
+    color: var(--error);
     font-size: 0.9rem;
     margin: 1rem 0;
     padding: 0.75rem 1rem;
-    background-color: rgba(239, 68, 68, 0.1);
-    border-left: 3px solid #ef4444;
+    background-color: rgba(255, 0, 0, 0.1);
+    border-left: 3px solid var(--error);
     border-radius: 0.5rem;
 }
-
-/* Scrollbar */
-.journal-sidebar::-webkit-scrollbar,
-.journal-main::-webkit-scrollbar {
-    width: 6px;
-}
-
-.journal-sidebar::-webkit-scrollbar-track,
-.journal-main::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.journal-sidebar::-webkit-scrollbar-thumb,
-.journal-main::-webkit-scrollbar-thumb {
-    background: var(--border);
-    border-radius: 3px;
-}
-
-    .journal-sidebar::-webkit-scrollbar-thumb:hover,
-    .journal-main::-webkit-scrollbar-thumb:hover {
-        background: var(--muted);
-    }
 
 /* Responsive */
 @media (max-width: 1200px) {

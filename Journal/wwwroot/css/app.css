@@ -5,16 +5,18 @@
 }
 
 :root {
-    --primary-bg: #10221d;
-    --secondary-bg: #162E26;
-    --text: #fff;
-    --muted: #7a8c84;
+    --primary-bg: #121212;
+    --secondary-bg: #1e1e1e;
+    --text: #e1e1e1;
+    --btn-text: #1e1e1e;
+    --muted: #898989;
     --border: #253733;
-    --primary-btn-bg: #162E26;
-    --primary-btn-hover: #10221d;
-    --secondary-btn-bg: #10221d;
-    --secondary-btn-hover: #162E26;
+    --primary-btn-bg: #4ade80;
+    --primary-btn-hover: #4ade8040;
+    --secondary-btn-bg: #4ade8040;
+    --secondary-btn-hover: #4ade80;
     --link: #4ade80;
+    --error: #ef4444;
 }
 
 html, body {
@@ -42,16 +44,16 @@ body {
 
 .primary-btn {
     background-color: var(--primary-btn-bg);
-    color: var(--text);
+    color: var(--btn-text);
     border: 1px solid var(--border);
 }
 
     .primary-btn:hover {
-        background-color: var(--primary-btn-hover);
-        color: var(--text);
+        background-color: transparent;
+        color: var(--link);
     }
 
-.secondary-btn {
+/*.secondary-btn {
     background-color: var(--secondary-btn-bg);
     color: var(--text);
     border: 1px solid var(--border);
@@ -60,7 +62,7 @@ body {
     .secondary-btn:hover {
         background-color: var(--secondary-btn-hover);
         color: var(--text);
-    }
+    }*/
 
 .login-page .input,
 .register-page .input {
