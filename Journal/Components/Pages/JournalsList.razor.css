@@ -136,6 +136,10 @@
     font-size: 1.25rem;
 }
 
+.mood-emoji i{
+    color: var(--link);
+}
+
 .mood-text {
     color: var(--link);
     font-size: 0.875rem;

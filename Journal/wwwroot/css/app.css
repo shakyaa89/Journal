@@ -73,3 +73,8 @@ body {
     background: transparent;
     color: var(--text);
 }
+
+::selection{
+    background-color: var(--link);
+    color: var(--primary-bg);
+}

@@ -13,7 +13,7 @@
                 <label>DATE & TIME</label>
             </div>
             <div class="date-picker">
-                <span class="date-icon">📅</span>
+                <span class="date-icon"><i class="fa-solid fa-calendar"></i></span>
                 <div class="date-info">
                     <div class="date-text">@DateTime.Now.ToString("MMM dd, yyyy")</div>
                     <div class="date-subtext">Today</div>
@@ -31,7 +31,7 @@
                 {
                     <div class="mood-item @(newJournal.Mood == mood ? "active" : "")"
                          @onclick="() => newJournal.Mood = mood">
-                        <div class="mood-icon">😊</div>
+                        <div class="mood-icon"><i class="fa-solid fa-face-smile"></i></div>
                         <div class="mood-label">@mood.ToUpper()</div>
                     </div>
                 }
@@ -51,7 +51,6 @@
                         <span>@mood</span>
                     </label>
                 }
-                <button class="add-custom-btn">+ Add Custom</button>
             </div>
         </div>
 
@@ -131,6 +130,12 @@
         {
             var journals = await JournalService.GetAllJournalsAsync(currentUser!.Id);
             bool existsToday = journals.Any(j => j.CreatedAt.Date == today);
+
+            if (string.IsNullOrEmpty(newJournal.Title) || string.IsNullOrEmpty(newJournal.Content)) 
+            {
+                errorMessage = "All fields must be filled.";
+                return;
+            }
 
             if (existsToday)
             {
