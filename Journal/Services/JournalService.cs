@@ -13,13 +13,15 @@ namespace Journal.Services
         }
 
         // Add a new journal entry
-        public async Task<JournalEntry> AddJournalEntryAsync(string title, string content, string mood, int userId)
+        public async Task<JournalEntry> AddJournalEntryAsync(string title, string content, string mood, string secondaryMood1, string secondaryMood2, int userId)
         {
             var journal = new JournalEntry
             {
                 Title = title,
                 Content = content,
                 Mood = mood,
+                SecondaryMood1 = secondaryMood1,
+                SecondaryMood2 = secondaryMood2,
                 UserId = userId
             };
 

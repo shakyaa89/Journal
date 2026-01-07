@@ -20,6 +20,9 @@ namespace Journal.Models
 
         public string Mood { get; set; } = string.Empty;
 
+        public string SecondaryMood1 { get; set; } = string.Empty;
+        public string SecondaryMood2 { get; set; } = string.Empty;
+
         [Required]
         public int UserId { get; set; }
 

@@ -46,8 +46,10 @@
             <div class="secondary-moods">
                 @foreach (var mood in MoodsList)
                 {
-                    <label class="mood-chip">
-                        <input type="checkbox" />
+                    <label class="mood-chip @(selectedSecondaryMoods.Contains(mood) ? "active" : "")">
+                        <input type="checkbox"
+                               checked="@selectedSecondaryMoods.Contains(mood)"
+                               @onchange="e => ToggleSecondaryMood(mood, e)" />
                         <span>@mood</span>
                     </label>
                 }
@@ -121,6 +123,27 @@
 
     private List<string> MoodsList = new List<string> { "Happy", "Excited", "Relaxed", "Grateful", "Confident", "Calm", "Thoughtful", "Curious", "Nostalgic", "Bored", "Sad", "Angry", "Stressed", "Lonely", "Anxious" };
 
+    private List<string> selectedSecondaryMoods = new();
+
+    private void ToggleSecondaryMood(string mood, ChangeEventArgs e)
+    {
+        var isChecked = (bool)e.Value;
+
+        if (isChecked)
+        {
+            if (selectedSecondaryMoods.Count < 2 && !selectedSecondaryMoods.Contains(mood))
+                selectedSecondaryMoods.Add(mood);
+        }
+        else
+        {
+            selectedSecondaryMoods.Remove(mood);
+        }
+    }
+
+    
+
+
+
 
     private async Task SaveEntryAsync()
     {
@@ -149,17 +172,34 @@
                 return;
             }
 
+            if (selectedSecondaryMoods.Count != 2)
+            {
+                errorMessage = "Please select exactly 2 secondary moods.";
+                return;
+            }
+
+
+            
+
+
             if (!string.IsNullOrWhiteSpace(newJournal.Title) && !string.IsNullOrWhiteSpace(newJournal.Content))
             {
+                newJournal.SecondaryMood1 = selectedSecondaryMoods[0];
+                newJournal.SecondaryMood2 = selectedSecondaryMoods[1];
+
+
                 await JournalService.AddJournalEntryAsync(
                     newJournal.Title,
                     newJournal.Content,
                     newJournal.Mood,
+                    newJournal.SecondaryMood1,
+                    newJournal.SecondaryMood2,
                     currentUser.Id
                 );
 
                 newJournal = new JournalEntry();
                 errorMessage = string.Empty;
+                selectedSecondaryMoods.Clear();
                 Navigation.NavigateTo("/journal/list");
             }
         }
