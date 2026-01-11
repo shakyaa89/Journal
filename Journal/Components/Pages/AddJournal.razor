@@ -1,6 +1,7 @@
 ﻿@page "/journal/add"
 @using Journal.Models;
 @using Journal.Services;
+@using Syncfusion.Blazor.RichTextEditor
 @inject NavigationManager Navigation
 @inject JournalService JournalService
 @inject AuthService AuthService
@@ -73,7 +74,7 @@
 
     <div class="journal-main">
         <!-- Toolbar -->
-        <div class="editor-toolbar">
+        @* <div class="editor-toolbar">
             <div class="toolbar-left">
                 <button class="toolbar-btn"><strong>B</strong></button>
                 <button class="toolbar-btn"><em>I</em></button>
@@ -85,7 +86,7 @@
                 <button class="toolbar-btn">⊕</button>
                 <button class="toolbar-btn">⤢</button>
             </div>
-        </div>
+        </div> *@
 
         <!-- Editor Area -->
         <div class="editor-container">
@@ -97,6 +98,9 @@
             <textarea class="entry-content"
                       placeholder="Start writing your thoughts here..."
                       @bind="newJournal.Content"></textarea>
+
+            @* <SfRichTextEditor EditorMode="EditorMode.Markdown" Height="400px" CssClass="journal-editor">
+            </SfRichTextEditor> *@
 
             <div class="word-count">0 words</div>
         </div>
@@ -125,7 +129,7 @@
 
     private List<string> selectedSecondaryMoods = new();
 
-    private void ToggleSecondaryMood(string mood, ChangeEventArgs e)
+    private void ToggleSecondaryMood(string mood, Microsoft.AspNetCore.Components.ChangeEventArgs e)
     {
         var isChecked = (bool)e.Value;
 

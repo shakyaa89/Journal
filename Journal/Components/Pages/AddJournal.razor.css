@@ -404,3 +404,65 @@
         flex-direction: column;
     }
 }
+
+/* Outer editor container */
+.journal-editor.e-richtexteditor {
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    background-color: var(--secondary-bg);
+    font-family: inherit;
+}
+
+/* Toolbar */
+.journal-editor .e-toolbar {
+    background-color: var(--secondary-bg);
+    border-radius: 0.75rem;
+    border: 1px solid var(--border);
+    margin-bottom: 1rem;
+}
+
+    .journal-editor .e-toolbar .e-btn {
+        background-color: transparent;
+        color: var(--muted);
+        border-radius: 0.375rem;
+        transition: all 0.2s;
+    }
+
+        .journal-editor .e-toolbar .e-btn:hover {
+            background-color: rgba(var(--link), 0.2);
+            color: var(--link);
+        }
+
+/* Editable area */
+.journal-editor .sf-content-area,
+.journal-editor .e-rte-content {
+    background-color: var(--primary-bg);
+    color: var(--text);
+    font-size: 1rem;
+    line-height: 1.8;
+    padding: 1rem;
+    min-height: 350px;
+    border-radius: 0.5rem;
+}
+
+/* Markdown preview (when preview is active) */
+.journal-editor .e-preview {
+    background-color: var(--primary-bg);
+    color: var(--text);
+    padding: 1rem;
+    border-radius: 0.5rem;
+}
+
+/* Placeholder */
+.journal-editor .e-rte-placeholder {
+    color: var(--muted);
+    opacity: 0.5;
+}
+
+/* Scrollbar inside editor */
+.journal-editor .sf-content-area {
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(var(--link), 0.3) transparent;
+}
+

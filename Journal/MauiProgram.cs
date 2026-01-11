@@ -2,6 +2,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Journal.Services;
+using Syncfusion.Blazor;
+using Syncfusion.Licensing;
+
+
 
 namespace Journal
 {
@@ -20,6 +24,9 @@ namespace Journal
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 });
+
+            builder.Services.AddSyncfusionBlazor();
+            SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjGyl/VkR+XU9Ff1RAQmRWfFN0Q3NedV53fldFcC0sT3RfQFtjSH5bdkJhWXxXcnxXQWtfUw==");
 
             builder.Services.AddMauiBlazorWebView();
             builder.Services.AddScoped<JournalService>();

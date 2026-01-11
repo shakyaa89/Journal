@@ -56,13 +56,13 @@ namespace Journal.Services
         }
 
         // Delete a journal entry
-        public bool DeleteJournal(int id)
+        public async Task<bool> DeleteJournalAsync(int id)
         {
             var journal = _context.Journals.Find(id);
             if (journal == null) return false;
 
             _context.Journals.Remove(journal);
-            return _context.SaveChanges() > 0;
+            return await _context.SaveChangesAsync() > 0;
         }
     }
 }
