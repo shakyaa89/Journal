@@ -1,9 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 using BCrypt.Net;
 using Journal.Models;
 using Journal.Repositories;
-using System.Diagnostics;
 
 namespace Journal.Services
 {
@@ -11,9 +9,9 @@ namespace Journal.Services
     {
         private readonly IAuthRepository _authRepository;
 
-        public AuthService(IAuthRepository userRepository)
+        public AuthService(IAuthRepository authRepository)
         {
-            _authRepository = userRepository;
+            _authRepository = authRepository;
         }
 
         // Register a new user
@@ -42,12 +40,10 @@ namespace Journal.Services
             
             if (user != null && BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
             {
-                Debug.WriteLine("Login successful for user: " + email);
                 return user;
             }
             else
             {
-                Debug.WriteLine("Login unsuccessful for user: " + email);
                 return null;
             }
         }

@@ -30,9 +30,10 @@ namespace Journal
             SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjGyl/VkR+XU9Ff1RAQmRWfFN0Q3NedV53fldFcC0sT3RfQFtjSH5bdkJhWXxXcnxXQWtfUw==");
 
             builder.Services.AddMauiBlazorWebView();
-            builder.Services.AddScoped<JournalService>();
             builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+            builder.Services.AddScoped<IJournalRepository, JournalRepository>();
             builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IJournalService, JournalService>();
 
 
 

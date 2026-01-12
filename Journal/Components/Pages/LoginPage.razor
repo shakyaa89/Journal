@@ -49,7 +49,6 @@
         try
         {
             var user = await AuthService.LoginUserAsync(loginModel.Email, loginModel.Password);
-            System.Diagnostics.Debug.WriteLine($"Login attempt for {user}");
             if (user != null)
             {
                 AuthService.SetCurrentUser(user);

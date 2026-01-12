@@ -1,18 +1,19 @@
-﻿using Journal.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Journal.Models;
+using Journal.Repositories;
+using System.Diagnostics;
 
 namespace Journal.Services
 {
-    public class JournalService
+    public class JournalService : IJournalService
     {
-        private readonly AppDbContext _context;
+        private readonly IJournalRepository _journalRepository;
 
-        public JournalService(AppDbContext context)
+        public JournalService(IJournalRepository journalRepository)
         {
-            _context = context;
+            _journalRepository = journalRepository;
         }
 
-        // Add a new journal entry
         public async Task<JournalEntry> AddJournalEntryAsync(string title, string content, string mood, string secondaryMood1, string secondaryMood2, int userId)
         {
             var journal = new JournalEntry
@@ -25,44 +26,30 @@ namespace Journal.Services
                 UserId = userId
             };
 
-            await _context.Journals.AddAsync(journal);
-            await _context.SaveChangesAsync();
-
-            return journal;
+            return await _journalRepository.AddJournalEntryAsync(journal);
         }
 
 
         // Get all journal entries
         public async Task<List<JournalEntry>> GetAllJournalsAsync(int userId)
         {
-            var journals = await _context.Journals
-                             .Where(j => j.UserId == userId)
-                             .ToListAsync();
-            return journals;
+            return await _journalRepository.FetchJournalEntriesAsync(userId);
         }
 
 
         // Get single journal by ID
-        public JournalEntry? GetJournalById(int id)
+        public async Task<JournalEntry?> GetJournalByIdAsync(int id)
         {
-            return _context.Journals.Find(id);
-        }
-
-        // Update a journal entry
-        public bool UpdateJournal(JournalEntry journal)
-        {
-            _context.Journals.Update(journal);
-            return _context.SaveChanges() > 0;
+            return await _journalRepository.FetchJournalByIdAsync(id);
         }
 
         // Delete a journal entry
         public async Task<bool> DeleteJournalAsync(int id)
         {
-            var journal = _context.Journals.Find(id);
-            if (journal == null) return false;
-
-            _context.Journals.Remove(journal);
-            return await _context.SaveChangesAsync() > 0;
+            return await _journalRepository.DeleteJournalEntry(id);
         }
+
     }
 }
+
+

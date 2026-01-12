@@ -3,7 +3,7 @@
 @using Journal.Services;
 @using Syncfusion.Blazor.RichTextEditor
 @inject NavigationManager Navigation
-@inject JournalService JournalService
+@inject IJournalService JournalService
 @inject IAuthService AuthService
 
 <div class="journal-container">
@@ -210,7 +210,6 @@
         catch (Exception ex)
         {
             errorMessage = $"An error occurred: {ex.Message}, {ex.InnerException?.Message}";
-            Console.WriteLine(ex.Message);
         }
     }
 
