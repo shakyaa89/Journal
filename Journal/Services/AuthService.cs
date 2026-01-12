@@ -2,27 +2,28 @@
 using System.Threading.Tasks;
 using BCrypt.Net;
 using Journal.Models;
+using Journal.Repositories;
+using System.Diagnostics;
 
 namespace Journal.Services
 {
-    public class AuthService
+    public class AuthService: IAuthService
     {
-        private readonly AppDbContext db_context;
+        private readonly IAuthRepository _authRepository;
 
-        public AuthService(AppDbContext context)
+        public AuthService(IAuthRepository userRepository)
         {
-            db_context = context;
+            _authRepository = userRepository;
         }
 
         // Register a new user
-        public async Task<User> RegisterUserAsync(string fullName, string email, string password)
+        public async Task<bool> RegisterUserAsync(string fullName, string email, string password)
         {
             if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
                 throw new Exception("Email and password are required.");
 
-            // Check if email already exists
-            if (await db_context.Users.AnyAsync(u => u.Email == email))
-                throw new Exception("Email already registered.");
+            if(await _authRepository.CheckEmailExistence(email))
+                throw new Exception("Email is already registered.");
 
             var user = new User
             {
@@ -32,21 +33,23 @@ namespace Journal.Services
                 CreatedAt = DateTime.UtcNow
             };
 
-            db_context.Users.Add(user);
-            await db_context.SaveChangesAsync();
-
-            return user;
+            return await _authRepository.AddUserAsync(user);
         }
 
         public async Task<User?> LoginUserAsync(string email, string password)
         {
-            var user = await db_context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            User? user = await _authRepository.CheckUserExistence(email);
+            
             if (user != null && BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
             {
-
+                Debug.WriteLine("Login successful for user: " + email);
                 return user;
             }
-            return null;
+            else
+            {
+                Debug.WriteLine("Login unsuccessful for user: " + email);
+                return null;
+            }
         }
 
         private User? _currentUser;

@@ -1,7 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Journal.Repositories;
+using Journal.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Journal.Services;
 using Syncfusion.Blazor;
 using Syncfusion.Licensing;
 
@@ -30,7 +31,8 @@ namespace Journal
 
             builder.Services.AddMauiBlazorWebView();
             builder.Services.AddScoped<JournalService>();
-            builder.Services.AddScoped<AuthService>();
+            builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+            builder.Services.AddScoped<IAuthService, AuthService>();
 
 
 

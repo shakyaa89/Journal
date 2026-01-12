@@ -1,6 +1,6 @@
 ﻿@using Journal.Services
 @using Journal.Models
-@inject AuthService AuthService
+@inject IAuthService AuthService
 @inject NavigationManager NavigationManager
 
 <div class="app-sidebar">
@@ -62,6 +62,4 @@
         }
         return currentUser.FullName.Length > 0 ? currentUser.FullName[0].ToString().ToUpper() : "?";
     }
-
-    
 }

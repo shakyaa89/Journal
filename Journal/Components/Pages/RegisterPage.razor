@@ -2,7 +2,7 @@
 @using Journal.Services
 @using System.ComponentModel.DataAnnotations
 @inject NavigationManager Navigation
-@inject AuthService AuthService
+@inject IAuthService AuthService
 
 <div class="register-page">
     <button class="back-btn" @onclick="GoBack">Back</button>
@@ -16,7 +16,7 @@
             <div class="error">@ErrorMessage</div>
         }
 
-        <EditForm Model="registerModel" OnValidSubmit="Register">
+        <EditForm Model="registerModel" OnValidSubmit="RegisterAsync">
             <DataAnnotationsValidator />
 
             <div class="form-group">
@@ -56,7 +56,7 @@
     private RegisterModel registerModel = new();
     private string ErrorMessage = "";
 
-    private async Task Register()
+    private async Task RegisterAsync()
     {
         try
         {
