@@ -11,5 +11,8 @@ namespace Journal.Repositories
         Task<List<JournalEntry>> FetchJournalEntriesAsync(int userId);
         Task<JournalEntry?> FetchJournalByIdAsync(int journalId);
         Task<bool> DeleteJournalEntry(int journalId);
+
+        Task<JournalEntry?> UpdateJournalEntryAsync(JournalEntry journal);
+
     }
 }

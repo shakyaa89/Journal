@@ -37,8 +37,8 @@ namespace Journal
 
 
 
-            builder.Services.AddDbContext<AppDbContext>(options =>
-                options.UseNpgsql(builder.Configuration.GetConnectionString("defaultConnection")));
+                builder.Services.AddDbContext<AppDbContext>(options =>
+                    options.UseNpgsql(builder.Configuration.GetConnectionString("defaultConnection")));
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();

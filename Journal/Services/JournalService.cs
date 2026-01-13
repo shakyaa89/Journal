@@ -49,6 +49,29 @@ namespace Journal.Services
             return await _journalRepository.DeleteJournalEntry(id);
         }
 
+        public async Task<JournalEntry?> UpdateJournalEntryAsync(
+            int id,
+            string title,
+            string content,
+            string mood,
+            string secondaryMood1,
+            string secondaryMood2,
+            int userId)
+        {
+            // ensure entry exists + belongs to user
+            var existing = await _journalRepository.FetchJournalByIdAsync(id);
+            if (existing == null || existing.UserId != userId)
+                return null;
+
+            existing.Title = title;
+            existing.Content = content;
+            existing.Mood = mood;
+            existing.SecondaryMood1 = secondaryMood1;
+            existing.SecondaryMood2 = secondaryMood2;
+
+            return await _journalRepository.UpdateJournalEntryAsync(existing);
+        }
+
     }
 }
 

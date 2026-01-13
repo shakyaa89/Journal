@@ -42,5 +42,20 @@ namespace Journal.Repositories
             _context.Journals.Remove(journal);
             return await _context.SaveChangesAsync() > 0;
         }
+
+        public async Task<JournalEntry?> UpdateJournalEntryAsync(JournalEntry journal)
+        {
+            var existing = await _context.Journals.FirstOrDefaultAsync(j => j.Id == journal.Id);
+            if (existing == null) return null;
+
+            existing.Title = journal.Title;
+            existing.Content = journal.Content;
+            existing.Mood = journal.Mood;
+            existing.SecondaryMood1 = journal.SecondaryMood1;
+            existing.SecondaryMood2 = journal.SecondaryMood2;
+
+            await _context.SaveChangesAsync();
+            return existing;
+        }
     }
 }

@@ -11,7 +11,7 @@
         <p class="header-subtitle">@journals?.Count @(journals?.Count == 1 ? "entry" : "entries") total</p>
     </div>
 
-    @if (journals?.Count == 0)
+    @if (journals == null || journals.Count == 0)
     {
         <div class="empty-state">
             <div class="empty-icon">📝</div>
@@ -23,7 +23,7 @@
     else
     {
         <div class="journal-grid">
-            @foreach (var journal in journals!)
+            @foreach (var journal in PagedJournals)
             {
                 <div class="journal-card">
                     <div class="card-top">
@@ -31,6 +31,7 @@
                             <span class="date-day">@journal.CreatedAt.ToString("dd")</span>
                             <span class="date-month">@journal.CreatedAt.ToString("MMM")</span>
                         </div>
+
                         @if (!string.IsNullOrEmpty(journal.Mood))
                         {
                             <div class="mood-badge">
@@ -41,16 +42,41 @@
                     </div>
 
                     <h3 class="journal-title">@journal.Title</h3>
-
                     <p class="journal-preview">@GetPreview(journal.Content)</p>
 
                     <div class="card-footer">
                         <span class="journal-time">@journal.CreatedAt.ToString("h:mm tt")</span>
+                        <button class="btn-read-more" @onclick="() => ViewJournal(journal.Id)">View Journal</button>
                         <button class="btn-read-more" @onclick="() => DeleteJournal(journal.Id)">Delete Journal</button>
                     </div>
                 </div>
             }
         </div>
+
+        @if (TotalPages > 1)
+        {
+            <div class="pagination">
+                <button class="page-btn"
+                        disabled="@(CurrentPage == 1)"
+                        @onclick="PrevPage">
+                    Prev
+                </button>
+
+                @foreach (var p in PageNumbers)
+                {
+                    <button class="page-number @(p == CurrentPage ? "active" : "")"
+                            @onclick="() => GoToPage(p)">
+                        @p
+                    </button>
+                }
+
+                <button class="page-btn"
+                        disabled="@(CurrentPage == TotalPages)"
+                        @onclick="NextPage">
+                    Next
+                </button>
+            </div>
+        }
     }
 
     <div class="floating-add-btn">
@@ -63,9 +89,23 @@
 
 @code {
     private User? currentUser;
-    private List<JournalEntry>? journals = new List<JournalEntry>();
+    private List<JournalEntry> journals = new();
 
-    protected async override Task OnInitializedAsync()
+    private int PageSize = 6; 
+
+    private int CurrentPage = 1;
+
+    private int TotalPages => (int)Math.Ceiling(journals.Count / (double)PageSize);
+
+    private IEnumerable<int> PageNumbers => Enumerable.Range(1, TotalPages);
+
+    private IEnumerable<JournalEntry> PagedJournals =>
+        journals
+            .OrderByDescending(j => j.CreatedAt)
+            .Skip((CurrentPage - 1) * PageSize)
+            .Take(PageSize);
+
+    protected override async Task OnInitializedAsync()
     {
         currentUser = AuthService.GetCurrentUser();
         if (currentUser == null)
@@ -73,15 +113,35 @@
             Navigation.NavigateTo("/login");
             return;
         }
+
         await FetchJournalsAsync();
     }
 
     private async Task FetchJournalsAsync()
     {
         if (currentUser != null)
-        {
             journals = await JournalService.GetAllJournalsAsync(currentUser.Id);
-        }
+
+        if (CurrentPage > TotalPages)
+            CurrentPage = Math.Max(1, TotalPages);
+    }
+
+    private void GoToPage(int page)
+    {
+        if (page < 1 || page > TotalPages) return;
+        CurrentPage = page;
+    }
+
+    private void PrevPage()
+    {
+        if (CurrentPage > 1)
+            CurrentPage--;
+    }
+
+    private void NextPage()
+    {
+        if (CurrentPage < TotalPages)
+            CurrentPage++;
     }
 
     private string GetPreview(string content)
@@ -92,7 +152,7 @@
 
     private void ViewJournal(int id)
     {
-        // Navigation.NavigateTo($"/journal/view/{id}");
+        Navigation.NavigateTo($"/journal/{id}");
     }
 
     private async Task<bool> ShowDeleteAlertAsync()
@@ -107,24 +167,13 @@
         return confirmation;
     }
 
-    private async Task DeleteJournal(int Id)
+    private async Task DeleteJournal(int id)
     {
-
         bool confirmDelete = await ShowDeleteAlertAsync();
+        if (!confirmDelete) return;
 
-        if (confirmDelete)
-        {
-            bool deleted = await JournalService.DeleteJournalAsync(Id);
-            if (deleted)
-            {
-                await FetchJournalsAsync();
-            }
-        }
-        else
-        {
-            return;
-        }
-
-        
+        bool deleted = await JournalService.DeleteJournalAsync(id);
+        if (deleted)
+            await FetchJournalsAsync();
     }
 }

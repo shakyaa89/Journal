@@ -1,0 +1,91 @@
+@page "/journal/{Id:int}"
+@using Journal.Models
+@inject IJournalService JournalService
+@inject NavigationManager Navigation
+
+<div class="journal-view-page">
+    <div class="view-header">
+        <a class="btn-back" href="/journals">
+            Back to Journals
+        </a>
+    </div>
+
+    @if (Entry == null)
+    {
+        <div class="journal-view-card">
+            <p class="loading-text">Loading journal entry...</p>
+        </div>
+    }
+    else
+    {
+        <div class="journal-view-card">
+            <div class="view-top">
+                <div class="journal-date-badge">
+                    <span class="date-day">@Entry.CreatedAt.ToLocalTime().Day</span>
+                    <span class="date-month">
+                        @Entry.CreatedAt.ToLocalTime().ToString("MMM")
+                    </span>
+                </div>
+
+                <div class="mood-group">
+                    @if (!string.IsNullOrWhiteSpace(Entry.Mood))
+                    {
+                        <span class="mood-badge">
+                            <span class="mood-text">@Entry.Mood</span>
+                        </span>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Entry.SecondaryMood1))
+                    {
+                        <span class="mood-badge secondary">
+                            <span class="mood-text">@Entry.SecondaryMood1</span>
+                        </span>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Entry.SecondaryMood2))
+                    {
+                        <span class="mood-badge secondary">
+                            <span class="mood-text">@Entry.SecondaryMood2</span>
+                        </span>
+                    }
+                </div>
+            </div>
+
+            <h1 class="journal-title">@Entry.Title</h1>
+
+            <div class="journal-meta">
+                <span>
+                    @Entry.CreatedAt.ToLocalTime().ToString("dddd, MMM dd yyyy")
+                </span>
+                <span>
+                    @Entry.CreatedAt.ToLocalTime().ToString("hh:mm tt")
+                </span>
+            </div>
+
+            <div class="journal-content">
+                @Entry.Content
+            </div>
+
+            <button @onclick="() => NavigateTo(Entry.Id) " class="btn-update">
+                Update
+            </button>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private JournalEntry? Entry;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Entry = await JournalService.GetJournalByIdAsync(Id);
+    }
+
+    private void NavigateTo(int id)
+    {
+        Navigation.NavigateTo($"/journal/edit/{id}");
+    }
+}
