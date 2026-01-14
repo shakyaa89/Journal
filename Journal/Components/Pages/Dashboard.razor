@@ -3,7 +3,9 @@
 @using Journal.Services
 @inject IJournalService JournalService
 @inject IAuthService AuthService
+@inject IAnalyticsService AnalyticsService
 @inject NavigationManager Navigation
+@inject IJSRuntime JS
 
 <div class="dashboard-container">
     <div class="dashboard-content">
@@ -13,6 +15,16 @@
         <div class="dashboard-actions">
             <button class="btn primary-btn" @onclick="NavigateToNewJournal">New Journal Entry</button>
             <button class="btn primary-btn" @onclick="NavigateToJournalList">View All Journals</button>
+        </div>
+
+        <div class="mood-chart">
+            @if (chartRendered == false)
+            {
+                <div class="chart-loading">
+                    Loading chart…
+                </div>
+            }
+            <canvas id="moodChart"></canvas>
         </div>
 
         <div class="dashboard-stats">
@@ -56,28 +68,50 @@
     private int totalJournals;
     private JournalEntry? recentJournal;
     private List<JournalEntry> journals = new List<JournalEntry>();
+    private Dictionary<string, double> moodDistribution = new Dictionary<string, double>();
+
+    private bool chartRendered;
 
     protected async override Task OnInitializedAsync()
     {
-        currentUser = AuthService.GetCurrentUser();
+        currentUser = await AuthService.GetCurrentUser();
         if (currentUser == null)
         {
             Navigation.NavigateTo("/login");
             return;
         }
 
-        // Example: fetch journals from a service or DB
         journals = await JournalService.GetAllJournalsAsync(currentUser.Id);
         totalJournals = journals.Count;
         recentJournal = journals.OrderByDescending(j => j.CreatedAt).FirstOrDefault();
+
+        moodDistribution = AnalyticsService.GetMoodDistribution(journals);
+        chartRendered = false;
+
+        StateHasChanged();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (chartRendered) return;
+
+
+        var labels = moodDistribution.Keys.ToArray();
+        var values = moodDistribution.Values.ToArray();
+           
+        chartRendered = true;
+
+        await InvokeAsync(StateHasChanged);
+
+        await JS.InvokeVoidAsync(
+            "renderMoodChart",
+            "moodChart",
+            labels,
+            values,
+            "pie" 
+        );
     }
 
     private void NavigateToNewJournal() => Navigation.NavigateTo("/journal/add");
     private void NavigateToJournalList() => Navigation.NavigateTo("/journal/list");
-
-    private void Logout()
-    {
-        // AuthService.Logout();
-        Navigation.NavigateTo("/login");
-    }
 }

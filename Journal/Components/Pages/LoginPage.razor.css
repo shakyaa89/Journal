@@ -71,7 +71,7 @@
     }
 
         .login-page .register-link a {
-            color: var(--link);
+            color: var(--accent);
             cursor: pointer;
             text-decoration: underline;
         }

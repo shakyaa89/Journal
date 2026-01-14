@@ -40,6 +40,8 @@ namespace Journal.Services
             
             if (user != null && BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
             {
+                string userString = System.Text.Json.JsonSerializer.Serialize(user);
+                await SecureStorage.SetAsync("user", userString);
                 return user;
             }
             else
@@ -49,8 +51,21 @@ namespace Journal.Services
         }
 
         private User? _currentUser;
-        public void SetCurrentUser(User user) => _currentUser = user;
-        public User? GetCurrentUser() => _currentUser;
-        public void Logout() => _currentUser = null;
+
+        public async Task<User?> GetCurrentUser()
+        {
+            string userString = await SecureStorage.GetAsync("user");
+            if (!string.IsNullOrEmpty(userString))
+            {
+                User? storageUser = System.Text.Json.JsonSerializer.Deserialize<User>(userString);
+                return storageUser;
+            }
+
+            return null;
+        }
+        public void LogoutUser()
+        {
+            SecureStorage.Remove("user");
+        }
     }
 }

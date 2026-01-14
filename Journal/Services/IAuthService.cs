@@ -8,7 +8,8 @@ namespace Journal.Services
 
         Task<User?> LoginUserAsync(string email, string password);
 
-        void SetCurrentUser(User user);
-        User? GetCurrentUser();
+        Task<User?> GetCurrentUser();
+
+        void LogoutUser();
     }
 }

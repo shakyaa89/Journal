@@ -15,6 +15,7 @@
             </div>
         </div>
     </div>
+    <div class="app-sidebar-main-container">
     <nav class="app-sidebar-nav">
         <ul class="app-sidebar-list">
             <li class="app-sidebar-item">
@@ -35,16 +36,28 @@
                     <span class="app-sidebar-text">New Entry</span>
                 </a>
             </li>
+           
         </ul>
     </nav>
+        <nav class="app-sidebar-nav app-sidebar-bottom">
+            <ul class="app-sidebar-list">
+                <li class="app-sidebar-item">
+                    <a class="app-sidebar-link app-sidebar-bottom-btn" @onclick='() => LogoutAsync()'>
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                        <span class="app-sidebar-text">Logout</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
 </div>
 
 @code {
     private User? currentUser;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        currentUser = AuthService.GetCurrentUser();
+        currentUser = await AuthService.GetCurrentUser();
     }
 
     private void Navigate(string path)
@@ -61,5 +74,31 @@
             return $"{parts[0][0]}{parts[1][0]}".ToUpper();
         }
         return currentUser.FullName.Length > 0 ? currentUser.FullName[0].ToString().ToUpper() : "?";
+    }
+
+    private async Task<bool> ShowLogoutAlertAsync()
+    {
+        bool confirmation = await (Application.Current!.MainPage!.DisplayAlert(
+            title: "Confirm Logout",
+            message: "Are you sure you want to logout?",
+            accept: "Yes",
+            cancel: "No"
+        ));
+
+        return confirmation;
+    }
+
+    private async Task LogoutAsync()
+    {
+        if(await ShowLogoutAlertAsync())
+        {
+            AuthService.LogoutUser();
+        }
+        else
+        {
+            return;
+        }
+
+        NavigationManager.NavigateTo("/login");
     }
 }

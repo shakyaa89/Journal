@@ -42,7 +42,7 @@
         <!-- Secondary Moods Section -->
         <div class="sidebar-card">
             <div class="card-header">
-                <label>SECONDARY MOODS <span class="mood-limit">(Max 2)</span></label>
+                <label>SECONDARY MOODS <span class="mood-limit">(Select 2)</span></label>
             </div>
             <div class="secondary-moods">
                 @foreach (var mood in MoodsList)
@@ -219,9 +219,9 @@
 
     private User? currentUser;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        currentUser = AuthService.GetCurrentUser();
+        currentUser = await AuthService.GetCurrentUser();
 
         if (currentUser == null)
         {

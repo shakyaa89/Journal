@@ -15,14 +15,29 @@
     --primary-btn-hover: #4ade8040;
     --secondary-btn-bg: #4ade8040;
     --secondary-btn-hover: #4ade80;
-    --link: #4ade80;
+    --accent: #4ade80;
+    --error: #ef4444;
+}
+
+.light {
+    --primary-bg: #fff;
+    --secondary-bg: #ddd;
+    --text: #e1e1e1;
+    --btn-text: #1e1e1e;
+    --muted: #898989;
+    --border: #253733;
+    --primary-btn-bg: #4ade80;
+    --primary-btn-hover: #4ade8040;
+    --secondary-btn-bg: #4ade8040;
+    --secondary-btn-hover: #4ade80;
+    --accent: #4ade80;
     --error: #ef4444;
 }
 
 html, body {
     width: 100%;
     min-height: 100%;
-    background: var(--primary-bg);
+    background-color: var(--primary-bg);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana;
 }
 
@@ -50,19 +65,9 @@ body {
 
     .primary-btn:hover {
         background-color: transparent;
-        color: var(--link);
+        color: var(--accent);
     }
 
-/*.secondary-btn {
-    background-color: var(--secondary-btn-bg);
-    color: var(--text);
-    border: 1px solid var(--border);
-}
-
-    .secondary-btn:hover {
-        background-color: var(--secondary-btn-hover);
-        color: var(--text);
-    }*/
 
 .login-page .input,
 .register-page .input {
@@ -75,6 +80,14 @@ body {
 }
 
 ::selection{
-    background-color: var(--link);
+    background-color: var(--accent);
     color: var(--primary-bg);
+}
+
+.initial-loader {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--accent);
 }

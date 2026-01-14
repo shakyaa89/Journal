@@ -14,7 +14,7 @@
 
 .btn-update {
     padding: 0.6rem 1.25rem;
-    background-color: var(--link);
+    background-color: var(--accent);
     color: var(--primary-bg);
     border: none;
     border-radius: 0.5rem;
@@ -32,7 +32,7 @@
 
 .btn-back {
     padding: 0.6rem 1.25rem;
-    background-color: var(--link);
+    background-color: var(--accent);
     color: var(--primary-bg);
     border: none;
     border-radius: 3rem;
@@ -83,7 +83,7 @@
     }
 
 .mood-text {
-    color: var(--link);
+    color: var(--accent);
     font-size: 0.875rem;
     font-weight: 600;
 }

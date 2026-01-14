@@ -13,11 +13,13 @@
     <link rel="icon" href="data:,">
 </head>
 
-<body>
+<body class="">
 
     <div class="status-bar-safe-area"></div>
 
-    <div id="app">Loading...</div>
+    <div id="app">
+        <div class="initial-loader">Loading...</div>
+    </div>
 
     <!--<div id="blazor-error-ui">
         An unhandled error has occurred.
@@ -29,6 +31,10 @@
     <script src="https://kit.fontawesome.com/722cfb3fc9.js" crossorigin="anonymous"></script>
 
     <script src="_content/Syncfusion.Blazor/scripts/syncfusion-blazor.min.js"></script>
+
+    <!--for charts: chart.js-->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/journal-chart.js"></script>
 
 </body>
 

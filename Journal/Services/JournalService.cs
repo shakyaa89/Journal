@@ -58,7 +58,6 @@ namespace Journal.Services
             string secondaryMood2,
             int userId)
         {
-            // ensure entry exists + belongs to user
             var existing = await _journalRepository.FetchJournalByIdAsync(id);
             if (existing == null || existing.UserId != userId)
                 return null;

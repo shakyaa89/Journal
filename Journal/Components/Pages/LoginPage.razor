@@ -7,7 +7,7 @@
 
 <div class="login-page">
     <div class="login-container">
-        <button class="back-btn" onclick="history.back()">Back</button>
+        <button class="back-btn" @onclick="NavigateToHome">Back</button>
 
         <h2>Login to Your Journal</h2>
 
@@ -51,7 +51,6 @@
             var user = await AuthService.LoginUserAsync(loginModel.Email, loginModel.Password);
             if (user != null)
             {
-                AuthService.SetCurrentUser(user);
                 Navigation.NavigateTo("/dashboard");
             }
             else
@@ -65,10 +64,9 @@
         }
     }
 
-    private void NavigateToRegister()
-    {
-        Navigation.NavigateTo("/register");
-    }
+    private void NavigateToRegister() => Navigation.NavigateTo("/register");
+
+    private void NavigateToHome() => Navigation.NavigateTo("/");
 
     public class LoginModel
     {

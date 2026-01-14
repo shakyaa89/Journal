@@ -5,7 +5,7 @@
 @inject IAuthService AuthService
 
 <div class="register-page">
-    <button class="back-btn" @onclick="GoBack">Back</button>
+    <button class="back-btn" @onclick="NavigateToHome">Back</button>
 
     <div class="register-container">
         <h2>Create Account</h2>
@@ -74,10 +74,8 @@
         }
     }
 
-    private void GoBack()
-    {
-        Navigation.NavigateTo("/");
-    }
+    private void NavigateToHome() => Navigation.NavigateTo("/");
+    
 
     private class RegisterModel
     {

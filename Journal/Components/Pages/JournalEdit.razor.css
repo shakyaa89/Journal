@@ -30,7 +30,7 @@
 }
 
     .card-header label {
-        color: var(--link);
+        color: var(--accent);
         font-size: 0.75rem;
         font-weight: 700;
         letter-spacing: 0.08em;
@@ -58,7 +58,7 @@
 
 .date-icon {
     font-size: 1.5rem;
-    color: var(--link);
+    color: var(--accent);
 }
 
     .date-icon i {
@@ -101,18 +101,18 @@
 }
 
     .mood-item:hover {
-        background-color: rgba(var(--link), 0.5);
-        border-color: var(--link);
+        background-color: rgba(var(--accent), 0.5);
+        border-color: var(--accent);
     }
 
     .mood-item.active {
-        background-color: rgba(var(--link), 0.5);
-        border-color: var(--link);
+        background-color: rgba(var(--accent), 0.5);
+        border-color: var(--accent);
     }
 
 .mood-icon {
     font-size: 1.75rem;
-    color: var(--link);
+    color: var(--accent);
 }
 
 .mood-label {
@@ -124,7 +124,7 @@
 }
 
 .mood-item.active .mood-label {
-    color: var(--link);
+    color: var(--accent);
 }
 
 .secondary-moods {
@@ -152,15 +152,15 @@
     }
 
     .mood-chip:hover {
-        background-color: rgba(var(--link), 0.3);
-        border-color: var(--link);
+        background-color: rgba(var(--accent), 0.3);
+        border-color: var(--accent);
         color: var(--text);
     }
 
     .mood-chip.active {
         background-color: rgba(74, 222, 128, 0.2);
-        border-color: var(--link);
-        color: var(--link);
+        border-color: var(--accent);
+        color: var(--accent);
     }
 
 /* Main Content */
@@ -229,7 +229,7 @@
     border: 1px solid var(--border);
     border-radius: 5rem;
     margin-top: 0.5rem;
-    color: var(--link);
+    color: var(--accent);
 }
 
     .btn-cancel:hover {

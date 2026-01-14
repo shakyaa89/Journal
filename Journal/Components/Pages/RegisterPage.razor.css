@@ -69,7 +69,7 @@
     }
 
         .register-page .register-link a {
-            color: var(--link);
+            color: var(--accent);
         }
 
 /* Back button */

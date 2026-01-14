@@ -54,7 +54,7 @@
 .btn-add-first {
     display: inline-block;
     padding: 0.875rem 2rem;
-    background-color: var(--link);
+    background-color: var(--accent);
     color: var(--primary-bg);
     text-decoration: none;
     border-radius: 0.5rem;
@@ -63,7 +63,7 @@
 }
 
     .btn-add-first:hover {
-        background-color: var(--link);
+        background-color: var(--accent);
         opacity: 0.9;
         transform: translateY(-2px);
     }
@@ -87,7 +87,7 @@
 }
 
     .journal-card:hover {
-        border-color: var(--link);
+        border-color: var(--accent);
         transform: translateY(-4px);
     }
 
@@ -137,11 +137,11 @@
 }
 
 .mood-emoji i{
-    color: var(--link);
+    color: var(--accent);
 }
 
 .mood-text {
-    color: var(--link);
+    color: var(--accent);
     font-size: 0.875rem;
     font-weight: 600;
 }
@@ -177,7 +177,7 @@
 .btn-read-more {
     background: none;
     border: none;
-    color: var(--link);
+    color: var(--accent);
     font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
@@ -201,7 +201,7 @@
     align-items: center;
     gap: 0.75rem;
     padding: 1rem 1.75rem;
-    background-color: var(--link);
+    background-color: var(--accent);
     color: var(--primary-bg);
     text-decoration: none;
     border-radius: 3rem;
@@ -279,14 +279,14 @@
 
     .page-btn:hover,
     .page-number:hover {
-        background-color: rgba(var(--link), 0.25);
-        border-color: var(--link);
+        background-color: rgba(var(--accent), 0.25);
+        border-color: var(--accent);
     }
 
     .page-number.active {
-        background-color: rgba(var(--link), 0.5);
-        border-color: var(--link);
-        color: var(--link);
+        background-color: rgba(var(--accent), 0.5);
+        border-color: var(--accent);
+        color: var(--accent);
         font-weight: 700;
     }
 

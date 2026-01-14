@@ -2,82 +2,90 @@
 @inject NavigationManager Navigation
 @inject IAuthService AuthService
 
-<div class="hero-page">
-    <div class="hero-content">
-        <!-- Main Hero Section -->
-        <div class="hero-left">
-            <div class="hero-badge">
-                <span class="badge-dot"></span>
-                Your Digital Sanctuary
-            </div>
-
-            <h1 class="hero-title">
-                Where thoughts
-                <span class="title-highlight">become clarity</span>
-            </h1>
-
-            <p class="hero-description">
-                A private space to capture moments, track moods, and discover patterns in your journey.
-            </p>
-
-            <!-- Quote Section -->
-            <div class="hero-quote">
-                <div class="quote-mark">"</div>
-                <p class="quote-content">@selectedQuote</p>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="hero-actions">
-                <button class="btn-hero-primary" @onclick="GoToRegister">
-                    Start Your Journey
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                </button>
-                <button class="btn-hero-ghost" @onclick="GoToLogin">
-                    Already a member?
-                </button>
-            </div>
-        </div>
-
-        <!-- Visual Section -->
-        <div class="hero-right">
-            <div class="journal-mockup">
-                <div class="mockup-header">
-                    <div class="mockup-dots">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
-                    <div class="mockup-date">December 28, 2025</div>
-                </div>
-                <div class="mockup-content">
-                    <div class="mockup-title">Today was meaningful...</div>
-                    <div class="mockup-line"></div>
-                    <div class="mockup-line short"></div>
-                    <div class="mockup-line"></div>
-                    <div class="mockup-mood">
-                        <span class="mood-emoji">😊</span>
-                        <span class="mood-text">Happy</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Stats Preview -->
-            <div class="stats-preview">
-                <div class="stat-item">
-                    <div class="stat-number">Insightful Dashboard</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">Intuitive UI Design</div>
-                </div>
-            </div>
-        </div>
+@* @if (loading)
+{
+    <div class="loading-div">
+        <p class="loading-text">Loading...</p>
     </div>
+}
+else
+{ *@
+    <div class="hero-page">
+        <div class="hero-content">
+            <!-- Main Hero Section -->
+            <div class="hero-left">
+                <div class="hero-badge">
+                    <span class="badge-dot"></span>
+                    Your Digital Sanctuary
+                </div>
 
-    <div class="activity-card">
+                <h1 class="hero-title">
+                    Where thoughts
+                    <span class="title-highlight">become clarity</span>
+                </h1>
+
+                <p class="hero-description">
+                    A private space to capture moments, track moods, and discover patterns in your journey.
+                </p>
+
+                <!-- Quote Section -->
+                <div class="hero-quote">
+                    <div class="quote-mark">"</div>
+                    <p class="quote-content">@selectedQuote</p>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="hero-actions">
+                    <button class="btn-hero-primary" @onclick="GoToRegister">
+                        Start Your Journey
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </button>
+                    <button class="btn-hero-ghost" @onclick="GoToLogin">
+                        Already a member?
+                    </button>
+                </div>
+            </div>
+
+            <!-- Visual Section -->
+            <div class="hero-right">
+                <div class="journal-mockup">
+                    <div class="mockup-header">
+                        <div class="mockup-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <div class="mockup-date">December 28, 2025</div>
+                    </div>
+                    <div class="mockup-content">
+                        <div class="mockup-title">Today was meaningful...</div>
+                        <div class="mockup-line"></div>
+                        <div class="mockup-line short"></div>
+                        <div class="mockup-line"></div>
+                        <div class="mockup-mood">
+                            <span class="mood-emoji">😊</span>
+                            <span class="mood-text">Happy</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Preview -->
+                <div class="stats-preview">
+                    <div class="stat-item">
+                        <div class="stat-number">Insightful Dashboard</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">Intuitive UI Design</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="activity-card">
             <div class="card-header-dash">
-            <h2>Journal <span style="color: var(--link);">Examples</span></h2>
+                <h2>Journal <span style="color: var(--accent);">Examples</span></h2>
                 <span class="card-subtitle">3 entries</span>
             </div>
             <div class="activity-list">
@@ -128,12 +136,12 @@
 
             </div>
         </div>
-
-
-   
-</div>
+    </div>
+@* } *@
 
 @code {
+    private bool loading = true;
+
     private readonly List<string> quotes = new List<string>
     {
         "Write what feels heavy. Read what feels light",
@@ -145,9 +153,10 @@
 
     private string selectedQuote = string.Empty;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        var currentUser = AuthService.GetCurrentUser();
+        loading = true;
+        var currentUser = await AuthService.GetCurrentUser();
         if (currentUser != null)
         {
             Navigation.NavigateTo("/dashboard");
@@ -157,6 +166,7 @@
         var random = new Random();
         int randomIndex = random.Next(quotes.Count);
         selectedQuote = quotes[randomIndex];
+        loading = false;
     }
 
     private void GoToLogin()

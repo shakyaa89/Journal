@@ -28,7 +28,7 @@
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background-color: var(--link);
+    background-color: var(--accent);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -64,9 +64,19 @@
     text-overflow: ellipsis;
 }
 
+.app-sidebar-main-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.app-sidebar-bottom{
+    margin-top: auto;
+    padding-bottom: 1.5rem;
+}
+
 .app-sidebar-nav {
     padding: 1.5rem 0;
-    flex: 1;
 }
 
 .app-sidebar-list {
@@ -102,7 +112,7 @@
 }
 
     .app-sidebar-link:hover {
-        background-color: var(--link);
+        background-color: var(--accent);
         color: var(--btn-text);
         text-decoration: none;
         border-radius: 0.5rem;
@@ -122,6 +132,10 @@
         line-height: 1;
         opacity: 0.9;
     }
+
+.app-sidebar-bottom-btn {
+    border-top: 1px solid var(--border);
+}
 
 
 @media (max-width: 768px) {
