@@ -1,10 +1,10 @@
-/* ===== Journal Edit Page CSS (same style as Add page) ===== */
 
 .journal-container {
     display: grid;
     grid-template-columns: 400px 1fr;
     gap: 0;
     min-height: 100vh;
+    background-color: var(--primary-bg);
 }
 
 .journal-sidebar {
@@ -52,9 +52,10 @@
     gap: 1rem;
     padding: 1rem;
     border-radius: 0.75rem;
-    cursor: default;
+    cursor: pointer;
     transition: background-color 0.2s;
 }
+
 
 .date-icon {
     font-size: 1.5rem;
@@ -82,7 +83,7 @@
 
 .mood-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.625rem;
 }
 
@@ -144,7 +145,6 @@
     font-size: 0.875rem;
     cursor: pointer;
     transition: all 0.2s;
-    user-select: none;
 }
 
     .mood-chip input[type="checkbox"] {
@@ -163,10 +163,123 @@
         color: var(--accent);
     }
 
+.add-custom-btn {
+    padding: 0.625rem 1rem;
+    background-color: transparent;
+    border: 1px dashed var(--border);
+    border-radius: 2rem;
+    color: var(--muted);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+    .add-custom-btn:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+    }
+
+.tags-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.625rem;
+}
+
+.tag-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: rgba(74, 222, 128, 0.2);
+    border: 1px solid var(--accent);
+    border-radius: 2rem;
+    color: var(--accent);
+    font-size: 0.875rem;
+}
+
+.tag-remove {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+    .tag-remove:hover {
+        opacity: 1;
+    }
+
+.tag-input {
+    flex: 1;
+    min-width: 200px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border);
+    border-radius: 2rem;
+    padding: 0.625rem 1rem;
+    color: var(--text);
+    font-size: 0.875rem;
+    outline: none;
+}
+
+    .tag-input::placeholder {
+        color: var(--muted);
+    }
+
+    .tag-input:focus {
+        border-color: var(--accent);
+    }
+
+.sidebar-actions {
+    margin-top: auto;
+    padding-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    border-top: 1px solid var(--border);
+}
+
+.btn-cancel {
+    width: 100%;
+    padding: 12px 28px;
+    background-color: transparent;
+    border: 1px solid var(--border);
+    border-radius: 5rem;
+    margin-top: 0.5rem;
+    color: var(--accent);
+}
+
+    .btn-cancel:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+
+.btn-save {
+    width: 100%;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 0.5rem;
+}
+
 /* Main Content */
 .journal-main {
     padding: 2rem 3rem;
     overflow-y: auto;
+}
+
+#quill-toolbar {
+    border: 1px solid var(--border);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.5rem;
+    border-radius: 0.75rem;
+    background-color: var(--primary-bg);
 }
 
 .editor-container {
@@ -186,7 +299,6 @@
     font-size: 1.75rem;
     font-weight: 600;
     padding: 0 0 1rem 0;
-    margin-bottom: 1rem;
     outline: none;
 }
 
@@ -195,24 +307,14 @@
         opacity: 0.5;
     }
 
-.entry-content {
+#editor {
     width: 100%;
     min-height: 400px;
     background: none;
     border: none;
     color: var(--text);
     font-size: 1rem;
-    line-height: 1.8;
-    padding: 0;
-    outline: none;
-    resize: none;
-    font-family: inherit;
 }
-
-    .entry-content::placeholder {
-        color: var(--muted);
-        opacity: 0.5;
-    }
 
 .word-count {
     position: absolute;
@@ -221,35 +323,6 @@
     color: var(--muted);
     font-size: 0.85rem;
 }
-
-.btn-cancel {
-    width: 100%;
-    padding: 12px 28px;
-    background-color: transparent;
-    border: 1px solid var(--border);
-    border-radius: 5rem;
-    margin-top: 0.5rem;
-    color: var(--accent);
-}
-
-    .btn-cancel:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-    }
-
-.btn-save {
-    width: 100%;
-    font-size: 0.95rem;
-    font-weight: 600;
-    cursor: pointer;
-    margin-top: 0.5rem;
-}
-
-    /* Disabled buttons (when loading) */
-    .btn-save:disabled,
-    .btn-cancel:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-    }
 
 .error-msg {
     color: var(--error);
@@ -284,5 +357,9 @@
 
     .mood-grid {
         grid-template-columns: repeat(3, 1fr);
+    }
+
+    .sidebar-actions {
+        flex-direction: column;
     }
 }

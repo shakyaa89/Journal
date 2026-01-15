@@ -4,6 +4,7 @@
 @inject NavigationManager Navigation
 @inject IJournalService JournalService
 @inject IAuthService AuthService
+@inject IJSRuntime JS
 
 <div class="journal-container">
     <div class="journal-sidebar">
@@ -65,14 +66,29 @@
 
     <div class="journal-main">
 
+        <div id="quill-toolbar" class="quill-toolbar">
+            <button class="ql-bold"></button>
+            <button class="ql-italic"></button>
+            <button class="ql-underline"></button>
+
+            <button class="ql-list" value="ordered"></button>
+            <button class="ql-list" value="bullet"></button>
+
+            <select class="ql-header">
+                <option value="1"></option>
+                <option value="2"></option>
+                <option selected></option>
+            </select>
+
+            <button class="ql-clean"></button>
+        </div>
+
         <div class="editor-container">
             <input class="entry-title"
                    placeholder="Entry Title..."
                    @bind="editJournal.Title" />
 
-            <textarea class="entry-content"
-                      placeholder="Start writing your thoughts here..."
-                      @bind="editJournal.Content"></textarea>
+            <div id="editor"></div>
 
             <div class="word-count">0 words</div>
         </div>
@@ -163,6 +179,8 @@
     {
         errorMessage = string.Empty;
 
+        editJournal.Content = await JS.InvokeAsync<string>("getQuillContent");
+
         if (string.IsNullOrWhiteSpace(editJournal.Title) ||
             string.IsNullOrWhiteSpace(editJournal.Content) ||
             string.IsNullOrWhiteSpace(editJournal.Mood))
@@ -204,4 +222,14 @@
     }
 
     private void GoToList() => Navigation.NavigateTo("/journal/list");
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("initQuill", "editor", "quill-toolbar");
+
+            await JS.InvokeVoidAsync("setQuillHtml", editJournal.Content ?? "");
+        }
+    }
 }
