@@ -21,20 +21,16 @@
         <div class="journal-view-card">
             <div class="view-top">
                 <div class="journal-date-badge">
-                    <span class="date-day">@Entry.CreatedAt.ToLocalTime().Day</span>
-                    <span class="date-month">
-                        @Entry.CreatedAt.ToLocalTime().ToString("MMM")
-                    </span>
-                </div>
-
-                <div class="mood-group">
                     @if (!string.IsNullOrWhiteSpace(Entry.Mood))
                     {
                         <span class="mood-badge">
                             <span class="mood-text">@Entry.Mood</span>
                         </span>
                     }
+                </div>
 
+                <div class="mood-group">
+                    
                     @if (!string.IsNullOrWhiteSpace(Entry.SecondaryMood1))
                     {
                         <span class="mood-badge secondary">
@@ -63,7 +59,7 @@
             </div>
 
             <div class="journal-content">
-                @Entry.Content
+                @((MarkupString)@Entry.Content)
             </div>
 
             <button @onclick="() => NavigateTo(Entry.Id) " class="btn-update">

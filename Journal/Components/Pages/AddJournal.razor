@@ -1,10 +1,10 @@
 ﻿@page "/journal/add"
 @using Journal.Models;
 @using Journal.Services;
-@using Syncfusion.Blazor.RichTextEditor
 @inject NavigationManager Navigation
 @inject IJournalService JournalService
 @inject IAuthService AuthService
+@inject IJSRuntime JS
 
 <div class="journal-container">
     <div class="journal-sidebar">
@@ -74,19 +74,23 @@
 
     <div class="journal-main">
         <!-- Toolbar -->
-        @* <div class="editor-toolbar">
-            <div class="toolbar-left">
-                <button class="toolbar-btn"><strong>B</strong></button>
-                <button class="toolbar-btn"><em>I</em></button>
-                <button class="toolbar-btn"><u>U</u></button>
-                <button class="toolbar-btn">☰</button>
-                <button class="toolbar-btn">≡</button>
-            </div>
-            <div class="toolbar-right">
-                <button class="toolbar-btn">⊕</button>
-                <button class="toolbar-btn">⤢</button>
-            </div>
-        </div> *@
+        <div id="quill-toolbar" class="quill-toolbar">
+    <button class="ql-bold"></button>
+    <button class="ql-italic"></button>
+    <button class="ql-underline"></button>
+
+    <button class="ql-list" value="ordered"></button>
+    <button class="ql-list" value="bullet"></button>
+
+    <select class="ql-header">
+        <option value="1"></option>
+        <option value="2"></option>
+        <option selected></option>
+    </select>
+
+    <button class="ql-clean"></button>
+</div>
+
 
         <!-- Editor Area -->
         <div class="editor-container">
@@ -95,12 +99,7 @@
                    placeholder="Entry Title..."
                    @bind="newJournal.Title" />
 
-            <textarea class="entry-content"
-                      placeholder="Start writing your thoughts here..."
-                      @bind="newJournal.Content"></textarea>
-
-            @* <SfRichTextEditor EditorMode="EditorMode.Markdown" Height="400px" CssClass="journal-editor">
-            </SfRichTextEditor> *@
+            <div id="editor"></div>
 
             <div class="word-count">0 words</div>
         </div>
@@ -129,7 +128,8 @@
 
     private List<string> selectedSecondaryMoods = new();
 
-    private void ToggleSecondaryMood(string mood, Microsoft.AspNetCore.Components.ChangeEventArgs e)
+    // Secondary mood selection
+    private void ToggleSecondaryMood(string mood, ChangeEventArgs e)
     {
         var isChecked = (bool)e.Value;
 
@@ -144,11 +144,7 @@
         }
     }
 
-    
-
-
-
-
+    // Add Journal Entry
     private async Task SaveEntryAsync()
     {
         var today = DateTime.Now.Date;
@@ -157,6 +153,8 @@
         {
             var journals = await JournalService.GetAllJournalsAsync(currentUser!.Id);
             bool existsToday = journals.Any(j => j.CreatedAt.Date == today);
+
+            newJournal.Content = await JS.InvokeAsync<string>("getQuillContent");
 
             if (string.IsNullOrEmpty(newJournal.Title) || string.IsNullOrEmpty(newJournal.Content)) 
             {
@@ -182,15 +180,10 @@
                 return;
             }
 
-
-            
-
-
             if (!string.IsNullOrWhiteSpace(newJournal.Title) && !string.IsNullOrWhiteSpace(newJournal.Content))
             {
                 newJournal.SecondaryMood1 = selectedSecondaryMoods[0];
                 newJournal.SecondaryMood2 = selectedSecondaryMoods[1];
-
 
                 await JournalService.AddJournalEntryAsync(
                     newJournal.Title,
@@ -213,12 +206,12 @@
         }
     }
 
-
+    // Navigate to Journal List
     private void GoToList() => Navigation.NavigateTo("/journal/list");
-
 
     private User? currentUser;
 
+    // Initial Check for User
     protected override async Task OnInitializedAsync()
     {
         currentUser = await AuthService.GetCurrentUser();
@@ -229,5 +222,16 @@
             return;
         }
     }
+
+    private string markdownContent = "";
+ 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("initQuill", "editor", "quill-toolbar");
+        }
+    }
+ 
 
 }

@@ -42,7 +42,7 @@
                     </div>
 
                     <h3 class="journal-title">@journal.Title</h3>
-                    <p class="journal-preview">@GetPreview(journal.Content)</p>
+                    <p class="journal-preview">@((MarkupString)@GetPreview(journal.Content))</p>
 
                     <div class="card-footer">
                         <span class="journal-time">@journal.CreatedAt.ToString("h:mm tt")</span>
@@ -147,7 +147,7 @@
     private string GetPreview(string content)
     {
         if (string.IsNullOrEmpty(content)) return "";
-        return content.Length > 150 ? content.Substring(0, 150) + "..." : content;
+        return content.Length > 150 ? content.Substring(0, 16) + "..." : content;
     }
 
     private void ViewJournal(int id)
