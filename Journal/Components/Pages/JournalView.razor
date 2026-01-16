@@ -30,7 +30,6 @@
                 </div>
 
                 <div class="mood-group">
-                    
                     @if (!string.IsNullOrWhiteSpace(Entry.SecondaryMood1))
                     {
                         <span class="mood-badge secondary">
@@ -46,6 +45,22 @@
                     }
                 </div>
             </div>
+
+            @if (Entry.Tags != null && Entry.Tags.Count > 0)
+            {
+                <div class="journal-tags-container">
+                    <p>TAGS</p> <br />
+                    <div class="journal-tags-inside">
+                        @foreach (string tags in Entry.Tags)
+                        {
+                            <span class="mood-badge secondary">
+                                <span class="mood-text">@tags</span>
+                            </span>
+                        }
+                    </div>
+                </div>
+            }
+            
 
             <h1 class="journal-title">@Entry.Title</h1>
 

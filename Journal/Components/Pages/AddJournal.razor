@@ -62,10 +62,23 @@
             <div class="card-header">
                 <label>TAGS</label>
             </div>
+            <div class="tags-container">
+            @foreach (var tag in AvailableTags)
+            {
+                <label class="tag-chip @(selectedTags.Contains(tag) ? "active" : "")">
+                    <input type="checkbox"
+                           checked="@selectedTags.Contains(tag)"
+                           @onchange="e => ToggleTag(tag, e)" />
+                    <span>@tag</span>
+                </label>
+            }
+            </div>
             <div class="tags-section">
                 <input type="text"
                        class="tag-input"
-                       placeholder="# Add tags (e.g. Health, Hobbies)..." />
+                       placeholder="# Add tags (e.g. Health, Hobbies)..."
+                       @bind="newTagText"/>
+                <button @onclick="AddCustomTag">Add Tag</button>
             </div>
         </div>
 
@@ -122,11 +135,16 @@
     private JournalEntry newJournal = new JournalEntry();
     private string errorMessage = string.Empty;
 
+    private User? currentUser;
+
     private List<string> AvailableTags = new List<string> { "Work", "Career", "Studies", "Family", "Friends", "Relationships", "Health", "Fitness", "Personal Growth", "Self-care", "Hobbies", "Travel", "Nature", "Finance", "Spirituality", "Birthday", "Holiday", "Vacation", "Celebration", "Exercise", "Reading", "Writing", "Cooking", "Meditation", "Yoga", "Music", "Shopping", "Parenting", "Projects", "Planning", "Reflection" };
 
     private List<string> MoodsList = new List<string> { "Happy", "Excited", "Relaxed", "Grateful", "Confident", "Calm", "Thoughtful", "Curious", "Nostalgic", "Bored", "Sad", "Angry", "Stressed", "Lonely", "Anxious" };
 
     private List<string> selectedSecondaryMoods = new();
+
+    private List<string> selectedTags = new();
+    private string newTagText = string.Empty;
 
     // Secondary mood selection
     private void ToggleSecondaryMood(string mood, ChangeEventArgs e)
@@ -185,12 +203,15 @@
                 newJournal.SecondaryMood1 = selectedSecondaryMoods[0];
                 newJournal.SecondaryMood2 = selectedSecondaryMoods[1];
 
+                newJournal.Tags = selectedTags.ToList();
+
                 await JournalService.AddJournalEntryAsync(
                     newJournal.Title,
                     newJournal.Content,
                     newJournal.Mood,
                     newJournal.SecondaryMood1,
                     newJournal.SecondaryMood2,
+                    newJournal.Tags,
                     currentUser.Id
                 );
 
@@ -209,7 +230,38 @@
     // Navigate to Journal List
     private void GoToList() => Navigation.NavigateTo("/journal/list");
 
-    private User? currentUser;
+
+    private void ToggleTag(string tag, ChangeEventArgs e)
+    {
+        var isChecked = (bool)e.Value;
+
+        if (isChecked)
+        {
+            if (!selectedTags.Contains(tag))
+                selectedTags.Add(tag);
+        }
+        else
+        {
+            selectedTags.Remove(tag);
+        }
+    }
+
+    private void AddCustomTag()
+    {
+        var tag = newTagText?.Trim();
+
+        if (!string.IsNullOrWhiteSpace(tag))
+        {
+            if (!AvailableTags.Contains(tag))
+                AvailableTags.Add(tag);
+
+            if (!selectedTags.Contains(tag))
+                selectedTags.Add(tag);
+        }
+
+        newTagText = string.Empty;
+    }
+
 
     // Initial Check for User
     protected override async Task OnInitializedAsync()

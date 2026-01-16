@@ -122,7 +122,7 @@
     margin-top: 0.25rem;
 }
 
-.mood-badge {
+.mood-badge, .tag-badge {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -132,6 +132,7 @@
     border: 1px solid var(--border);
 }
 
+
 .mood-emoji {
     font-size: 1.25rem;
 }
@@ -140,7 +141,7 @@
     color: var(--accent);
 }
 
-.mood-text {
+.mood-text, .tag-text {
     color: var(--accent);
     font-size: 0.875rem;
     font-weight: 600;
@@ -159,6 +160,15 @@
     font-size: 0.95rem;
     line-height: 1.6;
     margin: 0 0 1.5rem 0;
+}
+
+.journal-tags-container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: .5rem;
 }
 
 .card-footer {

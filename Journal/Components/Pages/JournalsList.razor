@@ -44,6 +44,18 @@
                     <h3 class="journal-title">@journal.Title</h3>
                     <p class="journal-preview">@((MarkupString)@GetPreview(journal.Content))</p>
 
+                    @if(journal.Tags != null && journal.Tags.Count > 0)
+                    {
+                        <div class="journal-tags-container">
+                            @foreach (var tag in journal.Tags.Take(5))
+                            {
+                                <div class="tag-badge">
+                                    <span class="tag-text">@tag</span>
+                                </div>
+                            }
+                        </div>
+                    }
+
                     <div class="card-footer">
                         <span class="journal-time">@journal.CreatedAt.ToString("h:mm tt")</span>
                         <button class="btn-read-more" @onclick="() => ViewJournal(journal.Id)">View Journal</button>
@@ -147,7 +159,7 @@
     private string GetPreview(string content)
     {
         if (string.IsNullOrEmpty(content)) return "";
-        return content.Length > 150 ? content.Substring(0, 16) + "..." : content;
+        return content.Length > 60 ? content.Substring(0, 20) + "..." : content;
     }
 
     private void ViewJournal(int id)

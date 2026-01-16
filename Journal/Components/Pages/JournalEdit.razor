@@ -62,6 +62,30 @@
             </div>
         </div>
 
+        <div class="sidebar-card">
+            <div class="card-header">
+                <label>TAGS</label>
+            </div>
+            <div class="tags-container">
+                @foreach (var tag in AvailableTags)
+                {
+                    <label class="tag-chip @(selectedTags.Contains(tag) ? "active" : "")">
+                        <input type="checkbox"
+                               checked="@selectedTags.Contains(tag)"
+                               @onchange="e => ToggleTag(tag, e)" />
+                        <span>@tag</span>
+                    </label>
+                }
+            </div>
+            <div class="tags-section">
+                <input type="text"
+                       class="tag-input"
+                       placeholder="# Add tags (e.g. Health, Hobbies)..."
+                       @bind="newTagText" />
+                <button @onclick="AddCustomTag">Add Tag</button>
+            </div>
+        </div>
+
     </div>
 
     <div class="journal-main">
@@ -119,6 +143,8 @@
     private JournalEntry editJournal = new();
     private string errorMessage = string.Empty;
     private bool isLoading;
+    private List<string> selectedTags = new();
+    private string newTagText = string.Empty;
 
     private readonly List<string> MoodsList = new()
     {
@@ -126,6 +152,9 @@
         "Thoughtful","Curious","Nostalgic",
         "Bored","Sad","Angry","Stressed","Lonely","Anxious"
     };
+
+    private List<string> AvailableTags = new List<string> { "Work", "Career", "Studies", "Family", "Friends", "Relationships", "Health", "Fitness", "Personal Growth", "Self-care", "Hobbies", "Travel", "Nature", "Finance", "Spirituality", "Birthday", "Holiday", "Vacation", "Celebration", "Exercise", "Reading", "Writing", "Cooking", "Meditation", "Yoga", "Music", "Shopping", "Parenting", "Projects", "Planning", "Reflection" };
+
 
     private List<string> selectedSecondaryMoods = new();
 
@@ -150,12 +179,23 @@
 
         editJournal = existing;
 
-        // Preselect existing secondary moods
         if (!string.IsNullOrWhiteSpace(editJournal.SecondaryMood1))
             selectedSecondaryMoods.Add(editJournal.SecondaryMood1);
 
         if (!string.IsNullOrWhiteSpace(editJournal.SecondaryMood2))
             selectedSecondaryMoods.Add(editJournal.SecondaryMood2);
+
+        if(editJournal.Tags != null)
+        {
+            foreach (var tag in editJournal.Tags)
+            {
+                if(!AvailableTags.Contains(tag))
+                    AvailableTags.Add(tag);
+
+                if (!selectedTags.Contains(tag))
+                    selectedTags.Add(tag);
+            }
+        }
 
         isLoading = false;
     }
@@ -198,6 +238,8 @@
         editJournal.SecondaryMood1 = selectedSecondaryMoods[0];
         editJournal.SecondaryMood2 = selectedSecondaryMoods[1];
 
+        editJournal.Tags = selectedTags.ToList();
+
         isLoading = true;
 
         var updated = await JournalService.UpdateJournalEntryAsync(
@@ -207,6 +249,7 @@
             editJournal.Mood,
             editJournal.SecondaryMood1,
             editJournal.SecondaryMood2,
+            editJournal.Tags,
             currentUser!.Id
         );
 
@@ -231,5 +274,36 @@
 
             await JS.InvokeVoidAsync("setQuillHtml", editJournal.Content ?? "");
         }
+    }
+
+    private void ToggleTag(string tag, ChangeEventArgs e)
+    {
+        var isChecked = (bool)e.Value;
+
+        if (isChecked)
+        {
+            if (!selectedTags.Contains(tag))
+                selectedTags.Add(tag);
+        }
+        else
+        {
+            selectedTags.Remove(tag);
+        }
+    }
+
+    private void AddCustomTag()
+    {
+        var tag = newTagText?.Trim();
+
+        if (!string.IsNullOrWhiteSpace(tag))
+        {
+            if (!AvailableTags.Contains(tag))
+                AvailableTags.Add(tag);
+
+            if (!selectedTags.Contains(tag))
+                selectedTags.Add(tag);
+        }
+
+        newTagText = string.Empty;
     }
 }

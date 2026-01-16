@@ -14,7 +14,7 @@ namespace Journal.Services
             _journalRepository = journalRepository;
         }
 
-        public async Task<JournalEntry> AddJournalEntryAsync(string title, string content, string mood, string secondaryMood1, string secondaryMood2, int userId)
+        public async Task<JournalEntry> AddJournalEntryAsync(string title, string content, string mood, string secondaryMood1, string secondaryMood2, List<string>? tags, int userId)
         {
             var journal = new JournalEntry
             {
@@ -23,6 +23,7 @@ namespace Journal.Services
                 Mood = mood,
                 SecondaryMood1 = secondaryMood1,
                 SecondaryMood2 = secondaryMood2,
+                Tags = tags,
                 UserId = userId
             };
 
@@ -56,6 +57,7 @@ namespace Journal.Services
             string mood,
             string secondaryMood1,
             string secondaryMood2,
+            List<string>? tags,
             int userId)
         {
             var existing = await _journalRepository.FetchJournalByIdAsync(id);
@@ -67,6 +69,7 @@ namespace Journal.Services
             existing.Mood = mood;
             existing.SecondaryMood1 = secondaryMood1;
             existing.SecondaryMood2 = secondaryMood2;
+            existing.Tags = tags;
 
             return await _journalRepository.UpdateJournalEntryAsync(existing);
         }

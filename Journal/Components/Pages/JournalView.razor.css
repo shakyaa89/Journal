@@ -60,6 +60,23 @@
     text-align: center;
 }
 
+.journal-tags-container, .moods-div {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-direction: column;
+    width: 100%;
+}
+
+    .journal-tags-container p, .moods-div p {
+        color: var(--accent);
+        font-size: 0.875rem;
+        display: inline-block;
+        font-weight: 600;
+        margin: 0;
+        padding: 0;
+    }
+
 .view-top {
     display: flex;
     justify-content: space-between;
@@ -73,6 +90,17 @@
     gap: 0.5rem;
 }
 
+.journal-tags-inside {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: .5rem;
+}
+
+
+   
 .mood-badge {
     background-color: var(--primary-bg);
     padding: 0.5rem 0.875rem;
