@@ -14,7 +14,6 @@
     @if (journals == null || journals.Count == 0)
     {
         <div class="empty-state">
-            <div class="empty-icon">📝</div>
             <h2>No journal entries yet</h2>
             <p>Start documenting your thoughts and experiences</p>
             <a href="/journal/add" class="btn-add-first">Create Your First Entry</a>
@@ -35,7 +34,7 @@
                         @if (!string.IsNullOrEmpty(journal.Mood))
                         {
                             <div class="mood-badge">
-                                <span class="mood-emoji"><i class="fa-solid fa-face-smile"></i></span>
+                                <span class="mood-emoji"><i class="fa-solid @(GetMoodIcon(journal.Mood))"></i></span>
                                 <span class="mood-text">@journal.Mood</span>
                             </div>
                         }
@@ -93,7 +92,7 @@
 
     <div class="floating-add-btn">
         <a href="/journal/add" class="btn-add-new">
-            <span class="add-icon">+</span>
+            <span class="add-icon"><i class="fa-solid fa-plus"></i></span>
             <span>New Entry</span>
         </a>
     </div>
@@ -111,11 +110,11 @@
 
     private IEnumerable<int> PageNumbers => Enumerable.Range(1, TotalPages);
 
-    private IEnumerable<JournalEntry> PagedJournals =>
+    private List<JournalEntry> PagedJournals =>
         journals
             .OrderByDescending(j => j.CreatedAt)
             .Skip((CurrentPage - 1) * PageSize)
-            .Take(PageSize);
+            .Take(PageSize).ToList();
 
     protected override async Task OnInitializedAsync()
     {
@@ -187,5 +186,21 @@
         bool deleted = await JournalService.DeleteJournalAsync(id);
         if (deleted)
             await FetchJournalsAsync();
+    }
+
+    private string GetMoodIcon(string moods)
+    {
+        List<string> positiveMoods = new List<string> { "Happy", "Excited", "Relaxed", "Grateful", "Confident" };
+        List<string> neutralMoods = new List<string> { "Calm", "Thoughtful", "Curious", "Nostalgic", "Bored" };
+        List<string> negativeMoods = new List<string> { "Sad", "Angry", "Stressed", "Lonely", "Anxious" };
+
+        if (positiveMoods.Contains(moods))
+            return "fa-face-smile";
+        else if (neutralMoods.Contains(moods))
+            return "fa-face-meh";
+        else if (negativeMoods.Contains(moods))
+            return "fa-face-frown";
+
+        return "fa-face-smile";
     }
 }

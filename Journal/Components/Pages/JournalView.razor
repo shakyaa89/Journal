@@ -1,88 +1,120 @@
-@page "/journal/{Id:int}"
+﻿@page "/journal/{Id:int}"
 @using Journal.Models
+@using System.Text.RegularExpressions;
 @inject IJournalService JournalService
 @inject NavigationManager Navigation
 
-<div class="journal-view-page">
-    <div class="view-header">
-        <a class="btn-back" href="/journal/list">
-            Back to Journals
-        </a>
-    </div>
 
+<div class="journal-view-container">
     @if (Entry == null)
     {
-        <div class="journal-view-card">
+        <div class="loading-state">
+            <div class="loading-spinner"></div>
             <p class="loading-text">Loading journal entry...</p>
         </div>
     }
     else
     {
-        <div class="journal-view-card">
-            <div class="view-top">
-                <div class="journal-date-badge">
+        <div class="journal-view-content">
+            <!-- Header with Back Button -->
+            <div class="view-header">
+                <button class="btn-back" @onclick="@(() => Navigation.NavigateTo("/journal/list"))">
+                    <span class="back-icon">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </span>
+                    <span>Back to Journals</span>
+                </button>
+                <button class="btn-edit" @onclick="@(() => NavigateTo(Entry.Id))">
+                    <span class="edit-icon">
+                        <i class="fa-solid fa-pen"></i>
+                    </span>
+                    <span>Edit</span>
+                </button>
+            </div>
+
+            <!-- Journal Card -->
+            <div class="journal-card">
+                <!-- Mood Section -->
+                <div class="mood-section">
                     @if (!string.IsNullOrWhiteSpace(Entry.Mood))
                     {
-                        <span class="mood-badge">
-                            <span class="mood-text">@Entry.Mood</span>
-                        </span>
+                        <div class="primary-mood">
+                            <span class="mood-label">Primary Mood</span>
+                            <span class="mood-badge primary">@Entry.Mood</span>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Entry.SecondaryMood1) || !string.IsNullOrWhiteSpace(Entry.SecondaryMood2))
+                    {
+                        <div class="secondary-moods">
+                            <span class="mood-label">Also Feeling</span>
+                            <div class="mood-badges">
+                                @if (!string.IsNullOrWhiteSpace(Entry.SecondaryMood1))
+                                {
+                                    <span class="mood-badge secondary">@Entry.SecondaryMood1</span>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(Entry.SecondaryMood2))
+                                {
+                                    <span class="mood-badge secondary">@Entry.SecondaryMood2</span>
+                                }
+                            </div>
+                        </div>
                     }
                 </div>
 
-                <div class="mood-group">
-                    @if (!string.IsNullOrWhiteSpace(Entry.SecondaryMood1))
-                    {
-                        <span class="mood-badge secondary">
-                            <span class="mood-text">@Entry.SecondaryMood1</span>
-                        </span>
-                    }
-
-                    @if (!string.IsNullOrWhiteSpace(Entry.SecondaryMood2))
-                    {
-                        <span class="mood-badge secondary">
-                            <span class="mood-text">@Entry.SecondaryMood2</span>
-                        </span>
-                    }
-                </div>
-            </div>
-
-            @if (Entry.Tags != null && Entry.Tags.Count > 0)
-            {
-                <div class="journal-tags-container">
-                    <p>TAGS</p> <br />
-                    <div class="journal-tags-inside">
-                        @foreach (string tags in Entry.Tags)
-                        {
-                            <span class="mood-badge secondary">
-                                <span class="mood-text">@tags</span>
+                <!-- Title and Meta -->
+                <div class="journal-header">
+                    <h1 class="journal-title">@Entry.Title</h1>
+                    <div class="journal-meta">
+                        <span class="meta-item">
+                            <span class="meta-icon">
+                                <i class="fa-solid fa-calendar-days"></i>
                             </span>
-                        }
+                            @Entry.CreatedAt.ToLocalTime().ToString("dddd, MMM dd yyyy")
+                        </span>
+                        <span class="meta-item">
+                            <span class="meta-icon">
+                                <i class="fa-solid fa-clock"></i>
+                            </span>
+                            @Entry.CreatedAt.ToLocalTime().ToString("hh:mm tt")
+                        </span>
+                        <span class="meta-item">
+                            <span class="meta-icon">
+                                <i class="fa-solid fa-file-lines"></i>
+                            </span>
+                            @GetWordCount(Entry.Content) words
+                        </span>
                     </div>
                 </div>
-            }
-            
 
-            <h1 class="journal-title">@Entry.Title</h1>
+                <!-- Tags Section -->
+                @if (Entry.Tags != null && Entry.Tags.Count > 0)
+                {
+                    <div class="tags-section">
+                        <span class="tags-label">Tags</span>
+                        <div class="tags-list">
+                            @foreach (string tag in Entry.Tags)
+                            {
+                                <span class="tag-badge">
+                                    @tag
+                                </span>
+                            }
+                        </div>
+                    </div>
+                }
 
-            <div class="journal-meta">
-                <span>
-                    @Entry.CreatedAt.ToLocalTime().ToString("dddd, MMM dd yyyy")
-                </span>
-                <span>
-                    @Entry.CreatedAt.ToLocalTime().ToString("hh:mm tt")
-                </span>
+                <!-- Divider -->
+                <div class="content-divider"></div>
+
+                <!-- Journal Content -->
+                <div class="journal-content">
+                    @((MarkupString)Entry.Content)
+                </div>
             </div>
-
-            <div class="journal-content">
-                @((MarkupString)@Entry.Content)
-            </div>
-
-            <button @onclick="() => NavigateTo(Entry.Id) " class="btn-update">
-                Update
-            </button>
         </div>
     }
 </div>
+
 
 @code {
     [Parameter]
@@ -98,5 +130,16 @@
     private void NavigateTo(int id)
     {
         Navigation.NavigateTo($"/journal/edit/{id}");
+    }
+
+    private int GetWordCount(string? html)
+    {
+        if (string.IsNullOrWhiteSpace(html))
+            return 0;
+
+        var text = Regex.Replace(html, "<.*?>", " ");
+        text = Regex.Replace(text, @"\s+", " ").Trim();
+
+        return string.IsNullOrEmpty(text) ? 0 : text.Split(' ').Length;
     }
 }

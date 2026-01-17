@@ -2,14 +2,15 @@
 @inject NavigationManager Navigation
 @inject IAuthService AuthService
 
-@* @if (loading)
+@if (loading)
 {
-    <div class="loading-div">
-        <p class="loading-text">Loading...</p>
+    <div class="loading-container">
+        <div class="loading-spinner"></div>
+        Loading...
     </div>
 }
 else
-{ *@
+{
     <div class="hero-page">
         <div class="hero-content">
             <!-- Main Hero Section -->
@@ -137,7 +138,7 @@ else
             </div>
         </div>
     </div>
-@* } *@
+}
 
 @code {
     private bool loading = true;

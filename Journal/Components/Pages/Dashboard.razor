@@ -7,70 +7,166 @@
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
 
-<div class="dashboard-container">
-    <div class="dashboard-content">
-        <h1 class="title">Welcome, @currentUser?.FullName</h1>
-        <p class="subtitle">Here’s a quick overview of your journal activities.</p>
-
-        <div class="dashboard-actions">
-            <button class="btn primary-btn" @onclick="NavigateToNewJournal">New Journal Entry</button>
-            <button class="btn primary-btn" @onclick="NavigateToJournalList">View All Journals</button>
+@if (loading)
+{
+    <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>Loading your dashboard...</p>
+    </div>
+}
+else
+{
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <div class="header-content">
+                <h1 class="title">Welcome back, @currentUser?.FullName</h1>
+                <p class="subtitle">Here's your journaling journey at a glance</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" @onclick="NavigateToJournalList">
+                    View All
+                </button>
+                <button class="btn btn-primary" @onclick="NavigateToNewJournal">
+                    New Entry
+                </button>
+            </div>
         </div>
 
-        <div class="mood-chart">
-            @if (chartRendered == false)
+        <div class="dashboard-grid">
+            <!-- Stats Cards -->
+            <div class="stats-section">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-chart-simple" style="color: var(--accent)"></i></div>
+                    <div class="stat-content">
+                        <p class="stat-label">Total Entries</p>
+                        <p class="stat-value">@totalJournals</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-fire" style="color: red;"></i></div>
+                    <div class="stat-content">
+                        <p class="stat-label">Current Streak</p>
+                        <p class="stat-value">@currentStreak <span class="stat-unit">days</span></p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-trophy" style="color: gold;"></i></div>
+                    <div class="stat-content">
+                        <p class="stat-label">Longest Streak</p>
+                        <p class="stat-value">@longestStreak <span class="stat-unit">days</span></p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid @GetMoodIcon(mostFrequentMood)" style="color: var(--accent)"></i></div>
+                    <div class="stat-content">
+                        <p class="stat-label">Top Mood</p>
+                        <p class="stat-value mood-text">@mostFrequentMood</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mood Chart -->
+            <div class="chart-section">
+                <div class="section-header">
+                    <h2 class="section-title">Mood Distribution</h2>
+                </div>
+                <div class="chart-container">
+                    @if (chartRendered == false)
+                    {
+                        <div class="chart-loading">
+                            <div class="loading-spinner small"></div>
+                            <p>Loading chart...</p>
+                        </div>
+                    }
+                    <canvas id="moodChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Recent Entries -->
+            <div class="recent-section">
+                <div class="section-header">
+                    <h2 class="section-title">Recent Entries</h2>
+                    <span class="section-count">Last 5</span>
+                </div>
+
+                @if (limitJournal.Any())
+                {
+                    <div class="entries-list">
+                        @foreach (var journal in limitJournal)
+                        {
+                            <div class="entry-card">
+                                <div class="entry-header">
+                                    <h3 class="entry-title">@journal.Title</h3>
+                                    <span class="entry-date">@journal.CreatedAt.ToString("MMM dd, yyyy")</span>
+                                </div>
+                                <div class="entry-actions">
+                                    <a class="btn-link" href="@($"journal/{journal.Id}")">View</a>
+                                    <a class="btn-link" href="@($"/journal/edit/{journal.Id}")">Edit</a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <p class="empty-icon">📝</p>
+                        <p class="empty-text">No entries yet. Start journaling today!</p>
+                    </div>
+                }
+            </div>
+
+            <!-- Missed Days -->
+            @if (missedDays.Any())
             {
-                <div class="chart-loading">
-                    Loading chart…
+                <div class="missed-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Missed Days</h2>
+                        <span class="section-badge">@missedDays.Count</span>
+                    </div>
+                    <div class="missed-list">
+                        @foreach (var missedDay in missedDays.Take(7))
+                        {
+                            <div class="missed-item">
+                                <span class="missed-dot"></span>
+                                <span class="missed-date">@missedDay.ToString("dddd, MMM dd yyyy")</span>
+                            </div>
+                        }
+                        @if (missedDays.Count > 7)
+                        {
+                            <div class="missed-more">
+                                +@(missedDays.Count - 7) more missed days
+                            </div>
+                        }
+                    </div>
                 </div>
             }
-            <canvas id="moodChart"></canvas>
         </div>
-
-        <div class="dashboard-stats">
-            <div class="stat-card">
-                <h3>Total Entries</h3>
-                <p>@totalJournals</p>
-            </div>
-            <div class="stat-card">
-                <h3>Recent Entry</h3>
-                <p>@recentJournal?.Title</p>
-            </div>
-        </div>
-
-        <table class="dashboard-table">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Date</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var journal in @journals)
-                {
-                    <tr>
-                        <td>@journal.Title</td>
-                        <td>@journal.CreatedAt.ToShortDateString()</td>
-                        <td>
-                            <button class="dashboard-btn">Edit</button>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
     </div>
-</div>
+}
+
 
 
 @code {
     private User? currentUser;
+    private bool loading = true;
+
+    private List<JournalEntry> journals = new List<JournalEntry>();
+    private List<JournalEntry> limitJournal = new List<JournalEntry>();
     private int totalJournals;
     private JournalEntry? recentJournal;
-    private List<JournalEntry> journals = new List<JournalEntry>();
-    private Dictionary<string, double> moodDistribution = new Dictionary<string, double>();
+    private string mostFrequentMood = string.Empty;
 
+    private Dictionary<string, double> moodDistribution = new Dictionary<string, double>();
     private bool chartRendered;
+
+    private int currentStreak = 0;
+    private int longestStreak = 0;
+
+    private List<DateTime> missedDays = new List<DateTime>();
 
     protected async override Task OnInitializedAsync()
     {
@@ -85,10 +181,20 @@
         totalJournals = journals.Count;
         recentJournal = journals.OrderByDescending(j => j.CreatedAt).FirstOrDefault();
 
+        limitJournal = journals.OrderByDescending(j => j.CreatedAt).Take(5).ToList();
+
+        mostFrequentMood = AnalyticsService.GetMostFrequentMood(journals) ?? "";
+
         moodDistribution = AnalyticsService.GetMoodDistribution(journals);
         chartRendered = false;
 
+        currentStreak = AnalyticsService.GetCurrentDailyStreak(journals);
+        longestStreak = AnalyticsService.GetLongestStreak(journals);
+
+        missedDays = AnalyticsService.GetMissedDays(journals);
+
         StateHasChanged();
+        loading = false;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -110,6 +216,22 @@
             values,
             "pie" 
         );
+    }
+
+    private string GetMoodIcon(string moods)
+    {
+        List<string> positiveMoods = new List<string> { "Happy", "Excited", "Relaxed", "Grateful", "Confident" };
+        List<string> neutralMoods = new List<string> { "Calm", "Thoughtful", "Curious", "Nostalgic", "Bored" };
+        List<string> negativeMoods = new List<string> { "Sad", "Angry", "Stressed", "Lonely", "Anxious" };
+
+        if (positiveMoods.Contains(moods))
+            return "fa-face-smile";
+        else if (neutralMoods.Contains(moods))
+            return "fa-face-meh";
+        else if (negativeMoods.Contains(moods))
+            return "fa-face-frown";
+
+        return "fa-face-smile";
     }
 
     private void NavigateToNewJournal() => Navigation.NavigateTo("/journal/add");

@@ -32,7 +32,7 @@
                 {
                     <div class="mood-item @(newJournal.Mood == mood ? "active" : "")"
                          @onclick="() => newJournal.Mood = mood">
-                        <div class="mood-icon"><i class="fa-solid fa-face-smile"></i></div>
+                        <div class="mood-icon"><i class="fa-solid @(GetMoodIcon(mood))"></i></div>
                         <div class="mood-label">@mood.ToUpper()</div>
                     </div>
                 }
@@ -78,7 +78,7 @@
                        class="tag-input"
                        placeholder="# Add tags (e.g. Health, Hobbies)..."
                        @bind="newTagText"/>
-                <button @onclick="AddCustomTag">Add Tag</button>
+                <button @onclick="AddCustomTag" class="btn primary-btn">Add Tag</button>
             </div>
         </div>
 
@@ -114,7 +114,6 @@
 
             <div id="editor"></div>
 
-            <div class="word-count">0 words</div>
         </div>
 
         <button class="btn primary-btn btn-save" @onclick="SaveEntryAsync">
@@ -276,7 +275,7 @@
     }
 
     private string markdownContent = "";
- 
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -284,6 +283,21 @@
             await JS.InvokeVoidAsync("initQuill", "editor", "quill-toolbar");
         }
     }
- 
+
+    private string GetMoodIcon(string moods)
+    {
+        List<string> positiveMoods = new List<string> { "Happy", "Excited", "Relaxed", "Grateful", "Confident" };
+        List<string> neutralMoods = new List<string> { "Calm", "Thoughtful", "Curious", "Nostalgic", "Bored" };
+        List<string> negativeMoods = new List<string> { "Sad", "Angry", "Stressed", "Lonely", "Anxious" };
+
+        if(positiveMoods.Contains(moods))
+            return "fa-face-smile";
+        else if (neutralMoods.Contains(moods))
+            return "fa-face-meh";
+        else if (negativeMoods.Contains(moods))
+            return "fa-face-frown";
+
+        return "fa-face-smile";
+    }
 
 }

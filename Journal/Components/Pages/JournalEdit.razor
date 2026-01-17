@@ -82,7 +82,7 @@
                        class="tag-input"
                        placeholder="# Add tags (e.g. Health, Hobbies)..."
                        @bind="newTagText" />
-                <button @onclick="AddCustomTag">Add Tag</button>
+                <button @onclick="AddCustomTag" class="btn primary-btn">Add Tag</button>
             </div>
         </div>
 
@@ -261,7 +261,7 @@
             return;
         }
 
-        Navigation.NavigateTo("/journal/list");
+        Navigation.NavigateTo($"/journal/{editJournal.Id}");
     }
 
     private void GoToList() => Navigation.NavigateTo("/journal/list");
