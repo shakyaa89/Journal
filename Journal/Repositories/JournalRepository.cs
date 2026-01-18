@@ -1,6 +1,4 @@
-﻿// JournalRepository
-
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Journal.Models;
 
 namespace Journal.Repositories

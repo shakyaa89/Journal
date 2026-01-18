@@ -304,3 +304,69 @@
         opacity: 0.5;
         cursor: not-allowed;
     }
+
+.journal-filters {
+    margin-bottom: 1.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    background: var(--primary-bg);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    border: 1px solid var(--border)
+}
+
+    .journal-filters .filter-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .journal-filters input,
+    .journal-filters select {
+        flex: 1 1 180px;
+        min-width: 0;
+        padding: 0.4rem 0.6rem;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        font-size: 0.9rem;
+        box-sizing: border-box;
+        background-color: var(--primary-bg);
+        color: var(--text);
+    }
+
+        .journal-filters input:focus,
+        .journal-filters select:focus{
+            outline: none;
+        }
+
+    .journal-filters input[type="date"]{
+        background-color: var(--primary-bg);
+    }
+
+.journal-filters label {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+
+    
+
+
+/* Optional: make filter bar responsive on very small screens */
+@media (max-width: 600px) {
+    .journal-filters {
+        padding: 0.75rem;
+    }
+
+        .journal-filters .filter-row {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .journal-filters button {
+            width: 100%;
+        }
+}
