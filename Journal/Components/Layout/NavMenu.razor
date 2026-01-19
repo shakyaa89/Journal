@@ -2,6 +2,8 @@
 @using Journal.Models
 @inject IAuthService AuthService
 @inject NavigationManager NavigationManager
+@inject IThemeService ThemeService
+
 
 <div class="app-sidebar">
     <div class="app-sidebar-header">
@@ -42,6 +44,17 @@
         <nav class="app-sidebar-nav app-sidebar-bottom">
             <ul class="app-sidebar-list">
                 <li class="app-sidebar-item">
+                    <a class="app-sidebar-link app-sidebar-bottom-btn" @onclick='() => ChangeTheme()'>
+                        @if(theme == "dark")
+                        {
+                            <i class="fa-solid fa-moon"></i>
+                        }
+                        else
+                        {
+                            <i class="fa-solid fa-sun"></i>
+                        }
+                        <span class="app-sidebar-text">Change Theme</span>
+                    </a>
                     <a class="app-sidebar-link app-sidebar-bottom-btn" @onclick='() => LogoutAsync()'>
                         <i class="fa-solid fa-arrow-right-from-bracket"></i>
                         <span class="app-sidebar-text">Logout</span>
@@ -55,9 +68,12 @@
 @code {
     private User? currentUser;
 
+    private string theme = "dark";
+
     protected override async Task OnInitializedAsync()
     {
         currentUser = await AuthService.GetCurrentUser();
+        theme = await ThemeService.GetCurrentThemeAsync();
     }
 
     private void Navigate(string path)
@@ -78,7 +94,7 @@
 
     private async Task<bool> ShowLogoutAlertAsync()
     {
-        bool confirmation = await (Application.Current!.MainPage!.DisplayAlert(
+        bool confirmation = await (Application.Current!.MainPage!.DisplayAlertAsync(
             title: "Confirm Logout",
             message: "Are you sure you want to logout?",
             accept: "Yes",
@@ -100,5 +116,28 @@
         }
 
         NavigationManager.NavigateTo("/login");
+    }
+
+    private async Task ChangeTheme()
+    {
+        string currentTheme = await ThemeService.GetCurrentThemeAsync();
+
+        if(string.IsNullOrEmpty(currentTheme))
+        {
+            currentTheme = "dark";
+        }
+
+        string nextTheme = currentTheme == "dark" ? "light" : "dark";
+
+        theme = nextTheme;
+        
+        await ThemeService.SetThemeAsync(nextTheme);
+
+        StateHasChanged();
+
+        NavigationManager.NavigateTo(
+            NavigationManager.Uri,
+            forceLoad: false
+        );
     }
 }

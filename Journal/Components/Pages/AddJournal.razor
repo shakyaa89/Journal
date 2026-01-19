@@ -144,6 +144,7 @@
 
     private List<string> selectedTags = new();
     private string newTagText = string.Empty;
+    private string markdownContent = "";
 
     // Secondary mood selection
     private void ToggleSecondaryMood(string mood, ChangeEventArgs e)
@@ -161,9 +162,11 @@
         }
     }
 
+   
     // Add Journal Entry
     private async Task SaveEntryAsync()
     {
+
         var today = DateTime.Now.Date;
 
         try
@@ -274,7 +277,6 @@
         }
     }
 
-    private string markdownContent = "";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

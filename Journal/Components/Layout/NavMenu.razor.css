@@ -79,6 +79,7 @@
     padding: 1.5rem 0;
 }
 
+
 .app-sidebar-list {
     list-style: none;
     margin: 0;
@@ -98,7 +99,7 @@
     align-items: center;
     justify-content: flex-start;
     padding: 0.875rem 1rem;
-    color: #d1d5db;
+    color: var(--text);
     text-decoration: none;
     transition: all 0.2s ease;
     font-size: 0.95rem;
@@ -131,6 +132,7 @@
         min-width: 1.5rem;
         line-height: 1;
         opacity: 0.9;
+        color: var(--text);
     }
 
 .app-sidebar-bottom-btn {

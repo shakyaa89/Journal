@@ -26,11 +26,13 @@ namespace Journal
 
 
             builder.Services.AddMauiBlazorWebView();
+            builder.Services.AddScoped<IThemeService, ThemeService>();
             builder.Services.AddScoped<IAuthRepository, AuthRepository>();
             builder.Services.AddScoped<IJournalRepository, JournalRepository>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IJournalService, JournalService>();
             builder.Services.AddScoped <IAnalyticsService, AnalyticsService>();
+
 
             builder.Services.AddDbContext<AppDbContext>(options =>
                     options.UseNpgsql(builder.Configuration.GetConnectionString("defaultConnection")));

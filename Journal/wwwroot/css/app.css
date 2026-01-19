@@ -23,24 +23,23 @@
 }
 
 .light {
-    --primary-bg: #fff;
-    --secondary-bg: #ddd;
-    --text: #e1e1e1;
-    --btn-text: #1e1e1e;
-    --muted: #898989;
-    --border: #253733;
-    --primary-btn-bg: #4ade80;
-    --primary-btn-hover: #4ade8040;
-    --secondary-btn-bg: #4ade8040;
-    --secondary-btn-hover: #4ade80;
-    --accent: #4ade80;
+    --primary-bg: #f6f7f5; 
+    --secondary-bg: #eceeea; 
+    --text: #1f2933;
+    --btn-text: #ffffff;
+    --muted: #6b7280;
+    --border: #d1d5db;
+    --primary-btn-bg: #22c55e;
+    --primary-btn-hover: #22c55e40;
+    --secondary-btn-bg: #22c55e40;
+    --secondary-btn-hover: #22c55e;
+    --accent: #22c55e;
     --error: #ef4444;
 }
 
 html, body {
     width: 100%;
     min-height: 100%;
-    background-color: var(--primary-bg);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana;
 }
 

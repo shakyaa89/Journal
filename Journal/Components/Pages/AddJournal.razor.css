@@ -6,6 +6,7 @@
     height: 100vh;
     background-color: var(--primary-bg);
     overflow: hidden;
+    width: 100%;
 }
 
 .journal-sidebar {
@@ -33,6 +34,7 @@
 
 .card-header {
     margin-bottom: 1rem;
+    background-color: transparent;
 }
 
     .card-header label {
@@ -144,7 +146,7 @@
     display: inline-flex;
     align-items: center;
     padding: 0.625rem 1rem;
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: var(--primary-bg);
     border: 1px solid var(--border);
     border-radius: 2rem;
     color: var(--muted);
@@ -195,6 +197,10 @@
 .tags-section button{
     width: 100%;
 }
+
+    .tags-section input {
+        background-color: transparent
+    }
 
 .tag-badge {
     display: inline-flex;

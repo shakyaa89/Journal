@@ -1,7 +1,8 @@
 ﻿@inherits LayoutComponentBase
 @inject NavigationManager Navigation
+@inject IThemeService ThemeService
 
-<div class="page">
+<div class="page @currentTheme">
     @if (ShowSidebar)
     {
         <div class="sidebar">
@@ -17,5 +18,14 @@
 </div>
 
 @code {
-    private bool ShowSidebar => Navigation.Uri.Contains("/journal") || Navigation.Uri.Contains("/dashboard");
+    private string currentTheme = "dark";
+
+    private bool ShowSidebar =>
+        Navigation.Uri.Contains("/journal") ||
+        Navigation.Uri.Contains("/dashboard");
+
+    protected override async Task OnParametersSetAsync()
+    {
+        currentTheme = await ThemeService.GetCurrentThemeAsync();
+    }
 }
