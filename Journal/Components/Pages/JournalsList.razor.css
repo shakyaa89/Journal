@@ -230,41 +230,6 @@
     line-height: 1;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .journal-list-page {
-        padding: 1.5rem;
-    }
-
-    .list-header h1 {
-        font-size: 2rem;
-    }
-
-    .journal-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-
-    .floating-add-btn {
-        bottom: 1.5rem;
-        right: 1.5rem;
-    }
-
-    .btn-add-new span:last-child {
-        display: none;
-    }
-
-    .btn-add-new {
-        width: 56px;
-        height: 56px;
-        padding: 0;
-        justify-content: center;
-    }
-
-    .add-icon {
-        font-size: 2rem;
-    }
-}
 
 .pagination {
     display: flex;
@@ -352,10 +317,155 @@
     color: var(--muted);
 }
 
-    
+.view-switch{
+    margin-bottom: 1rem;
+}
 
+    .view-switch button{
+        margin-right: .5rem;
+    }
 
-/* Optional: make filter bar responsive on very small screens */
+    .view-toggle {
+        color: var(--text);
+        border: 1px solid var(--border);
+    }
+
+.calendar-container {
+    background: var(--secondary-bg);
+    padding: 1rem;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin-top: 1rem;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: .8rem;
+}
+
+.calendar-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.calendar-nav-btn {
+    background: var(--secondary-btn-bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: .35rem .6rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background .2s, border .2s;
+}
+
+    .calendar-nav-btn:hover {
+        background: var(--secondary-btn-hover);
+        border-color: var(--accent);
+    }
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+}
+
+.calendar-grid-header {
+    text-align: center;
+    font-weight: 600;
+    color: var(--muted);
+    padding: .4rem 0;
+}
+
+.calendar-cell {
+    aspect-ratio: 1 / 1;
+    background: var(--primary-bg);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: .25rem;
+    overflow: hidden;
+}
+
+    .calendar-cell.empty {
+        background: var(--secondary-bg);
+    }
+
+    .calendar-cell.has-entry {
+        border-color: var(--accent);
+        transition: filter .2s;
+    }
+
+        .calendar-cell.has-entry:hover {
+            filter: brightness(1.15);
+        }
+
+.calendar-day-number {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: .1rem;
+}
+
+.calendar-entry-btn {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+    cursor: pointer;
+}
+
+.calendar-entry-title {
+    font-size: .75rem;
+    color: var(--accent);
+    line-height: 1.1rem;
+    word-break: break-word;
+    white-space: normal;
+    margin-top: .15rem;
+}
+
+@media (max-width: 768px) {
+    .journal-list-page {
+        padding: 1.5rem;
+    }
+
+    .list-header h1 {
+        font-size: 2rem;
+    }
+
+    .journal-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .floating-add-btn {
+        bottom: 1.5rem;
+        right: 1.5rem;
+    }
+
+    .btn-add-new span:last-child {
+        display: none;
+    }
+
+    .btn-add-new {
+        width: 56px;
+        height: 56px;
+        padding: 0;
+        justify-content: center;
+    }
+
+    .add-icon {
+        font-size: 2rem;
+    }
+}
+
 @media (max-width: 600px) {
     .journal-filters {
         padding: 0.75rem;
@@ -370,3 +480,4 @@
             width: 100%;
         }
 }
+

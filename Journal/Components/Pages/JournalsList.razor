@@ -1,6 +1,7 @@
 ﻿@page "/journal/list"
 @using Journal.Models
 @using Journal.Services
+@using MudBlazor
 @inject IJournalService JournalService
 @inject IAuthService AuthService
 @inject NavigationManager Navigation
@@ -51,82 +52,152 @@
         </div>
     </div>
 
-    @if (!FilteredJournals.Any())
+    <div class="view-switch">
+        <button class="btn @(IsCalendarView ? "view-toggle" : "primary-btn")"
+                @onclick="() => IsCalendarView = false">
+            List View
+        </button>
+        <button class="btn  @(IsCalendarView ? "primary-btn" : "view-toggle")"
+                @onclick="() => IsCalendarView = true">
+            Calendar View
+        </button>
+    </div>
+
+    @if (IsCalendarView)
     {
-        <div class="empty-state">
-            <h2>No journal entries yet</h2>
-            <p>Start documenting your thoughts and experiences</p>
-            <a href="/journal/add" class="btn-add-first">Create Your First Entry</a>
+        <div class="calendar-container">
+            <div class="calendar-header">
+                <button class="calendar-nav-btn" @onclick="PrevMonth">&#x276E;</button>
+                <span class="calendar-title">@CalendarMonthName</span>
+                <button class="calendar-nav-btn" @onclick="NextMonth">&#x276F;</button>
+            </div>
+
+            <div class="calendar-grid">
+                <div class="calendar-grid-header">Sun</div>
+                <div class="calendar-grid-header">Mon</div>
+                <div class="calendar-grid-header">Tue</div>
+                <div class="calendar-grid-header">Wed</div>
+                <div class="calendar-grid-header">Thu</div>
+                <div class="calendar-grid-header">Fri</div>
+                <div class="calendar-grid-header">Sat</div>
+
+                @foreach (var week in CalendarWeeks)
+                {
+                    @foreach (var day in week)
+                    {
+                        if (day == null)
+                        {
+                            <div class="calendar-cell empty"></div>
+                        }
+                        else
+                        {
+                            var date = new DateTime(CalendarYear, CalendarMonth, day.Value);
+                            var entry = FilteredJournals
+                            .Where(j => j.CreatedAt.Date == date.Date)
+                            .OrderByDescending(j => j.CreatedAt)
+                            .FirstOrDefault();
+
+                            if (entry != null)
+                            {
+                                <div class="calendar-cell has-entry">
+                                    <button class="calendar-entry-btn"
+                                            @onclick="() => ViewJournal(entry.Id)">
+                                        <div class="calendar-day-number">@day.Value</div>
+                                        <div class="calendar-entry-title">@entry.Title</div>
+                                    </button>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="calendar-cell">
+                                    <div class="calendar-day-number">@day.Value</div>
+                                </div>
+                            }
+                        }
+                    }
+                }
+            </div>
         </div>
     }
     else
     {
-        <div class="journal-grid">
-            @foreach (var journal in PagedJournals)
-            {
-                <div class="journal-card">
-                    <div class="card-top">
-                        <div class="journal-date-badge">
-                            <span class="date-day">@journal.CreatedAt.ToString("dd")</span>
-                            <span class="date-month">@journal.CreatedAt.ToString("MMM")</span>
-                        </div>
-
-                        @if (!string.IsNullOrEmpty(journal.Mood))
-                        {
-                            <div class="mood-badge">
-                                <span class="mood-emoji"><i class="fa-solid @(GetMoodIcon(journal.Mood))"></i></span>
-                                <span class="mood-text">@journal.Mood</span>
+        @if (!FilteredJournals.Any())
+        {
+            <div class="empty-state">
+                <h2>No journal entries yet</h2>
+                <p>Start documenting your thoughts and experiences</p>
+                <a href="/journal/add" class="btn-add-first">Create Your First Entry</a>
+            </div>
+        }
+        else
+        {
+            <div class="journal-grid">
+                @foreach (var journal in PagedJournals)
+                {
+                    <div class="journal-card">
+                        <div class="card-top">
+                            <div class="journal-date-badge">
+                                <span class="date-day">@journal.CreatedAt.ToString("dd")</span>
+                                <span class="date-month">@journal.CreatedAt.ToString("MMM")</span>
                             </div>
-                        }
-                    </div>
 
-                    <h3 class="journal-title">@journal.Title</h3>
-                    <p class="journal-preview">@((MarkupString)@GetPreview(journal.Content))</p>
-
-                    @if (journal.Tags != null && journal.Tags.Count > 0)
-                    {
-                        <div class="journal-tags-container">
-                            @foreach (var tag in journal.Tags.Take(5))
+                            @if (!string.IsNullOrEmpty(journal.Mood))
                             {
-                                <div class="tag-badge">
-                                    <span class="tag-text">@tag</span>
+                                <div class="mood-badge">
+                                    <span class="mood-emoji"><i class="fa-solid @(GetMoodIcon(journal.Mood))"></i></span>
+                                    <span class="mood-text">@journal.Mood</span>
                                 </div>
                             }
                         </div>
+
+                        <h3 class="journal-title">@journal.Title</h3>
+                        <p class="journal-preview">@((MarkupString)@GetPreview(journal.Content))</p>
+
+                        @if (journal.Tags != null && journal.Tags.Count > 0)
+                        {
+                            <div class="journal-tags-container">
+                                @foreach (var tag in journal.Tags.Take(5))
+                                {
+                                    <div class="tag-badge">
+                                        <span class="tag-text">@tag</span>
+                                    </div>
+                                }
+                            </div>
+                        }
+
+                        <div class="card-footer">
+                            <span class="journal-time">@journal.CreatedAt.ToString("h:mm tt")</span>
+                            <button class="btn-read-more" @onclick="() => ViewJournal(journal.Id)">View Journal</button>
+                            <button class="btn-read-more" @onclick="() => DeleteJournal(journal.Id)">Delete Journal</button>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            @if (TotalPages > 1)
+            {
+                <div class="pagination">
+                    <button class="page-btn"
+                            disabled="@(CurrentPage == 1)"
+                            @onclick="PrevPage">
+                        Prev
+                    </button>
+
+                    @foreach (var p in PageNumbers)
+                    {
+                        <button class="page-number @(p == CurrentPage ? "active" : "")"
+                                @onclick="() => GoToPage(p)">
+                            @p
+                        </button>
                     }
 
-                    <div class="card-footer">
-                        <span class="journal-time">@journal.CreatedAt.ToString("h:mm tt")</span>
-                        <button class="btn-read-more" @onclick="() => ViewJournal(journal.Id)">View Journal</button>
-                        <button class="btn-read-more" @onclick="() => DeleteJournal(journal.Id)">Delete Journal</button>
-                    </div>
+                    <button class="page-btn"
+                            disabled="@(CurrentPage == TotalPages)"
+                            @onclick="NextPage">
+                        Next
+                    </button>
                 </div>
             }
-        </div>
-
-        @if (TotalPages > 1)
-        {
-            <div class="pagination">
-                <button class="page-btn"
-                        disabled="@(CurrentPage == 1)"
-                        @onclick="PrevPage">
-                    Prev
-                </button>
-
-                @foreach (var p in PageNumbers)
-                {
-                    <button class="page-number @(p == CurrentPage ? "active" : "")"
-                            @onclick="() => GoToPage(p)">
-                        @p
-                    </button>
-                }
-
-                <button class="page-btn"
-                        disabled="@(CurrentPage == TotalPages)"
-                        @onclick="NextPage">
-                    Next
-                </button>
-            </div>
         }
     }
 
@@ -145,7 +216,18 @@
     private int PageSize = 6;
     private int CurrentPage = 1;
 
-    // simple filter fields (no setters, no underscores)
+    // calendar toggle
+    private bool IsCalendarView = false;
+
+    // calendar state
+    private int CalendarYear = DateTime.Today.Year;
+    private int CalendarMonth = DateTime.Today.Month;
+    private List<int?[]> CalendarWeeks = new();
+
+    private string CalendarMonthName =>
+        new DateTime(CalendarYear, CalendarMonth, 1).ToString("MMMM yyyy");
+
+    // simple filter fields
     private string SearchText = string.Empty;
     private string SelectedMood = string.Empty;
     private string TagFilter = string.Empty;
@@ -184,6 +266,7 @@
         }
 
         await FetchJournalsAsync();
+        CalendarView();
     }
 
     private async Task FetchJournalsAsync()
@@ -304,7 +387,10 @@
 
         bool deleted = await JournalService.DeleteJournalAsync(id);
         if (deleted)
+        {
             await FetchJournalsAsync();
+            CalendarView();
+        }
     }
 
     private string GetMoodIcon(string moods)
@@ -321,5 +407,53 @@
             return "fa-face-frown";
 
         return "fa-face-smile";
+    }
+
+    private void CalendarView()
+    {
+        CalendarWeeks.Clear();
+
+        var firstOfMonth = new DateTime(CalendarYear, CalendarMonth, 1);
+        var daysInMonth = DateTime.DaysInMonth(CalendarYear, CalendarMonth);
+
+        int offset = (int)firstOfMonth.DayOfWeek;
+
+        int currentDay = 1 - offset;
+
+        for (int week = 0; week < 6; week++)
+        {
+            var weekDays = new int?[7];
+
+            for (int dayIndex = 0; dayIndex < 7; dayIndex++)
+            {
+                if (currentDay < 1 || currentDay > daysInMonth)
+                    weekDays[dayIndex] = null;
+                else
+                    weekDays[dayIndex] = currentDay;
+
+                currentDay++;
+            }
+
+            CalendarWeeks.Add(weekDays);
+
+            if (currentDay > daysInMonth)
+                break;
+        }
+    }
+
+    private void PrevMonth()
+    {
+        var dt = new DateTime(CalendarYear, CalendarMonth, 1).AddMonths(-1);
+        CalendarYear = dt.Year;
+        CalendarMonth = dt.Month;
+        CalendarView();
+    }
+
+    private void NextMonth()
+    {
+        var dt = new DateTime(CalendarYear, CalendarMonth, 1).AddMonths(1);
+        CalendarYear = dt.Year;
+        CalendarMonth = dt.Month;
+        CalendarView();
     }
 }

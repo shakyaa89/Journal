@@ -5,7 +5,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 
-
 namespace Journal
 {
     public static class MauiProgram
@@ -26,6 +25,7 @@ namespace Journal
 
 
             builder.Services.AddMauiBlazorWebView();
+
             builder.Services.AddScoped<IThemeService, ThemeService>();
             builder.Services.AddScoped<IAuthRepository, AuthRepository>();
             builder.Services.AddScoped<IJournalRepository, JournalRepository>();

@@ -2,20 +2,20 @@
 @inject NavigationManager Navigation
 @inject IThemeService ThemeService
 
-<div class="page @currentTheme">
-    @if (ShowSidebar)
-    {
-        <div class="sidebar">
-            <NavMenu />
-        </div>
-    }
+    <div class="page @currentTheme">
+        @if (ShowSidebar)
+        {
+            <div class="sidebar">
+                <NavMenu />
+            </div>
+        }
 
-    <main>
-        <article class="content">
-            @Body
-        </article>
-    </main>
-</div>
+        <main>
+            <article class="content">
+                @Body
+            </article>
+        </main>
+    </div>
 
 @code {
     private string currentTheme = "dark";
