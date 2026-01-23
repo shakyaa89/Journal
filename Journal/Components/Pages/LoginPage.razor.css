@@ -58,6 +58,12 @@
             background-color: var(--primary-btn-hover);
         }
 
+        .login-page .btn:disabled {
+            background-color: var(--accent);
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
     /* Errors & links */
     .login-page .error {
         color: #ff6b6b;

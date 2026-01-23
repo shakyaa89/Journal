@@ -5,7 +5,7 @@
 @inject IAuthService AuthService
 
 <div class="register-page">
-    <button class="back-btn" @onclick="NavigateToHome">Back</button>
+    <a class="back-btn" href="/">Back</a>
 
     <div class="register-container">
         <h2>Create Account</h2>
@@ -42,7 +42,7 @@
                            placeholder="Create a password" />
             </div>
 
-            <button type="submit" class="btn">Register</button>
+            <button type="submit" class="btn" disabled="@isRegistering">@(isRegistering ? "Registering" : "Register")</button>
         </EditForm>
 
         <div class="register-link">
@@ -54,10 +54,12 @@
 
 @code {
     private RegisterModel registerModel = new();
-    private string ErrorMessage = "";
+    private string ErrorMessage = string.Empty;
+    private bool isRegistering = false;
 
     private async Task RegisterAsync()
     {
+        ErrorMessage = string.Empty;
         try
         {
             await AuthService.RegisterUserAsync(
@@ -67,15 +69,18 @@
             );
 
             Navigation.NavigateTo("/login");
+            await Application.Current!.Windows[0].Page!.DisplayAlertAsync("Success", "Your account has been created!", "OK");
         }
         catch (Exception ex)
         {
-            ErrorMessage = ex.Message;
+            System.Diagnostics.Debug.WriteLine($"Registration error: {ex.Message}");
+            ErrorMessage = "Failed to register!";
         }
-    }
-
-    private void NavigateToHome() => Navigation.NavigateTo("/");
-    
+        finally
+        {
+            isRegistering = false;
+        }
+    }    
 
     private class RegisterModel
     {

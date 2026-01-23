@@ -32,7 +32,7 @@
                 {
                     <div class="mood-item @(newJournal.Mood == mood ? "active" : "")"
                          @onclick="() => newJournal.Mood = mood">
-                        <div class="mood-icon"><i class="fa-solid @(GetMoodIcon(mood))"></i></div>
+                        <div class="mood-icon"><i class="fa-solid @(Util.GetMoodIcon(mood))"></i></div>
                         <div class="mood-label">@mood.ToUpper()</div>
                     </div>
                 }
@@ -116,15 +116,20 @@
 
         </div>
 
-        <button class="btn primary-btn btn-save" @onclick="SaveEntryAsync">
+        <button class="btn primary-btn btn-save" @onclick="SaveEntryAsync" disabled="@existsToday">
             Save Entry
         </button>
-        <button class="btn btn-cancel" @onclick="GoToList">Cancel</button>
+        <a class="btn btn-cancel" href="/journal/list">Cancel</a>
 
 
         @if (!string.IsNullOrEmpty(errorMessage))
         {
             <p class="error-msg">@errorMessage</p>
+        }
+
+        @if(existsToday)
+        {
+            <p class="error-msg">You have already created a journal entry for today!</p>
         }
     </div>
 </div>
@@ -146,6 +151,33 @@
     private string newTagText = string.Empty;
     private string markdownContent = "";
 
+    private bool existsToday = false;
+
+    // Initial Check for User
+    protected override async Task OnInitializedAsync()
+    {
+        currentUser = await AuthService.GetCurrentUser();
+
+        if (currentUser == null)
+        {
+            Navigation.NavigateTo("/login");
+            return;
+        }
+        var today = DateTime.Now.Date;
+
+        var journals = await JournalService.GetAllJournalsAsync(currentUser!.Id);
+
+        existsToday = journals.Any(j => j.CreatedAt.Date == today) ? true : false;
+    }
+   
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("initQuill", "editor", "quill-toolbar");
+        }
+    }
+    
     // Secondary mood selection
     private void ToggleSecondaryMood(string mood, ChangeEventArgs e)
     {
@@ -162,18 +194,11 @@
         }
     }
 
-   
     // Add Journal Entry
     private async Task SaveEntryAsync()
     {
-
-        var today = DateTime.Now.Date;
-
         try
         {
-            var journals = await JournalService.GetAllJournalsAsync(currentUser!.Id);
-            bool existsToday = journals.Any(j => j.CreatedAt.Date == today);
-
             newJournal.Content = await JS.InvokeAsync<string>("getQuillContent");
 
             if (string.IsNullOrEmpty(newJournal.Title) || string.IsNullOrEmpty(newJournal.Content)) 
@@ -229,13 +254,9 @@
         }
     }
 
-    // Navigate to Journal List
-    private void GoToList() => Navigation.NavigateTo("/journal/list");
-
-
     private void ToggleTag(string tag, ChangeEventArgs e)
     {
-        var isChecked = (bool)e.Value;
+        var isChecked = (bool)e.Value!;
 
         if (isChecked)
         {
@@ -263,43 +284,4 @@
 
         newTagText = string.Empty;
     }
-
-
-    // Initial Check for User
-    protected override async Task OnInitializedAsync()
-    {
-        currentUser = await AuthService.GetCurrentUser();
-
-        if (currentUser == null)
-        {
-            Navigation.NavigateTo("/login");
-            return;
-        }
-    }
-
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await JS.InvokeVoidAsync("initQuill", "editor", "quill-toolbar");
-        }
-    }
-
-    private string GetMoodIcon(string moods)
-    {
-        List<string> positiveMoods = new List<string> { "Happy", "Excited", "Relaxed", "Grateful", "Confident" };
-        List<string> neutralMoods = new List<string> { "Calm", "Thoughtful", "Curious", "Nostalgic", "Bored" };
-        List<string> negativeMoods = new List<string> { "Sad", "Angry", "Stressed", "Lonely", "Anxious" };
-
-        if(positiveMoods.Contains(moods))
-            return "fa-face-smile";
-        else if (neutralMoods.Contains(moods))
-            return "fa-face-meh";
-        else if (negativeMoods.Contains(moods))
-            return "fa-face-frown";
-
-        return "fa-face-smile";
-    }
-
 }

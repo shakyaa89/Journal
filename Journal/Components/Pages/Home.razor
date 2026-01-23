@@ -37,15 +37,15 @@ else
 
                 <!-- Action Buttons -->
                 <div class="hero-actions">
-                    <button class="btn-hero-primary" @onclick="GoToRegister">
+                    <a class="btn-hero-primary" href="/register">
                         Start Your Journey
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                             <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
-                    </button>
-                    <button class="btn-hero-ghost" @onclick="GoToLogin">
+                    </a>
+                    <a class="btn-hero-ghost" href="/login">
                         Already a member?
-                    </button>
+                    </a>
                 </div>
             </div>
 
@@ -168,15 +168,5 @@ else
         int randomIndex = random.Next(quotes.Count);
         selectedQuote = quotes[randomIndex];
         loading = false;
-    }
-
-    private void GoToLogin()
-    {
-        Navigation.NavigateTo("/login");
-    }
-
-    private void GoToRegister()
-    {
-        Navigation.NavigateTo("/register");
     }
 }

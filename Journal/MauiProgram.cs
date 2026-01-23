@@ -3,6 +3,7 @@ using Journal.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using QuestPDF.Infrastructure;
 
 
 namespace Journal
@@ -23,6 +24,7 @@ namespace Journal
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 });
 
+            QuestPDF.Settings.License = LicenseType.Community;
 
             builder.Services.AddMauiBlazorWebView();
 
@@ -32,6 +34,8 @@ namespace Journal
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IJournalService, JournalService>();
             builder.Services.AddScoped <IAnalyticsService, AnalyticsService>();
+            builder.Services.AddSingleton<IPDFService, PDFService>();
+
 
 
             builder.Services.AddDbContext<AppDbContext>(options =>

@@ -282,6 +282,12 @@
     margin-top: 0.5rem;
 }
 
+.btn-save:disabled {
+    background-color: var(--accent);
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 /* Main Content */
 .journal-main {
     padding: 2rem 3rem;

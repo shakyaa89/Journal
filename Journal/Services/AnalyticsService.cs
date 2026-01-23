@@ -4,8 +4,7 @@ namespace Journal.Services
 {
     public class AnalyticsService : IAnalyticsService
     {
-        public Dictionary<string, double> GetMoodDistribution(
-            List<JournalEntry> entries)
+        public Dictionary<string, double> GetMoodDistribution(List<JournalEntry> entries)
         {
             var positiveMoods = new List<string>
             {

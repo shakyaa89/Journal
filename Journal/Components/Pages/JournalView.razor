@@ -1,9 +1,12 @@
 ﻿@page "/journal/{Id:int}"
 @using Journal.Models
-@using System.Text.RegularExpressions;
+@using System.Text.RegularExpressions
+@using System.IO
+@using Microsoft.Maui.Storage
+@using Journal.Services
 @inject IJournalService JournalService
 @inject NavigationManager Navigation
-
+@inject IPDFService PDFService
 
 <div class="journal-view-container">
     @if (Entry == null)
@@ -18,17 +21,18 @@
         <div class="journal-view-content">
             <!-- Header with Back Button -->
             <div class="view-header">
-                <button class="btn-back" @onclick="@(() => Navigation.NavigateTo("/journal/list"))">
+                <a class="btn-back" href="/journal/list">
                     <span class="back-icon">
                         <i class="fa-solid fa-arrow-left"></i>
                     </span>
                     <span>Back to Journals</span>
-                </button>
-                <button class="btn-edit" @onclick="@(() => NavigateTo(Entry.Id))">
+                </a>
+                
+                <button class="btn-edit" @onclick="@ExportPdf">
                     <span class="edit-icon">
-                        <i class="fa-solid fa-pen"></i>
+                        <i class="fa-solid fa-file-pdf"></i>
                     </span>
-                    <span>Edit</span>
+                    <span>@(isExporting ? "Exporting..." : "Export to PDF")</span>
                 </button>
             </div>
 
@@ -80,6 +84,12 @@
                         </span>
                         <span class="meta-item">
                             <span class="meta-icon">
+                                <i class="fa-solid fa-rotate-right"></i>
+                            </span>
+                            @Entry.UpdatedAt.ToLocalTime().ToString("hh:mm tt")
+                        </span>
+                        <span class="meta-item">
+                            <span class="meta-icon">
                                 <i class="fa-solid fa-file-lines"></i>
                             </span>
                             @GetWordCount(Entry.Content) words
@@ -111,25 +121,61 @@
                     @((MarkupString)Entry.Content)
                 </div>
             </div>
+
+            <div class="btn-container">
+                <button class="btn primary-btn" @onclick="@(() => NavigateTo(Entry.Id))"><i class="fa-solid fa-pen"></i>Update Journal</button>
+                <button class="btn primary-btn del-btn" @onclick="() => DeleteJournal(Entry.Id)"><i class="fa-solid fa-trash"></i>Delete Journal</button>
+
+            </div>
         </div>
     }
 </div>
 
-
 @code {
     [Parameter]
     public int Id { get; set; }
-
+    private bool isExporting = false;
     private JournalEntry? Entry;
 
     protected override async Task OnInitializedAsync()
     {
-        Entry = await JournalService.GetJournalByIdAsync(Id);
+        await FetchJournalsAsync();
     }
 
     private void NavigateTo(int id)
     {
         Navigation.NavigateTo($"/journal/edit/{id}");
+    }
+
+    private async Task FetchJournalsAsync()
+    {
+        Entry = await JournalService.GetJournalByIdAsync(Id);
+
+    }
+
+    private async Task DeleteJournal(int id)
+    {
+        bool confirmDelete = await ShowDeleteAlertAsync();
+        if (!confirmDelete) return;
+
+        bool deleted = await JournalService.DeleteJournalAsync(id);
+        if (deleted)
+        {
+            Navigation.NavigateTo("/journal/list");
+            await Application.Current!.Windows[0].Page!.DisplayAlertAsync("Success", "Journal deleted successfully.", "OK");
+        }
+    }
+
+    private async Task<bool> ShowDeleteAlertAsync()
+    {
+        bool confirmation = await Application.Current!.Windows[0].Page!.DisplayAlertAsync(
+            title: "Confirm Deletion",
+            message: "Are you sure you want to delete this jounal?",
+            accept: "Yes",
+            cancel: "No"
+        );
+
+        return confirmation;
     }
 
     private int GetWordCount(string? html)
@@ -141,5 +187,33 @@
         text = Regex.Replace(text, @"\s+", " ").Trim();
 
         return string.IsNullOrEmpty(text) ? 0 : text.Split(' ').Length;
+    }
+
+    private async Task ExportPdf()
+    {
+        isExporting = true;
+        try
+        {
+            if (Entry is null || string.IsNullOrWhiteSpace(Entry.Content))
+                return;
+
+            var pdfBytes = PDFService.GeneratePdf(Entry);
+
+            var downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
+            var filePath = Path.Combine(downloadsPath, $"{Entry.Title}.pdf");
+
+            File.WriteAllBytes(filePath, pdfBytes);
+
+            await Application.Current!.Windows[0].Page!.DisplayAlertAsync("Success", "PDF saved to Downloads folder.", "OK");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error exporting PDF: {ex.Message}");
+            await Application.Current!.Windows[0].Page!.DisplayAlertAsync("Error", "Failed to export PDF", "OK");
+        }
+        finally
+        {
+            isExporting = false;
+        }
     }
 }

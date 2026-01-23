@@ -7,7 +7,7 @@
 
 <div class="login-page">
     <div class="login-container">
-        <button class="back-btn" @onclick="NavigateToHome">Back</button>
+        <a class="back-btn" href="/">Back</a>
 
         <h2>Login to Your Journal</h2>
 
@@ -30,11 +30,11 @@
                 <InputText @bind-Value="loginModel.Password" type="password" placeholder="Enter your password" class="input" />
             </div>
 
-            <button type="submit" class="btn">Login</button>
+            <button type="submit" class="btn" disabled="@isLoggingIn">@(isLoggingIn ? "Logging In" : "Login")</button>
         </EditForm>
 
         <p class="register-link">
-            Don't have an account? <a @onclick="NavigateToRegister">Register here</a>
+            Don't have an account? <a href="/register">Register here</a>
         </p>
     </div>
 </div>
@@ -42,10 +42,12 @@
 
 @code {
     private LoginModel loginModel = new();
-    private string errorMessage = "";
+    private string errorMessage = string.Empty;
+    private bool isLoggingIn = false;
 
     private async Task HandleLogin()
     {
+        isLoggingIn = true;
         try
         {
             var user = await AuthService.LoginUserAsync(loginModel.Email, loginModel.Password);
@@ -60,13 +62,13 @@
         }
         catch (Exception ex)
         {
-            errorMessage = $"Login failed: {ex.Message}";
+            System.Diagnostics.Debug.WriteLine($"Login failed: {ex.Message}");
+            errorMessage = "Login failed!";
+        } finally
+        {
+            isLoggingIn = false;
         }
     }
-
-    private void NavigateToRegister() => Navigation.NavigateTo("/register");
-
-    private void NavigateToHome() => Navigation.NavigateTo("/");
 
     public class LoginModel
     {

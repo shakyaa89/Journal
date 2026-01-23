@@ -342,6 +342,28 @@
         color: var(--text);
     }
 
+.btn-container {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.btn-container button{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    margin-top: 1rem;
+    font-weight: 500;
+}
+
+.del-btn{
+    background-color: var(--error);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .journal-view-container {

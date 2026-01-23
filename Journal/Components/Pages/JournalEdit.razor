@@ -125,7 +125,8 @@
 
         <button class="btn btn-cancel"
                 disabled="@isLoading"
-                @onclick="GoToList">
+                @onclick="GoBack">
+
             Cancel
         </button>
 
@@ -146,17 +147,11 @@
     private List<string> selectedTags = new();
     private string newTagText = string.Empty;
 
-    private readonly List<string> MoodsList = new()
-    {
-        "Happy","Excited","Relaxed","Grateful","Confident","Calm",
-        "Thoughtful","Curious","Nostalgic",
-        "Bored","Sad","Angry","Stressed","Lonely","Anxious"
-    };
+    private List<string> selectedSecondaryMoods = new();
+
+    private readonly List<string> MoodsList = new() {"Happy","Excited","Relaxed","Grateful","Confident","Calm", "Thoughtful","Curious","Nostalgic", "Bored","Sad","Angry","Stressed","Lonely","Anxious"};
 
     private List<string> AvailableTags = new List<string> { "Work", "Career", "Studies", "Family", "Friends", "Relationships", "Health", "Fitness", "Personal Growth", "Self-care", "Hobbies", "Travel", "Nature", "Finance", "Spirituality", "Birthday", "Holiday", "Vacation", "Celebration", "Exercise", "Reading", "Writing", "Cooking", "Meditation", "Yoga", "Music", "Shopping", "Parenting", "Projects", "Planning", "Reflection" };
-
-
-    private List<string> selectedSecondaryMoods = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -200,18 +195,13 @@
         isLoading = false;
     }
 
-    private void ToggleSecondaryMood(string mood, Microsoft.AspNetCore.Components.ChangeEventArgs e)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        var isChecked = e.Value is bool b && b;
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("initQuill", "editor", "quill-toolbar");
 
-        if (isChecked)
-        {
-            if (selectedSecondaryMoods.Count < 2 && !selectedSecondaryMoods.Contains(mood))
-                selectedSecondaryMoods.Add(mood);
-        }
-        else
-        {
-            selectedSecondaryMoods.Remove(mood);
+            await JS.InvokeVoidAsync("setQuillHtml", editJournal.Content ?? "");
         }
     }
 
@@ -238,6 +228,8 @@
         editJournal.SecondaryMood1 = selectedSecondaryMoods[0];
         editJournal.SecondaryMood2 = selectedSecondaryMoods[1];
 
+        editJournal.UpdatedAt = DateTime.UtcNow;
+
         editJournal.Tags = selectedTags.ToList();
 
         isLoading = true;
@@ -250,7 +242,8 @@
             editJournal.SecondaryMood1,
             editJournal.SecondaryMood2,
             editJournal.Tags,
-            currentUser!.Id
+            currentUser!.Id,
+            editJournal.UpdatedAt
         );
 
         isLoading = false;
@@ -264,15 +257,18 @@
         Navigation.NavigateTo($"/journal/{editJournal.Id}");
     }
 
-    private void GoToList() => Navigation.NavigateTo("/journal/list");
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    private void ToggleSecondaryMood(string mood, ChangeEventArgs e)
     {
-        if (firstRender)
-        {
-            await JS.InvokeVoidAsync("initQuill", "editor", "quill-toolbar");
+        var isChecked = e.Value is bool b && b;
 
-            await JS.InvokeVoidAsync("setQuillHtml", editJournal.Content ?? "");
+        if (isChecked)
+        {
+            if (selectedSecondaryMoods.Count < 2 && !selectedSecondaryMoods.Contains(mood))
+                selectedSecondaryMoods.Add(mood);
+        }
+        else
+        {
+            selectedSecondaryMoods.Remove(mood);
         }
     }
 
@@ -306,4 +302,6 @@
 
         newTagText = string.Empty;
     }
+
+    private void GoBack() => Navigation.NavigateTo($"/journal/{editJournal.Id}");
 }
