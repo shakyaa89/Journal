@@ -8,9 +8,9 @@ namespace Journal.Utils
     {
         public static string GetMoodIcon(string moods)
         {
-            List<string> positiveMoods = new List<string> { "Happy", "Excited", "Relaxed", "Grateful", "Confident" };
-            List<string> neutralMoods = new List<string> { "Calm", "Thoughtful", "Curious", "Nostalgic", "Bored" };
-            List<string> negativeMoods = new List<string> { "Sad", "Angry", "Stressed", "Lonely", "Anxious" };
+            List<string> positiveMoods = ["Happy", "Excited", "Relaxed", "Grateful", "Confident"];
+            List<string> neutralMoods = ["Calm", "Thoughtful", "Curious", "Nostalgic", "Bored"];
+            List<string> negativeMoods = ["Sad", "Angry", "Stressed", "Lonely", "Anxious"];
 
             if (positiveMoods.Contains(moods))
                 return "fa-face-smile";

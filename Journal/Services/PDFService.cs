@@ -13,8 +13,7 @@ namespace Journal.Services
     {
         public byte[] GeneratePdf(JournalEntry entry)
         {
-            if (entry is null)
-                throw new ArgumentNullException(nameof(entry));
+            ArgumentNullException.ThrowIfNull(entry);
 
             var title = string.IsNullOrWhiteSpace(entry.Title)
                 ? "Journal Entry"

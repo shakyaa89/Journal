@@ -8,5 +8,7 @@ namespace Journal.Repositories
         Task<bool> CheckEmailExistence(string email);
         Task<User?> CheckUserExistence(string email);
         Task<bool> AddUserAsync(User user);
+
+        Task<bool> UpdateUserAsync(User user);
     }
 }

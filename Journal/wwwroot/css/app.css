@@ -72,7 +72,8 @@ body {
 
 
 .login-page .input,
-.register-page .input {
+.register-page .input,
+.change-password-page input{
     width: 100%;
     padding: 12px;
     border-radius: 8px;
@@ -81,10 +82,15 @@ body {
     color: var(--text);
 }
 
-::selection{
-    background-color: var(--accent);
-    color: var(--primary-bg);
-}
+    .change-password-page input:focus {
+        background: transparent;
+        color: var(--text)
+    }
+
+    ::selection {
+        background-color: var(--accent);
+        color: var(--primary-bg);
+    }
 
 .initial-loader {
     min-height: 100vh;

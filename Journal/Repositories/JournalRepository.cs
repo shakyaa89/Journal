@@ -20,17 +20,9 @@ namespace Journal.Repositories
             return entry;
         }
 
-        public async Task<List<JournalEntry>> FetchJournalEntriesAsync(int userId)
-        {
-            return await _context.Journals
-                     .Where(j => j.UserId == userId)
-                     .ToListAsync();
-        }
+        public async Task<List<JournalEntry>> FetchJournalEntriesAsync(int userId) => await _context.Journals.Where(j => j.UserId == userId).ToListAsync();
 
-        public async Task<JournalEntry?> FetchJournalByIdAsync(int journalId)
-        {
-            return await _context.Journals.FindAsync(journalId);
-        }
+        public async Task<JournalEntry?> FetchJournalByIdAsync(int journalId) => await _context.Journals.FindAsync(journalId);
 
         public async Task<bool> DeleteJournalEntry(int journalId)
         {

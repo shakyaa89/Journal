@@ -1,6 +1,7 @@
 ﻿@page "/journal/add"
-@using Journal.Models;
-@using Journal.Services;
+@using Journal.Models
+@using Journal.Services
+@using System.Text.RegularExpressions
 @inject NavigationManager Navigation
 @inject IJournalService JournalService
 @inject IAuthService AuthService
@@ -11,7 +12,7 @@
         <!-- Date & Time Section -->
         <div class="sidebar-card">
             <div class="card-header">
-                <label>DATE & TIME</label>
+                <label>DATE</label>
             </div>
             <div class="date-picker">
                 <span class="date-icon"><i class="fa-solid fa-calendar"></i></span>
@@ -28,10 +29,10 @@
                 <label>PRIMARY MOOD <span class="required">*</span></label>
             </div>
             <div class="mood-grid">
-                @foreach (var mood in MoodsList)
+                @foreach (var mood in _moodsList)
                 {
-                    <div class="mood-item @(newJournal.Mood == mood ? "active" : "")"
-                         @onclick="() => newJournal.Mood = mood">
+                    <div class="mood-item @(_newJournal.Mood == mood ? "active" : "")"
+                         @onclick="() => _newJournal.Mood = mood">
                         <div class="mood-icon"><i class="fa-solid @(Util.GetMoodIcon(mood))"></i></div>
                         <div class="mood-label">@mood.ToUpper()</div>
                     </div>
@@ -45,11 +46,11 @@
                 <label>SECONDARY MOODS <span class="mood-limit">(Select 2)</span></label>
             </div>
             <div class="secondary-moods">
-                @foreach (var mood in MoodsList)
+                @foreach (var mood in _moodsList)
                 {
-                    <label class="mood-chip @(selectedSecondaryMoods.Contains(mood) ? "active" : "")">
+                    <label class="mood-chip @(_selectedSecondaryMoods.Contains(mood) ? "active" : "")">
                         <input type="checkbox"
-                               checked="@selectedSecondaryMoods.Contains(mood)"
+                               checked="@_selectedSecondaryMoods.Contains(mood)"
                                @onchange="e => ToggleSecondaryMood(mood, e)" />
                         <span>@mood</span>
                     </label>
@@ -63,113 +64,120 @@
                 <label>TAGS</label>
             </div>
             <div class="tags-container">
-            @foreach (var tag in AvailableTags)
-            {
-                <label class="tag-chip @(selectedTags.Contains(tag) ? "active" : "")">
-                    <input type="checkbox"
-                           checked="@selectedTags.Contains(tag)"
-                           @onchange="e => ToggleTag(tag, e)" />
-                    <span>@tag</span>
-                </label>
-            }
+                @foreach (var tag in _availableTags)
+                {
+                    <label class="tag-chip @(_selectedTags.Contains(tag) ? "active" : "")">
+                        <input type="checkbox"
+                               checked="@_selectedTags.Contains(tag)"
+                               @onchange="e => ToggleTag(tag, e)" />
+                        <span>@tag</span>
+                    </label>
+                }
             </div>
             <div class="tags-section">
                 <input type="text"
                        class="tag-input"
                        placeholder="# Add tags (e.g. Health, Hobbies)..."
-                       @bind="newTagText"/>
+                       @bind="_newTagText" />
                 <button @onclick="AddCustomTag" class="btn primary-btn">Add Tag</button>
             </div>
         </div>
-
-      
     </div>
 
     <div class="journal-main">
         <!-- Toolbar -->
         <div id="quill-toolbar" class="quill-toolbar">
-    <button class="ql-bold"></button>
-    <button class="ql-italic"></button>
-    <button class="ql-underline"></button>
+            <button class="ql-bold"></button>
+            <button class="ql-italic"></button>
+            <button class="ql-underline"></button>
 
-    <button class="ql-list" value="ordered"></button>
-    <button class="ql-list" value="bullet"></button>
+            <button class="ql-list" value="ordered"></button>
+            <button class="ql-list" value="bullet"></button>
 
-    <select class="ql-header">
-        <option value="1"></option>
-        <option value="2"></option>
-        <option selected></option>
-    </select>
+            <select class="ql-header">
+                <option value="1"></option>
+                <option value="2"></option>
+                <option selected></option>
+            </select>
 
-    <button class="ql-clean"></button>
-</div>
-
+            <button class="ql-clean"></button>
+        </div>
 
         <!-- Editor Area -->
         <div class="editor-container">
             <input type="text"
                    class="entry-title"
                    placeholder="Entry Title..."
-                   @bind="newJournal.Title" />
+                   @bind="_newJournal.Title"
+                   disabled="@_hasTodayEntry" />
 
             <div id="editor"></div>
-
         </div>
 
-        <button class="btn primary-btn btn-save" @onclick="SaveEntryAsync" disabled="@existsToday">
+        <button class="btn primary-btn btn-save"
+                @onclick="SaveEntryAsync"
+                disabled="@_hasTodayEntry">
             Save Entry
         </button>
         <a class="btn btn-cancel" href="/journal/list">Cancel</a>
 
-
-        @if (!string.IsNullOrEmpty(errorMessage))
+        @if (!string.IsNullOrEmpty(_errorMessage))
         {
-            <p class="error-msg">@errorMessage</p>
+            <p class="error-msg">@_errorMessage</p>
         }
 
-        @if(existsToday)
+        @if (_hasTodayEntry)
         {
             <p class="error-msg">You have already created a journal entry for today!</p>
         }
     </div>
 </div>
 
-
 @code {
-    private JournalEntry newJournal = new JournalEntry();
-    private string errorMessage = string.Empty;
+    private JournalEntry _newJournal = new();
+    private User? _currentUser;
 
-    private User? currentUser;
+    private string _errorMessage = string.Empty;
 
-    private List<string> AvailableTags = new List<string> { "Work", "Career", "Studies", "Family", "Friends", "Relationships", "Health", "Fitness", "Personal Growth", "Self-care", "Hobbies", "Travel", "Nature", "Finance", "Spirituality", "Birthday", "Holiday", "Vacation", "Celebration", "Exercise", "Reading", "Writing", "Cooking", "Meditation", "Yoga", "Music", "Shopping", "Parenting", "Projects", "Planning", "Reflection" };
+    private readonly List<string> _availableTags = new()
+    {
+        "Work", "Career", "Studies", "Family", "Friends", "Relationships",
+        "Health", "Fitness", "Personal Growth", "Self-care", "Hobbies",
+        "Travel", "Nature", "Finance", "Spirituality", "Birthday", "Holiday",
+        "Vacation", "Celebration", "Exercise", "Reading", "Writing", "Cooking",
+        "Meditation", "Yoga", "Music", "Shopping", "Parenting", "Projects",
+        "Planning", "Reflection"
+    };
 
-    private List<string> MoodsList = new List<string> { "Happy", "Excited", "Relaxed", "Grateful", "Confident", "Calm", "Thoughtful", "Curious", "Nostalgic", "Bored", "Sad", "Angry", "Stressed", "Lonely", "Anxious" };
+    private readonly List<string> _moodsList = new()
+    {
+        "Happy", "Excited", "Relaxed", "Grateful", "Confident",
+        "Calm", "Thoughtful", "Curious", "Nostalgic", "Bored",
+        "Sad", "Angry", "Stressed", "Lonely", "Anxious"
+    };
 
-    private List<string> selectedSecondaryMoods = new();
+    private readonly List<string> _selectedSecondaryMoods = new();
+    private readonly List<string> _selectedTags = new();
 
-    private List<string> selectedTags = new();
-    private string newTagText = string.Empty;
-    private string markdownContent = "";
+    private string _newTagText = string.Empty;
+    private bool _hasTodayEntry = false;
 
-    private bool existsToday = false;
 
-    // Initial Check for User
     protected override async Task OnInitializedAsync()
     {
-        currentUser = await AuthService.GetCurrentUser();
+        _currentUser = await AuthService.GetCurrentUser();
 
-        if (currentUser == null)
+        if (_currentUser == null)
         {
             Navigation.NavigateTo("/login");
             return;
         }
+
         var today = DateTime.Now.Date;
-
-        var journals = await JournalService.GetAllJournalsAsync(currentUser!.Id);
-
-        existsToday = journals.Any(j => j.CreatedAt.Date == today) ? true : false;
+        var journals = await JournalService.GetAllJournalsAsync(_currentUser.Id);
+        _hasTodayEntry = journals.Any(j => j.CreatedAt.Date == today);
     }
-   
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -177,111 +185,145 @@
             await JS.InvokeVoidAsync("initQuill", "editor", "quill-toolbar");
         }
     }
-    
-    // Secondary mood selection
+
     private void ToggleSecondaryMood(string mood, ChangeEventArgs e)
     {
-        var isChecked = (bool)e.Value;
+        if (!bool.TryParse(e.Value?.ToString(), out var isChecked))
+            return;
 
         if (isChecked)
         {
-            if (selectedSecondaryMoods.Count < 2 && !selectedSecondaryMoods.Contains(mood))
-                selectedSecondaryMoods.Add(mood);
+            if (_selectedSecondaryMoods.Count < 2 && !_selectedSecondaryMoods.Contains(mood))
+            {
+                _selectedSecondaryMoods.Add(mood);
+            }
         }
         else
         {
-            selectedSecondaryMoods.Remove(mood);
-        }
-    }
-
-    // Add Journal Entry
-    private async Task SaveEntryAsync()
-    {
-        try
-        {
-            newJournal.Content = await JS.InvokeAsync<string>("getQuillContent");
-
-            if (string.IsNullOrEmpty(newJournal.Title) || string.IsNullOrEmpty(newJournal.Content)) 
-            {
-                errorMessage = "All fields must be filled.";
-                return;
-            }
-
-            if (existsToday)
-            {
-                errorMessage = "You can only create one journal entry per day.";
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(newJournal.Mood))
-            {
-                errorMessage = "Please select a mood.";
-                return;
-            }
-
-            if (selectedSecondaryMoods.Count != 2)
-            {
-                errorMessage = "Please select exactly 2 secondary moods.";
-                return;
-            }
-
-            if (!string.IsNullOrWhiteSpace(newJournal.Title) && !string.IsNullOrWhiteSpace(newJournal.Content))
-            {
-                newJournal.SecondaryMood1 = selectedSecondaryMoods[0];
-                newJournal.SecondaryMood2 = selectedSecondaryMoods[1];
-
-                newJournal.Tags = selectedTags.ToList();
-
-                await JournalService.AddJournalEntryAsync(
-                    newJournal.Title,
-                    newJournal.Content,
-                    newJournal.Mood,
-                    newJournal.SecondaryMood1,
-                    newJournal.SecondaryMood2,
-                    newJournal.Tags,
-                    currentUser.Id
-                );
-
-                newJournal = new JournalEntry();
-                errorMessage = string.Empty;
-                selectedSecondaryMoods.Clear();
-                Navigation.NavigateTo("/journal/list");
-            }
-        }
-        catch (Exception ex)
-        {
-            errorMessage = $"An error occurred: {ex.Message}, {ex.InnerException?.Message}";
+            _selectedSecondaryMoods.Remove(mood);
         }
     }
 
     private void ToggleTag(string tag, ChangeEventArgs e)
     {
-        var isChecked = (bool)e.Value!;
+        if (!bool.TryParse(e.Value?.ToString(), out var isChecked))
+            return;
 
         if (isChecked)
         {
-            if (!selectedTags.Contains(tag))
-                selectedTags.Add(tag);
+            if (!_selectedTags.Contains(tag))
+            {
+                _selectedTags.Add(tag);
+            }
         }
         else
         {
-            selectedTags.Remove(tag);
+            _selectedTags.Remove(tag);
         }
     }
 
     private void AddCustomTag()
     {
-        var tag = newTagText?.Trim();
+        var tag = _newTagText?.Trim();
 
         if (!string.IsNullOrWhiteSpace(tag))
         {
-            if (!AvailableTags.Contains(tag))
-                AvailableTags.Add(tag);
+            if (!_availableTags.Contains(tag))
+            {
+                _availableTags.Add(tag);
+            }
 
-            if (!selectedTags.Contains(tag))
-                selectedTags.Add(tag);
+            if (!_selectedTags.Contains(tag))
+            {
+                _selectedTags.Add(tag);
+            }
         }
 
-        newTagText = string.Empty;
+        _newTagText = string.Empty;
+    }
+
+    private async Task SaveEntryAsync()
+    {
+        try
+        {
+            _newJournal.Content = await JS.InvokeAsync<string>("getQuillContent");
+
+            var validationError = ValidateEntry();
+            if (validationError != null)
+            {
+                _errorMessage = validationError;
+                return;
+            }
+
+            if (_currentUser is null)
+            {
+                _errorMessage = "User is not logged in.";
+                return;
+            }
+
+            _newJournal.SecondaryMood1 = _selectedSecondaryMoods[0];
+            _newJournal.SecondaryMood2 = _selectedSecondaryMoods[1];
+            _newJournal.Tags = _selectedTags.ToList();
+            _newJournal.WordCount = GetWordCount(_newJournal.Content);
+
+            await JournalService.AddJournalEntryAsync(
+                _newJournal.Title,
+                _newJournal.Content,
+                _newJournal.Mood,
+                _newJournal.SecondaryMood1,
+                _newJournal.SecondaryMood2,
+                _newJournal.Tags,
+                _newJournal.WordCount,
+                _currentUser.Id
+            );
+
+            ResetForm();
+            Navigation.NavigateTo("/journal/list");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error saving journal entry: {ex.Message}");
+            _errorMessage = "An unexpected error occurred while saving your entry.";
+        }
+    }
+
+    private string? ValidateEntry()
+    {
+        if (_hasTodayEntry)
+            return "You can only create one journal entry per day.";
+
+        if (string.IsNullOrWhiteSpace(_newJournal.Title))
+            return "Title is required.";
+
+        if (string.IsNullOrWhiteSpace(_newJournal.Content))
+            return "Content is required.";
+
+        if (string.IsNullOrWhiteSpace(_newJournal.Mood))
+            return "Please select a primary mood.";
+
+        if (_selectedSecondaryMoods.Count != 2)
+            return "Please select at most 2 secondary moods.";
+
+        return null;
+    }
+
+    private void ResetForm()
+    {
+        _newJournal = new JournalEntry();
+        _errorMessage = string.Empty;
+        _selectedSecondaryMoods.Clear();
+        _selectedTags.Clear();
+        _newTagText = string.Empty;
+    }
+
+    private int GetWordCount(string? html)
+    {
+        if (string.IsNullOrWhiteSpace(html))
+            return 0;
+
+        var text = Regex.Replace(html, "<.*?>", " ");
+        text = Regex.Replace(text, @"\s+", " ").Trim();
+
+        return string.IsNullOrEmpty(text) ? 0 : text.Split(' ').Length;
     }
 }

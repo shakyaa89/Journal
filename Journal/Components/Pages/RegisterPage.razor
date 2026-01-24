@@ -11,18 +11,18 @@
         <h2>Create Account</h2>
         <p class="subtitle">Start your journaling journey</p>
 
-        @if (!string.IsNullOrEmpty(ErrorMessage))
+        @if (!string.IsNullOrEmpty(_errorMessage))
         {
-            <div class="error">@ErrorMessage</div>
+            <div class="error">@_errorMessage</div>
         }
 
-        <EditForm Model="registerModel" OnValidSubmit="RegisterAsync">
+        <EditForm Model="_registerModel" OnValidSubmit="RegisterAsync">
             <DataAnnotationsValidator />
 
             <div class="form-group">
                 <label>Full Name</label>
                 <InputText class="input"
-                           @bind-Value="registerModel.FullName"
+                           @bind-Value="_registerModel.FullName"
                            placeholder="Your full name" />
             </div>
 
@@ -30,7 +30,7 @@
                 <label>Email</label>
                 <InputText class="input"
                            type="email"
-                           @bind-Value="registerModel.Email"
+                           @bind-Value="_registerModel.Email"
                            placeholder="you@example.com" />
             </div>
 
@@ -38,11 +38,11 @@
                 <label>Password</label>
                 <InputText class="input"
                            type="password"
-                           @bind-Value="registerModel.Password"
+                           @bind-Value="_registerModel.Password"
                            placeholder="Create a password" />
             </div>
 
-            <button type="submit" class="btn" disabled="@isRegistering">@(isRegistering ? "Registering" : "Register")</button>
+            <button type="submit" class="btn" disabled="@_isRegistering">@(_isRegistering ? "Registering" : "Register")</button>
         </EditForm>
 
         <div class="register-link">
@@ -53,44 +53,39 @@
 </div>
 
 @code {
-    private RegisterModel registerModel = new();
-    private string ErrorMessage = string.Empty;
-    private bool isRegistering = false;
+    private RegisterModel _registerModel = new();
+    private string _errorMessage = string.Empty;
+    private bool _isRegistering;
 
     private async Task RegisterAsync()
     {
-        ErrorMessage = string.Empty;
+        _errorMessage = string.Empty;
+        _isRegistering = true;
         try
         {
-            await AuthService.RegisterUserAsync(
-                registerModel.FullName,
-                registerModel.Email,
-                registerModel.Password
-            );
-
+            await AuthService.RegisterUserAsync(_registerModel.FullName, _registerModel.Email, _registerModel.Password);
+            await Application.Current!.Windows[0].Page!.DisplayAlert("Success", "Your account has been created!", "OK");
             Navigation.NavigateTo("/login");
-            await Application.Current!.Windows[0].Page!.DisplayAlertAsync("Success", "Your account has been created!", "OK");
         }
-        catch (Exception ex)
+        catch
         {
-            System.Diagnostics.Debug.WriteLine($"Registration error: {ex.Message}");
-            ErrorMessage = "Failed to register!";
+            _errorMessage = "Failed to register!";
         }
         finally
         {
-            isRegistering = false;
+            _isRegistering = false;
         }
-    }    
+    }
 
     private class RegisterModel
     {
         [Required]
-        public string FullName { get; set; } = "";
+        public string FullName { get; set; } = string.Empty;
 
         [Required, EmailAddress]
-        public string Email { get; set; } = "";
+        public string Email { get; set; } = string.Empty;
 
         [Required, MinLength(6)]
-        public string Password { get; set; } = "";
+        public string Password { get; set; } = string.Empty;
     }
 }

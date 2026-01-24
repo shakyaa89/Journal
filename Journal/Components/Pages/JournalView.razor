@@ -9,7 +9,7 @@
 @inject IPDFService PDFService
 
 <div class="journal-view-container">
-    @if (Entry == null)
+    @if (_entry == null)
     {
         <div class="loading-state">
             <div class="loading-spinner"></div>
@@ -19,7 +19,6 @@
     else
     {
         <div class="journal-view-content">
-            <!-- Header with Back Button -->
             <div class="view-header">
                 <a class="btn-back" href="/journal/list">
                     <span class="back-icon">
@@ -27,83 +26,79 @@
                     </span>
                     <span>Back to Journals</span>
                 </a>
-                
-                <button class="btn-edit" @onclick="@ExportPdf">
+
+                <button class="btn-edit" @onclick="ExportPdf" disabled="@_isExporting">
                     <span class="edit-icon">
                         <i class="fa-solid fa-file-pdf"></i>
                     </span>
-                    <span>@(isExporting ? "Exporting..." : "Export to PDF")</span>
+                    <span>@(_isExporting ? "Exporting..." : "Export to PDF")</span>
                 </button>
             </div>
 
-            <!-- Journal Card -->
             <div class="journal-card">
-                <!-- Mood Section -->
                 <div class="mood-section">
-                    @if (!string.IsNullOrWhiteSpace(Entry.Mood))
+                    @if (!string.IsNullOrWhiteSpace(_entry.Mood))
                     {
                         <div class="primary-mood">
                             <span class="mood-label">Primary Mood</span>
-                            <span class="mood-badge primary">@Entry.Mood</span>
+                            <span class="mood-badge primary">@_entry.Mood</span>
                         </div>
                     }
 
-                    @if (!string.IsNullOrWhiteSpace(Entry.SecondaryMood1) || !string.IsNullOrWhiteSpace(Entry.SecondaryMood2))
+                    @if (!string.IsNullOrWhiteSpace(_entry.SecondaryMood1) || !string.IsNullOrWhiteSpace(_entry.SecondaryMood2))
                     {
                         <div class="secondary-moods">
                             <span class="mood-label">Also Feeling</span>
                             <div class="mood-badges">
-                                @if (!string.IsNullOrWhiteSpace(Entry.SecondaryMood1))
+                                @if (!string.IsNullOrWhiteSpace(_entry.SecondaryMood1))
                                 {
-                                    <span class="mood-badge secondary">@Entry.SecondaryMood1</span>
+                                    <span class="mood-badge secondary">@_entry.SecondaryMood1</span>
                                 }
-                                @if (!string.IsNullOrWhiteSpace(Entry.SecondaryMood2))
+                                @if (!string.IsNullOrWhiteSpace(_entry.SecondaryMood2))
                                 {
-                                    <span class="mood-badge secondary">@Entry.SecondaryMood2</span>
+                                    <span class="mood-badge secondary">@_entry.SecondaryMood2</span>
                                 }
                             </div>
                         </div>
                     }
                 </div>
 
-                <!-- Title and Meta -->
                 <div class="journal-header">
-                    <h1 class="journal-title">@Entry.Title</h1>
+                    <h1 class="journal-title">@_entry.Title</h1>
                     <div class="journal-meta">
                         <span class="meta-item">
                             <span class="meta-icon">
                                 <i class="fa-solid fa-calendar-days"></i>
                             </span>
-                            @Entry.CreatedAt.ToLocalTime().ToString("dddd, MMM dd yyyy")
+                            @_entry.CreatedAt.ToLocalTime().ToString("dddd, MMM dd yyyy")
                         </span>
                         <span class="meta-item">
                             <span class="meta-icon">
                                 <i class="fa-solid fa-clock"></i>
                             </span>
-                            @Entry.CreatedAt.ToLocalTime().ToString("hh:mm tt")
+                            @_entry.CreatedAt.ToLocalTime().ToString("hh:mm tt")
                         </span>
                         <span class="meta-item">
                             <span class="meta-icon">
                                 <i class="fa-solid fa-rotate-right"></i>
                             </span>
-                            @Entry.UpdatedAt.ToLocalTime().ToString("hh:mm tt")
+                            @_entry.UpdatedAt.ToLocalTime().ToString("hh:mm tt")
                         </span>
                         <span class="meta-item">
                             <span class="meta-icon">
                                 <i class="fa-solid fa-file-lines"></i>
                             </span>
-                            @GetWordCount(Entry.Content) words
+                            @_entry.WordCount words
                         </span>
                     </div>
                 </div>
 
-                <!-- Tags Section -->
-                @if (Entry.Tags != null && Entry.Tags.Count > 0)
+                @if (_entry.Tags != null && _entry.Tags.Count > 0)
                 {
                     <div class="tags-section">
                         <span class="tags-label">Tags</span>
                         <div class="tags-list">
-                            @foreach (string tag in Entry.Tags)
+                            @foreach (var tag in _entry.Tags)
                             {
                                 <span class="tag-badge">
                                     @tag
@@ -113,33 +108,34 @@
                     </div>
                 }
 
-                <!-- Divider -->
                 <div class="content-divider"></div>
 
-                <!-- Journal Content -->
                 <div class="journal-content">
-                    @((MarkupString)Entry.Content)
+                    @((MarkupString)_entry.Content)
                 </div>
             </div>
 
             <div class="btn-container">
-                <button class="btn primary-btn" @onclick="@(() => NavigateTo(Entry.Id))"><i class="fa-solid fa-pen"></i>Update Journal</button>
-                <button class="btn primary-btn del-btn" @onclick="() => DeleteJournal(Entry.Id)"><i class="fa-solid fa-trash"></i>Delete Journal</button>
-
+                <button class="btn primary-btn" @onclick="() => NavigateTo(_entry.Id)">
+                    <i class="fa-solid fa-pen"></i>Update Journal
+                </button>
+                <button class="btn primary-btn del-btn" @onclick="() => DeleteJournal(_entry.Id)">
+                    <i class="fa-solid fa-trash"></i>Delete Journal
+                </button>
             </div>
         </div>
     }
 </div>
 
 @code {
-    [Parameter]
-    public int Id { get; set; }
-    private bool isExporting = false;
-    private JournalEntry? Entry;
+    [Parameter] public int Id { get; set; }
+
+    private bool _isExporting;
+    private JournalEntry? _entry;
 
     protected override async Task OnInitializedAsync()
     {
-        await FetchJournalsAsync();
+        await LoadEntryAsync();
     }
 
     private void NavigateTo(int id)
@@ -147,73 +143,65 @@
         Navigation.NavigateTo($"/journal/edit/{id}");
     }
 
-    private async Task FetchJournalsAsync()
+    private async Task LoadEntryAsync()
     {
-        Entry = await JournalService.GetJournalByIdAsync(Id);
-
+        _entry = await JournalService.GetJournalByIdAsync(Id);
     }
 
     private async Task DeleteJournal(int id)
     {
-        bool confirmDelete = await ShowDeleteAlertAsync();
-        if (!confirmDelete) return;
+        var confirmDelete = await ShowDeleteAlertAsync();
+        if (!confirmDelete)
+            return;
 
-        bool deleted = await JournalService.DeleteJournalAsync(id);
-        if (deleted)
-        {
-            Navigation.NavigateTo("/journal/list");
-            await Application.Current!.Windows[0].Page!.DisplayAlertAsync("Success", "Journal deleted successfully.", "OK");
-        }
+        var deleted = await JournalService.DeleteJournalAsync(id);
+        if (!deleted) return;
+
+        await Application.Current!.Windows[0].Page!.DisplayAlert("Success", "Journal deleted successfully.", "OK");
+        Navigation.NavigateTo("/journal/list");
     }
 
     private async Task<bool> ShowDeleteAlertAsync()
     {
-        bool confirmation = await Application.Current!.Windows[0].Page!.DisplayAlertAsync(
-            title: "Confirm Deletion",
-            message: "Are you sure you want to delete this jounal?",
-            accept: "Yes",
-            cancel: "No"
+        return await Application.Current!.Windows[0].Page!.DisplayAlert(
+            "Confirm Deletion",
+            "Are you sure you want to delete this journal?",
+            "Yes",
+            "No"
         );
-
-        return confirmation;
-    }
-
-    private int GetWordCount(string? html)
-    {
-        if (string.IsNullOrWhiteSpace(html))
-            return 0;
-
-        var text = Regex.Replace(html, "<.*?>", " ");
-        text = Regex.Replace(text, @"\s+", " ").Trim();
-
-        return string.IsNullOrEmpty(text) ? 0 : text.Split(' ').Length;
     }
 
     private async Task ExportPdf()
     {
-        isExporting = true;
+        if (_entry is null || string.IsNullOrWhiteSpace(_entry.Content))
+            return;
+
+        _isExporting = true;
+
         try
         {
-            if (Entry is null || string.IsNullOrWhiteSpace(Entry.Content))
-                return;
+            var pdfBytes = PDFService.GeneratePdf(_entry);
 
-            var pdfBytes = PDFService.GeneratePdf(Entry);
+            var safeTitle = string.IsNullOrWhiteSpace(_entry.Title) ?
+            "JournalEntry" 
+            : string.Concat(_entry.Title.Split(Path.GetInvalidFileNameChars()));
 
             var downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
-            var filePath = Path.Combine(downloadsPath, $"{Entry.Title}.pdf");
+
+            var filePath = Path.Combine(downloadsPath, $"{safeTitle}.pdf");
 
             File.WriteAllBytes(filePath, pdfBytes);
 
-            await Application.Current!.Windows[0].Page!.DisplayAlertAsync("Success", "PDF saved to Downloads folder.", "OK");
+            await Application.Current!.Windows[0].Page!.DisplayAlert("Success", "PDF saved to Downloads folder.", "OK");
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Error exporting PDF: {ex.Message}");
-            await Application.Current!.Windows[0].Page!.DisplayAlertAsync("Error", "Failed to export PDF", "OK");
+            await Application.Current!.Windows[0].Page!.DisplayAlert("Error", "Failed to export PDF", "OK");
         }
         finally
         {
-            isExporting = false;
+            _isExporting = false;
         }
     }
 }

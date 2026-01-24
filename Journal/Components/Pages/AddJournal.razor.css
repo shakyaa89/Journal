@@ -330,6 +330,10 @@
         opacity: 0.5;
     }
 
+    .entry-title:disabled {
+        cursor: not-allowed;
+    }
+
 #editor {
     width: 100%;
     min-height: 400px;

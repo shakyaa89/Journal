@@ -9,7 +9,6 @@
 <div class="journal-container">
     <div class="journal-sidebar">
 
-        <!-- Date -->
         <div class="sidebar-card">
             <div class="card-header">
                 <label>DATE</label>
@@ -17,25 +16,24 @@
             <div class="date-picker">
                 <span class="date-icon"><i class="fa-solid fa-calendar"></i></span>
                 <div class="date-info">
-                    <div class="date-text">@editJournal.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy")</div>
+                    <div class="date-text">@_journal.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy")</div>
                     <div class="date-subtext">Original entry date</div>
                 </div>
             </div>
         </div>
 
-        <!-- Primary Mood -->
         <div class="sidebar-card">
             <div class="card-header">
                 <label>PRIMARY MOOD <span class="required">*</span></label>
             </div>
 
             <div class="mood-grid">
-                @foreach (var mood in MoodsList)
+                @foreach (var mood in _moods)
                 {
-                    <div class="mood-item @(editJournal.Mood == mood ? "active" : "")"
-                         @onclick="() => editJournal.Mood = mood">
+                    <div class="mood-item @(_journal.Mood == mood ? "active" : "")"
+                         @onclick="() => _journal.Mood = mood">
                         <div class="mood-icon">
-                            <i class="fa-solid fa-face-smile"></i>
+                            <i class="fa-solid @(Util.GetMoodIcon(mood))"></i>
                         </div>
                         <div class="mood-label">@mood.ToUpper()</div>
                     </div>
@@ -43,18 +41,17 @@
             </div>
         </div>
 
-        <!-- Secondary Moods -->
         <div class="sidebar-card">
             <div class="card-header">
-                <label>SECONDARY MOODS <span class="mood-limit">(Select 2)</span></label>
+                <label>SECONDARY MOODS <span class="mood-limit">(Select up to 2)</span></label>
             </div>
 
             <div class="secondary-moods">
-                @foreach (var mood in MoodsList)
+                @foreach (var mood in _moods)
                 {
-                    <label class="mood-chip @(selectedSecondaryMoods.Contains(mood) ? "active" : "")">
+                    <label class="mood-chip @(_selectedSecondaryMoods.Contains(mood) ? "active" : "")">
                         <input type="checkbox"
-                               checked="@selectedSecondaryMoods.Contains(mood)"
+                               checked="@_selectedSecondaryMoods.Contains(mood)"
                                @onchange="e => ToggleSecondaryMood(mood, e)" />
                         <span>@mood</span>
                     </label>
@@ -67,11 +64,11 @@
                 <label>TAGS</label>
             </div>
             <div class="tags-container">
-                @foreach (var tag in AvailableTags)
+                @foreach (var tag in _availableTags)
                 {
-                    <label class="tag-chip @(selectedTags.Contains(tag) ? "active" : "")">
+                    <label class="tag-chip @(_selectedTags.Contains(tag) ? "active" : "")">
                         <input type="checkbox"
-                               checked="@selectedTags.Contains(tag)"
+                               checked="@_selectedTags.Contains(tag)"
                                @onchange="e => ToggleTag(tag, e)" />
                         <span>@tag</span>
                     </label>
@@ -81,7 +78,7 @@
                 <input type="text"
                        class="tag-input"
                        placeholder="# Add tags (e.g. Health, Hobbies)..."
-                       @bind="newTagText" />
+                       @bind="_newTagText" />
                 <button @onclick="AddCustomTag" class="btn primary-btn">Add Tag</button>
             </div>
         </div>
@@ -110,7 +107,7 @@
         <div class="editor-container">
             <input class="entry-title"
                    placeholder="Entry Title..."
-                   @bind="editJournal.Title" />
+                   @bind="_journal.Title" />
 
             <div id="editor"></div>
 
@@ -118,21 +115,20 @@
         </div>
 
         <button class="btn primary-btn btn-save"
-                disabled="@isLoading"
+                disabled="@_isLoading"
                 @onclick="UpdateEntryAsync">
-            @(isLoading ? "Updating..." : "Update Entry")
+            @_isLoading ? "Updating..." : "Update Entry"
         </button>
 
         <button class="btn btn-cancel"
-                disabled="@isLoading"
+                disabled="@_isLoading"
                 @onclick="GoBack">
-
             Cancel
         </button>
 
-        @if (!string.IsNullOrEmpty(errorMessage))
+        @if (!string.IsNullOrEmpty(_errorMessage))
         {
-            <p class="error-msg">@errorMessage</p>
+            <p class="error-msg">@_errorMessage</p>
         }
     </div>
 </div>
@@ -140,121 +136,139 @@
 @code {
     [Parameter] public int Id { get; set; }
 
-    private User? currentUser;
-    private JournalEntry editJournal = new();
-    private string errorMessage = string.Empty;
-    private bool isLoading;
-    private List<string> selectedTags = new();
-    private string newTagText = string.Empty;
+    private User? _currentUser;
+    private JournalEntry _journal = new();
+    private string _errorMessage = string.Empty;
+    private bool _isLoading;
 
-    private List<string> selectedSecondaryMoods = new();
+    private readonly List<string> _selectedTags = new();
+    private readonly List<string> _selectedSecondaryMoods = new();
 
-    private readonly List<string> MoodsList = new() {"Happy","Excited","Relaxed","Grateful","Confident","Calm", "Thoughtful","Curious","Nostalgic", "Bored","Sad","Angry","Stressed","Lonely","Anxious"};
+    private string _newTagText = string.Empty;
 
-    private List<string> AvailableTags = new List<string> { "Work", "Career", "Studies", "Family", "Friends", "Relationships", "Health", "Fitness", "Personal Growth", "Self-care", "Hobbies", "Travel", "Nature", "Finance", "Spirituality", "Birthday", "Holiday", "Vacation", "Celebration", "Exercise", "Reading", "Writing", "Cooking", "Meditation", "Yoga", "Music", "Shopping", "Parenting", "Projects", "Planning", "Reflection" };
+    private readonly List<string> _moods = new()
+    {
+        "Happy","Excited","Relaxed","Grateful","Confident",
+        "Calm","Thoughtful","Curious","Nostalgic","Bored",
+        "Sad","Angry","Stressed","Lonely","Anxious"
+    };
+
+    private readonly List<string> _availableTags = new()
+    {
+        "Work","Career","Studies","Family","Friends","Relationships",
+        "Health","Fitness","Personal Growth","Self-care","Hobbies",
+        "Travel","Nature","Finance","Spirituality","Birthday","Holiday",
+        "Vacation","Celebration","Exercise","Reading","Writing","Cooking",
+        "Meditation","Yoga","Music","Shopping","Parenting","Projects",
+        "Planning","Reflection"
+    };
 
     protected override async Task OnInitializedAsync()
     {
-        currentUser = await AuthService.GetCurrentUser();
-        if (currentUser == null)
+        _currentUser = await AuthService.GetCurrentUser();
+        if (_currentUser == null)
         {
             Navigation.NavigateTo("/login");
             return;
         }
 
-        isLoading = true;
+        _isLoading = true;
 
         var existing = await JournalService.GetJournalByIdAsync(Id);
 
-        if (existing == null || existing.UserId != currentUser.Id)
+        if (existing == null || existing.UserId != _currentUser.Id)
         {
+            _isLoading = false;
             Navigation.NavigateTo("/journal/list");
             return;
         }
 
-        editJournal = existing;
+        _journal = existing;
 
-        if (!string.IsNullOrWhiteSpace(editJournal.SecondaryMood1))
-            selectedSecondaryMoods.Add(editJournal.SecondaryMood1);
+        if (!string.IsNullOrWhiteSpace(_journal.SecondaryMood1))
+            _selectedSecondaryMoods.Add(_journal.SecondaryMood1);
 
-        if (!string.IsNullOrWhiteSpace(editJournal.SecondaryMood2))
-            selectedSecondaryMoods.Add(editJournal.SecondaryMood2);
+        if (!string.IsNullOrWhiteSpace(_journal.SecondaryMood2))
+            _selectedSecondaryMoods.Add(_journal.SecondaryMood2);
 
-        if(editJournal.Tags != null)
+        if (_journal.Tags != null)
         {
-            foreach (var tag in editJournal.Tags)
+            foreach (var tag in _journal.Tags)
             {
-                if(!AvailableTags.Contains(tag))
-                    AvailableTags.Add(tag);
+                if (!_availableTags.Contains(tag))
+                    _availableTags.Add(tag);
 
-                if (!selectedTags.Contains(tag))
-                    selectedTags.Add(tag);
+                if (!_selectedTags.Contains(tag))
+                    _selectedTags.Add(tag);
             }
         }
 
-        isLoading = false;
+        _isLoading = false;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
-        {
-            await JS.InvokeVoidAsync("initQuill", "editor", "quill-toolbar");
+        if (!firstRender)
+            return;
 
-            await JS.InvokeVoidAsync("setQuillHtml", editJournal.Content ?? "");
-        }
+        await JS.InvokeVoidAsync("initQuill", "editor", "quill-toolbar");
+        await JS.InvokeVoidAsync("setQuillHtml", _journal.Content ?? string.Empty);
     }
 
     private async Task UpdateEntryAsync()
     {
-        errorMessage = string.Empty;
+        _errorMessage = string.Empty;
 
-        editJournal.Content = await JS.InvokeAsync<string>("getQuillContent");
+        _journal.Content = await JS.InvokeAsync<string>("getQuillContent");
 
-        if (string.IsNullOrWhiteSpace(editJournal.Title) ||
-            string.IsNullOrWhiteSpace(editJournal.Content) ||
-            string.IsNullOrWhiteSpace(editJournal.Mood))
+        if (string.IsNullOrWhiteSpace(_journal.Title) ||
+            string.IsNullOrWhiteSpace(_journal.Content) ||
+            string.IsNullOrWhiteSpace(_journal.Mood))
         {
-            errorMessage = "All fields must be filled.";
+            _errorMessage = "All fields must be filled.";
             return;
         }
 
-        if (selectedSecondaryMoods.Count != 2)
+        if (_selectedSecondaryMoods.Count != 2)
         {
-            errorMessage = "Please select exactly 2 secondary moods.";
+            _errorMessage = "Please select 2 secondary moods.";
             return;
         }
 
-        editJournal.SecondaryMood1 = selectedSecondaryMoods[0];
-        editJournal.SecondaryMood2 = selectedSecondaryMoods[1];
+        if (_currentUser is null)
+        {
+            _errorMessage = "User session is invalid. Please sign in again.";
+            return;
+        }
 
-        editJournal.UpdatedAt = DateTime.UtcNow;
+        _journal.SecondaryMood1 = _selectedSecondaryMoods[0];
+        _journal.SecondaryMood2 = _selectedSecondaryMoods[1];
+        _journal.UpdatedAt = DateTime.UtcNow;
+        _journal.Tags = _selectedTags.ToList();
 
-        editJournal.Tags = selectedTags.ToList();
-
-        isLoading = true;
+        _isLoading = true;
 
         var updated = await JournalService.UpdateJournalEntryAsync(
-            editJournal.Id,
-            editJournal.Title,
-            editJournal.Content,
-            editJournal.Mood,
-            editJournal.SecondaryMood1,
-            editJournal.SecondaryMood2,
-            editJournal.Tags,
-            currentUser!.Id,
-            editJournal.UpdatedAt
+            _journal.Id,
+            _journal.Title,
+            _journal.Content,
+            _journal.Mood,
+            _journal.SecondaryMood1,
+            _journal.SecondaryMood2,
+            _journal.Tags,
+            _currentUser.Id,
+            _journal.UpdatedAt
         );
 
-        isLoading = false;
+        _isLoading = false;
 
         if (updated == null)
         {
-            errorMessage = "Update failed.";
+            _errorMessage = "Update failed.";
             return;
         }
 
-        Navigation.NavigateTo($"/journal/{editJournal.Id}");
+        Navigation.NavigateTo($"/journal/{_journal.Id}");
     }
 
     private void ToggleSecondaryMood(string mood, ChangeEventArgs e)
@@ -263,45 +277,45 @@
 
         if (isChecked)
         {
-            if (selectedSecondaryMoods.Count < 2 && !selectedSecondaryMoods.Contains(mood))
-                selectedSecondaryMoods.Add(mood);
+            if (_selectedSecondaryMoods.Count < 2 && !_selectedSecondaryMoods.Contains(mood))
+                _selectedSecondaryMoods.Add(mood);
         }
         else
         {
-            selectedSecondaryMoods.Remove(mood);
+            _selectedSecondaryMoods.Remove(mood);
         }
     }
 
     private void ToggleTag(string tag, ChangeEventArgs e)
     {
-        var isChecked = (bool)e.Value;
+        var isChecked = e.Value is bool b && b;
 
         if (isChecked)
         {
-            if (!selectedTags.Contains(tag))
-                selectedTags.Add(tag);
+            if (!_selectedTags.Contains(tag))
+                _selectedTags.Add(tag);
         }
         else
         {
-            selectedTags.Remove(tag);
+            _selectedTags.Remove(tag);
         }
     }
 
     private void AddCustomTag()
     {
-        var tag = newTagText?.Trim();
+        var tag = _newTagText?.Trim();
 
         if (!string.IsNullOrWhiteSpace(tag))
         {
-            if (!AvailableTags.Contains(tag))
-                AvailableTags.Add(tag);
+            if (!_availableTags.Contains(tag))
+                _availableTags.Add(tag);
 
-            if (!selectedTags.Contains(tag))
-                selectedTags.Add(tag);
+            if (!_selectedTags.Contains(tag))
+                _selectedTags.Add(tag);
         }
 
-        newTagText = string.Empty;
+        _newTagText = string.Empty;
     }
 
-    private void GoBack() => Navigation.NavigateTo($"/journal/{editJournal.Id}");
+    private void GoBack() => Navigation.NavigateTo($"/journal/{_journal.Id}");
 }

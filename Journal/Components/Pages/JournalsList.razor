@@ -15,12 +15,12 @@
         <div class="filter-row">
             <input type="text"
                    placeholder="Search by title or content"
-                   @bind="SearchText"
+                   @bind="_searchText"
                    @bind:event="oninput" />
 
-            <select @bind="SelectedMood">
+            <select @bind="_selectedMood">
                 <option value="">All moods</option>
-                @foreach (var mood in MoodOptions)
+                @foreach (var mood in _moodOptions)
                 {
                     <option value="@mood">@mood</option>
                 }
@@ -28,7 +28,7 @@
 
             <input type="text"
                    placeholder="Filter by tag"
-                   @bind="TagFilter"
+                   @bind="_tagFilter"
                    @bind:event="oninput" />
         </div>
 
@@ -36,14 +36,14 @@
             <label>
                 From:
                 <input type="date"
-                       @bind="StartDate"
+                       @bind="_startDate"
                        @bind:format="yyyy-MM-dd" />
             </label>
 
             <label>
                 To:
                 <input type="date"
-                       @bind="EndDate"
+                       @bind="_endDate"
                        @bind:format="yyyy-MM-dd" />
             </label>
 
@@ -52,17 +52,17 @@
     </div>
 
     <div class="view-switch">
-        <button class="btn @(IsCalendarView ? "view-toggle" : "primary-btn")"
-                @onclick="() => IsCalendarView = false">
+        <button class="btn @(_isCalendarView ? "view-toggle" : "primary-btn")"
+                @onclick="() => _isCalendarView = false">
             List View
         </button>
-        <button class="btn  @(IsCalendarView ? "primary-btn" : "view-toggle")"
-                @onclick="() => IsCalendarView = true">
+        <button class="btn  @(_isCalendarView ? "primary-btn" : "view-toggle")"
+                @onclick="() => _isCalendarView = true">
             Calendar View
         </button>
     </div>
 
-    @if (IsCalendarView)
+    @if (_isCalendarView)
     {
         <div class="calendar-container">
             <div class="calendar-header">
@@ -80,7 +80,7 @@
                 <div class="calendar-grid-header">Fri</div>
                 <div class="calendar-grid-header">Sat</div>
 
-                @foreach (var week in CalendarWeeks)
+                @foreach (var week in _calendarWeeks)
                 {
                     @foreach (var day in week)
                     {
@@ -90,7 +90,7 @@
                         }
                         else
                         {
-                            var date = new DateTime(CalendarYear, CalendarMonth, day.Value);
+                            var date = new DateTime(_calendarYear, _calendarMonth, day.Value);
                             var entry = FilteredJournals
                             .Where(j => j.CreatedAt.Date == date.Date)
                             .OrderByDescending(j => j.CreatedAt)
@@ -143,14 +143,16 @@
                             @if (!string.IsNullOrEmpty(journal.Mood))
                             {
                                 <div class="mood-badge">
-                                    <span class="mood-emoji"><i class="fa-solid @(Util.GetMoodIcon(journal.Mood))"></i></span>
+                                    <span class="mood-emoji">
+                                        <i class="fa-solid @(Util.GetMoodIcon(journal.Mood))"></i>
+                                    </span>
                                     <span class="mood-text">@journal.Mood</span>
                                 </div>
                             }
                         </div>
 
                         <h3 class="journal-title">@journal.Title</h3>
-                        <p class="journal-preview">@((MarkupString)@GetPreview(journal.Content))</p>
+                        <p class="journal-preview">@((MarkupString)GetPreview(journal.Content))</p>
 
                         @if (journal.Tags != null && journal.Tags.Count > 0)
                         {
@@ -176,8 +178,8 @@
             {
                 <div class="pagination">
                     <button class="page-btn"
-                            disabled="@(CurrentPage == 1)"
-                            @onclick="PrevPage">
+                            @(CurrentPage= =1 ? "disabled" : "" )
+                            @onclick ="PrevPage">
                         Prev
                     </button>
 
@@ -190,8 +192,8 @@
                     }
 
                     <button class="page-btn"
-                            disabled="@(CurrentPage == TotalPages)"
-                            @onclick="NextPage">
+                            @(CurrentPage= =TotalPages ? "disabled" : "" )
+                            @onclick ="NextPage">
                         Next
                     </button>
                 </div>
@@ -208,31 +210,28 @@
 </div>
 
 @code {
-    private User? currentUser;
-    private List<JournalEntry> journals = new();
+    private User? _currentUser;
+    private List<JournalEntry> _journals = new();
 
-    private int PageSize = 6;
-    private int CurrentPage = 1;
+    private int _pageSize = 6;
+    private int _currentPage = 1;
 
-    // calendar toggle
-    private bool IsCalendarView = false;
+    private bool _isCalendarView;
 
-    // calendar state
-    private int CalendarYear = DateTime.Today.Year;
-    private int CalendarMonth = DateTime.Today.Month;
-    private List<int?[]> CalendarWeeks = new();
+    private int _calendarYear = DateTime.Today.Year;
+    private int _calendarMonth = DateTime.Today.Month;
+    private readonly List<int?[]> _calendarWeeks = new();
 
     private string CalendarMonthName =>
-        new DateTime(CalendarYear, CalendarMonth, 1).ToString("MMMM yyyy");
+        new DateTime(_calendarYear, _calendarMonth, 1).ToString("MMMM yyyy");
 
-    // simple filter fields
-    private string SearchText = string.Empty;
-    private string SelectedMood = string.Empty;
-    private string TagFilter = string.Empty;
-    private DateTime? StartDate;
-    private DateTime? EndDate;
+    private string _searchText = string.Empty;
+    private string _selectedMood = string.Empty;
+    private string _tagFilter = string.Empty;
+    private DateTime? _startDate;
+    private DateTime? _endDate;
 
-    private readonly List<string> MoodOptions = new()
+    private readonly List<string> _moodOptions = new()
     {
         "Happy", "Excited", "Relaxed", "Grateful", "Confident",
         "Calm", "Thoughtful", "Curious", "Nostalgic", "Bored",
@@ -241,23 +240,18 @@
 
     private List<JournalEntry> FilteredJournals => GetFilteredJournals();
 
-    private int TotalPages => (int)Math.Ceiling(FilteredJournals.Count / (double)PageSize);
+    private int TotalPages => FilteredJournals.Count == 0 ? 0 : (int)Math.Ceiling(FilteredJournals.Count / (double)_pageSize);
 
-    private IEnumerable<int> PageNumbers => TotalPages == 0
-        ? Enumerable.Empty<int>()
-        : Enumerable.Range(1, TotalPages);
-    
-    private List<JournalEntry> PagedJournals =>
-        FilteredJournals
-            .OrderByDescending(j => j.CreatedAt)
-            .Skip((CurrentPage - 1) * PageSize)
-            .Take(PageSize)
-            .ToList();
+    private int CurrentPage => _currentPage;
+
+    private IEnumerable<int> PageNumbers => TotalPages == 0 ? Enumerable.Empty<int>() : Enumerable.Range(1, TotalPages);
+
+    private List<JournalEntry> PagedJournals => FilteredJournals.OrderByDescending(j => j.CreatedAt).Skip((CurrentPage - 1) * _pageSize).Take(_pageSize).ToList();
 
     protected override async Task OnInitializedAsync()
     {
-        currentUser = await AuthService.GetCurrentUser();
-        if (currentUser == null)
+        _currentUser = await AuthService.GetCurrentUser();
+        if (_currentUser == null)
         {
             Navigation.NavigateTo("/login");
             return;
@@ -269,115 +263,109 @@
 
     private async Task FetchJournalsAsync()
     {
-        if (currentUser != null)
-            journals = await JournalService.GetAllJournalsAsync(currentUser.Id);
+        if (_currentUser != null)
+            _journals = await JournalService.GetAllJournalsAsync(_currentUser.Id);
 
-        if (CurrentPage > TotalPages)
-            CurrentPage = Math.Max(1, TotalPages == 0 ? 1 : TotalPages);
+        if (TotalPages > 0 && _currentPage > TotalPages)
+            _currentPage = TotalPages;
+        else if (TotalPages == 0)
+            _currentPage = 1;
     }
 
     private List<JournalEntry> GetFilteredJournals()
     {
-        List<JournalEntry> query = journals;
+        IEnumerable<JournalEntry> query = _journals;
 
-        // text search
-        if (!string.IsNullOrWhiteSpace(SearchText))
+        if (!string.IsNullOrWhiteSpace(_searchText))
         {
-            string text = SearchText.Trim();
-            query = query.Where(j =>
-                (!string.IsNullOrEmpty(j.Title) &&
-                 j.Title.Contains(text, StringComparison.OrdinalIgnoreCase)) ||
-                (!string.IsNullOrEmpty(j.Content) &&
-                 j.Content.Contains(text, StringComparison.OrdinalIgnoreCase))).ToList();
+            var text = _searchText.Trim();
+            query = query.Where(j => (!string.IsNullOrEmpty(j.Title) && j.Title.Contains(text, StringComparison.OrdinalIgnoreCase)) || (!string.IsNullOrEmpty(j.Content) && j.Content.Contains(text, StringComparison.OrdinalIgnoreCase)));
         }
 
-        // date range
-        if (StartDate.HasValue)
+        if (_startDate.HasValue)
         {
-            DateTime from = StartDate.Value.Date;
-            query = query.Where(j => j.CreatedAt.Date >= from).ToList();
+            var from = _startDate.Value.Date;
+            query = query.Where(j => j.CreatedAt.Date >= from);
         }
 
-        if (EndDate.HasValue)
+        if (_endDate.HasValue)
         {
-            DateTime to = EndDate.Value.Date;
-            query = query.Where(j => j.CreatedAt.Date <= to).ToList();
+            var to = _endDate.Value.Date;
+            query = query.Where(j => j.CreatedAt.Date <= to);
         }
 
-        // mood
-        if (!string.IsNullOrWhiteSpace(SelectedMood))
+        if (!string.IsNullOrWhiteSpace(_selectedMood))
         {
-            string mood = SelectedMood.Trim();
+            var mood = _selectedMood.Trim();
             query = query.Where(j =>
                 !string.IsNullOrEmpty(j.Mood) &&
-                string.Equals(j.Mood, mood, StringComparison.OrdinalIgnoreCase)).ToList();
+                string.Equals(j.Mood, mood, StringComparison.OrdinalIgnoreCase));
         }
 
-        // tag
-        if (!string.IsNullOrWhiteSpace(TagFilter))
+        if (!string.IsNullOrWhiteSpace(_tagFilter))
         {
-            string tagText = TagFilter.Trim();
+            var tagText = _tagFilter.Trim();
             query = query.Where(j =>
                 j.Tags != null &&
-                j.Tags.Any(t =>
-                    !string.IsNullOrEmpty(t) &&
-                    t.Contains(tagText, StringComparison.OrdinalIgnoreCase))).ToList();
+                j.Tags.Any(t => !string.IsNullOrEmpty(t) && t.Contains(tagText, StringComparison.OrdinalIgnoreCase)));
         }
 
-        return query;
+        return query.ToList();
     }
 
-    
     private string GetPreview(string content)
     {
-        if (string.IsNullOrEmpty(content)) return "";
-        return content.Length > 20 ? content.Substring(0, 20) + "..." : content;
+        if (string.IsNullOrEmpty(content))
+            return string.Empty;
+
+        return content.Length > 20 ? content[..20] + "..." : content;
     }
 
     private void ClearFilters()
     {
-        SearchText = string.Empty;
-        SelectedMood = string.Empty;
-        TagFilter = string.Empty;
-        StartDate = null;
-        EndDate = null;
-        CurrentPage = 1;
+        _searchText = string.Empty;
+        _selectedMood = string.Empty;
+        _tagFilter = string.Empty;
+        _startDate = null;
+        _endDate = null;
+        _currentPage = 1;
     }
-    
+
     private void GoToPage(int page)
     {
-        if (page < 1 || page > TotalPages) return;
-        CurrentPage = page;
+        if (page < 1 || page > TotalPages)
+            return;
+
+        _currentPage = page;
     }
 
     private void PrevPage()
     {
-        if (CurrentPage > 1)
-            CurrentPage--;
+        if (_currentPage > 1)
+            _currentPage--;
     }
 
     private void NextPage()
     {
-        if (CurrentPage < TotalPages)
-            CurrentPage++;
+        if (_currentPage < TotalPages)
+            _currentPage++;
     }
 
     private void CalendarView()
     {
-        CalendarWeeks.Clear();
+        _calendarWeeks.Clear();
 
-        var firstOfMonth = new DateTime(CalendarYear, CalendarMonth, 1);
-        var daysInMonth = DateTime.DaysInMonth(CalendarYear, CalendarMonth);
+        var firstOfMonth = new DateTime(_calendarYear, _calendarMonth, 1);
+        var daysInMonth = DateTime.DaysInMonth(_calendarYear, _calendarMonth);
 
-        int offset = (int)firstOfMonth.DayOfWeek;
+        var offset = (int)firstOfMonth.DayOfWeek;
+        var currentDay = 1 - offset;
 
-        int currentDay = 1 - offset;
-
-        for (int week = 0; week < 6; week++)
+        for (var week = 0; week < 6; week++)
         {
             var weekDays = new int?[7];
 
-            for (int dayIndex = 0; dayIndex < 7; dayIndex++)
+            for (var dayIndex = 0; dayIndex < 7; dayIndex++)
             {
                 if (currentDay < 1 || currentDay > daysInMonth)
                     weekDays[dayIndex] = null;
@@ -387,7 +375,7 @@
                 currentDay++;
             }
 
-            CalendarWeeks.Add(weekDays);
+            _calendarWeeks.Add(weekDays);
 
             if (currentDay > daysInMonth)
                 break;
@@ -396,25 +384,22 @@
 
     private void PrevMonth()
     {
-        var dt = new DateTime(CalendarYear, CalendarMonth, 1).AddMonths(-1);
-        CalendarYear = dt.Year;
-        CalendarMonth = dt.Month;
+        var dt = new DateTime(_calendarYear, _calendarMonth, 1).AddMonths(-1);
+        _calendarYear = dt.Year;
+        _calendarMonth = dt.Month;
         CalendarView();
     }
 
     private void NextMonth()
     {
-        var dt = new DateTime(CalendarYear, CalendarMonth, 1).AddMonths(1);
-        CalendarYear = dt.Year;
-        CalendarMonth = dt.Month;
+        var dt = new DateTime(_calendarYear, _calendarMonth, 1).AddMonths(1);
+        _calendarYear = dt.Year;
+        _calendarMonth = dt.Month;
         CalendarView();
     }
-
 
     private void ViewJournal(int id)
     {
         Navigation.NavigateTo($"/journal/{id}");
     }
-
-
 }

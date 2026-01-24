@@ -1,5 +1,4 @@
-﻿// IJournalRepository
-
+﻿
 using Journal.Models;
 
 namespace Journal.Repositories

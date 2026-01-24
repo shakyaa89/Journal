@@ -50,11 +50,12 @@ namespace Journal.Services
             }
         }
 
-        private User? _currentUser;
+        public async Task<bool> UpdateUser(User user) => await _authRepository.UpdateUserAsync(user);
+        
 
         public async Task<User?> GetCurrentUser()
         {
-            string userString = await SecureStorage.GetAsync("user");
+            string userString = await SecureStorage.GetAsync("user") ?? "";
             if (!string.IsNullOrEmpty(userString))
             {
                 User? storageUser = System.Text.Json.JsonSerializer.Deserialize<User>(userString);
@@ -63,9 +64,7 @@ namespace Journal.Services
 
             return null;
         }
-        public void LogoutUser()
-        {
-            SecureStorage.Remove("user");
-        }
+        public void LogoutUser() => SecureStorage.Remove("user");
+        
     }
 }

@@ -11,5 +11,7 @@ namespace Journal.Services
         Task<User?> GetCurrentUser();
 
         void LogoutUser();
+
+        Task<bool> UpdateUser(User user);
     }
 }

@@ -7,7 +7,7 @@
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
 
-@if (loading)
+@if (_isLoading)
 {
     <div class="loading-container">
         <div class="loading-spinner"></div>
@@ -19,27 +19,23 @@ else
     <div class="dashboard-container">
         <div class="dashboard-header">
             <div class="header-content">
-                <h1 class="title">Welcome back, @currentUser?.FullName</h1>
+                <h1 class="title">Welcome back, @_currentUser?.FullName</h1>
                 <p class="subtitle">Here's your journaling journey at a glance</p>
             </div>
             <div class="header-actions">
-                <a class="btn btn-secondary" href="/journal/list">
-                    View All
-                </a>
-                <a class="btn btn-primary" href="/journal/add">
-                    New Entry
+                <a class="btn btn-secondary" href="/change-password">
+                    Change Password
                 </a>
             </div>
         </div>
 
         <div class="dashboard-grid">
-            <!-- Stats Cards -->
             <div class="stats-section">
                 <div class="stat-card">
                     <div class="stat-icon"><i class="fa-solid fa-chart-simple" style="color: var(--accent)"></i></div>
                     <div class="stat-content">
                         <p class="stat-label">Total Entries</p>
-                        <p class="stat-value">@totalJournals</p>
+                        <p class="stat-value">@_totalJournalCount</p>
                     </div>
                 </div>
 
@@ -47,7 +43,7 @@ else
                     <div class="stat-icon"><i class="fa-solid fa-fire" style="color: red;"></i></div>
                     <div class="stat-content">
                         <p class="stat-label">Current Streak</p>
-                        <p class="stat-value">@currentStreak <span class="stat-unit">days</span></p>
+                        <p class="stat-value">@_currentStreak <span class="stat-unit">days</span></p>
                     </div>
                 </div>
 
@@ -55,47 +51,58 @@ else
                     <div class="stat-icon"><i class="fa-solid fa-trophy" style="color: gold;"></i></div>
                     <div class="stat-content">
                         <p class="stat-label">Longest Streak</p>
-                        <p class="stat-value">@longestStreak <span class="stat-unit">days</span></p>
+                        <p class="stat-value">@_longestStreak <span class="stat-unit">days</span></p>
                     </div>
                 </div>
 
                 <div class="stat-card">
-                    <div class="stat-icon"><i class="fa-solid @Util.GetMoodIcon(mostFrequentMood)" style="color: var(--accent)"></i></div>
+                    <div class="stat-icon">
+                        <i class="fa-solid @Util.GetMoodIcon(_mostFrequentMood)" style="color: var(--accent)"></i>
+                    </div>
                     <div class="stat-content">
                         <p class="stat-label">Top Mood</p>
-                        <p class="stat-value mood-text">@mostFrequentMood</p>
+                        <p class="stat-value mood-text">@_mostFrequentMood</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Mood Chart -->
             <div class="chart-section">
                 <div class="section-header">
                     <h2 class="section-title">Mood Distribution</h2>
                 </div>
                 <div class="chart-container">
-                    @if (chartRendered == false)
+                    @if (_totalJournalCount == 0 || _moodDistribution == null || !_moodDistribution.Any())
                     {
-                        <div class="chart-loading">
-                            <div class="loading-spinner small"></div>
-                            <p>Loading chart...</p>
+                        <div class="empty-state">
+                            <i class="fa-solid fa-chart-pie empty-icon" style="font-size: 40px; color: var(--accent);"></i>
+                            <p class="empty-text">No entries yet, so there’s no mood data to show.</p>
                         </div>
                     }
-                    <canvas id="moodChart"></canvas>
+                    else
+                    {
+                        @if (!_chartRendered)
+                        {
+                            <div class="chart-loading">
+                                <div class="loading-spinner small"></div>
+                                <p>Loading chart...</p>
+                            </div>
+                        }
+
+                        <canvas id="moodChart"></canvas>
+                    }
                 </div>
             </div>
 
-            <!-- Recent Entries -->
             <div class="recent-section">
                 <div class="section-header">
                     <h2 class="section-title">Recent Entries</h2>
                     <span class="section-count">Last 5</span>
                 </div>
 
-                @if (limitJournal.Any())
+                @if (_recentJournals.Any())
                 {
                     <div class="entries-list">
-                        @foreach (var journal in limitJournal)
+                        @foreach (var journal in _recentJournals)
                         {
                             <div class="entry-card">
                                 <div class="entry-header">
@@ -113,32 +120,31 @@ else
                 else
                 {
                     <div class="empty-state">
-                        <p class="empty-icon">📝</p>
+                        <i class="fa-solid fa-note-sticky empty-icon" style="font-size: 40px; color: var(--accent);"></i>
                         <p class="empty-text">No entries yet. Start journaling today!</p>
                     </div>
                 }
             </div>
 
-            <!-- Missed Days -->
-            @if (missedDays.Any())
+            @if (_missedDays.Any())
             {
                 <div class="missed-section">
                     <div class="section-header">
                         <h2 class="section-title">Missed Days</h2>
-                        <span class="section-badge">@missedDays.Count</span>
+                        <span class="section-badge">@_missedDays.Count</span>
                     </div>
                     <div class="missed-list">
-                        @foreach (var missedDay in missedDays.Take(7))
+                        @foreach (var missedDay in _missedDays.Take(7))
                         {
                             <div class="missed-item">
                                 <span class="missed-dot"></span>
                                 <span class="missed-date">@missedDay.ToString("dddd, MMM dd yyyy")</span>
                             </div>
                         }
-                        @if (missedDays.Count > 7)
+                        @if (_missedDays.Count > 7)
                         {
                             <div class="missed-more">
-                                +@(missedDays.Count - 7) more missed days
+                                +@(_missedDays.Count - 7) more missed days
                             </div>
                         }
                     </div>
@@ -148,74 +154,63 @@ else
     </div>
 }
 
-
-
 @code {
-    private User? currentUser;
-    private bool loading = true;
+    private User? _currentUser;
+    private bool _isLoading = true;
 
-    private List<JournalEntry> journals = new List<JournalEntry>();
-    private List<JournalEntry> limitJournal = new List<JournalEntry>();
-    private int totalJournals;
-    private JournalEntry? recentJournal;
-    private string mostFrequentMood = string.Empty;
+    private List<JournalEntry> _journals = new();
+    private List<JournalEntry> _recentJournals = new();
+    private int _totalJournalCount;
+    private string _mostFrequentMood = string.Empty;
 
-    private Dictionary<string, double> moodDistribution = new Dictionary<string, double>();
-    private bool chartRendered;
+    private Dictionary<string, double>? _moodDistribution;
+    private bool _chartRendered;
 
-    private int currentStreak = 0;
-    private int longestStreak = 0;
+    private int _currentStreak;
+    private int _longestStreak;
 
-    private List<DateTime> missedDays = new List<DateTime>();
+    private List<DateTime> _missedDays = new();
 
-    protected async override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
-        currentUser = await AuthService.GetCurrentUser();
-        if (currentUser == null)
+        _currentUser = await AuthService.GetCurrentUser();
+        if (_currentUser == null)
         {
             Navigation.NavigateTo("/login");
             return;
         }
 
-        journals = await JournalService.GetAllJournalsAsync(currentUser.Id);
-        totalJournals = journals.Count;
-        recentJournal = journals.OrderByDescending(j => j.CreatedAt).FirstOrDefault();
+        _journals = await JournalService.GetAllJournalsAsync(_currentUser.Id);
+        _totalJournalCount = _journals.Count;
 
-        limitJournal = journals.OrderByDescending(j => j.CreatedAt).Take(5).ToList();
+        _recentJournals = _journals.OrderByDescending(j => j.CreatedAt).Take(5).ToList();
 
-        mostFrequentMood = AnalyticsService.GetMostFrequentMood(journals) ?? "";
+        _mostFrequentMood = AnalyticsService.GetMostFrequentMood(_journals) ?? string.Empty;
+        _moodDistribution = AnalyticsService.GetMoodDistribution(_journals);
 
-        moodDistribution = AnalyticsService.GetMoodDistribution(journals);
-        chartRendered = false;
+        _currentStreak = AnalyticsService.GetCurrentDailyStreak(_journals);
+        _longestStreak = AnalyticsService.GetLongestStreak(_journals);
+        _missedDays = AnalyticsService.GetMissedDays(_journals);
 
-        currentStreak = AnalyticsService.GetCurrentDailyStreak(journals);
-        longestStreak = AnalyticsService.GetLongestStreak(journals);
-
-        missedDays = AnalyticsService.GetMissedDays(journals);
-
-        StateHasChanged();
-        loading = false;
+        _isLoading = false;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (chartRendered) return;
+        if (!firstRender || _chartRendered || _moodDistribution == null || !_moodDistribution.Any())
+            return;
 
+        var labels = _moodDistribution.Keys.ToArray();
+        var values = _moodDistribution.Values.ToArray();
 
-        var labels = moodDistribution.Keys.ToArray();
-        var values = moodDistribution.Values.ToArray();
-           
-        chartRendered = true;
-
-        await InvokeAsync(StateHasChanged);
+        _chartRendered = true;
 
         await JS.InvokeVoidAsync(
             "renderMoodChart",
             "moodChart",
             labels,
             values,
-            "pie" 
+            "pie"
         );
     }
-
 }
