@@ -50,7 +50,7 @@
             </label>
 
             <button @onclick="ClearFilters" class="btn primary-btn">Clear filters</button>
-            <button @onclick="ExportPdf" class="btn primary-btn">Export entries as PDF</button>
+            <button @onclick="ExportPdf" class="btn primary-btn">@(_isExporting ? "Exporting..." : "Export entries as PDF")</button>
 
         </div>
     </div>
@@ -214,29 +214,38 @@
 </div>
 
 @code {
+    // Logged-in user
     private User? _currentUser;
+    // List of all journals
     private List<JournalEntry> _journals = new();
 
+    // Exporting flag 
     private bool _isExporting;
 
+    // Pagination state
     private int _pageSize = 6;
     private int _currentPage = 1;
 
+    // Toggle between list and calendar views
     private bool _isCalendarView;
 
+    // Calendar state
     private int _calendarYear = DateTime.Today.Year;
     private int _calendarMonth = DateTime.Today.Month;
     private readonly List<int?[]> _calendarWeeks = new();
 
+    // Calendar month
     private string CalendarMonthName =>
         new DateTime(_calendarYear, _calendarMonth, 1).ToString("MMMM yyyy");
 
+    // Filter fields
     private string _searchText = string.Empty;
     private string _selectedMood = string.Empty;
     private string _tagFilter = string.Empty;
     private DateTime? _startDate;
     private DateTime? _endDate;
 
+    // All Moods
     private readonly List<string> _moodOptions = new()
     {
         "Happy", "Excited", "Relaxed", "Grateful", "Confident",
@@ -244,16 +253,18 @@
         "Sad", "Angry", "Stressed", "Lonely", "Anxious"
     };
 
+    // Journals after applying filters
     private List<JournalEntry> FilteredJournals => GetFilteredJournals();
 
+    // Pagination 
     private int TotalPages => FilteredJournals.Count == 0 ? 0 : (int)Math.Ceiling(FilteredJournals.Count / (double)_pageSize);
-
     private int CurrentPage => _currentPage;
-
     private IEnumerable<int> PageNumbers => TotalPages == 0 ? Enumerable.Empty<int>() : Enumerable.Range(1, TotalPages);
 
+    // Journals displayed on current page
     private List<JournalEntry> PagedJournals => FilteredJournals.OrderByDescending(j => j.CreatedAt).Skip((CurrentPage - 1) * _pageSize).Take(_pageSize).ToList();
 
+    // Fetch user and journals on initialization
     protected override async Task OnInitializedAsync()
     {
         _currentUser = await AuthService.GetCurrentUser();
@@ -267,6 +278,7 @@
         CalendarView();
     }
 
+    // Load all journals for the current user
     private async Task FetchJournalsAsync()
     {
         if (_currentUser != null)
@@ -278,6 +290,7 @@
             _currentPage = 1;
     }
 
+    // Apply search, date, mood, and tag filters
     private List<JournalEntry> GetFilteredJournals()
     {
         IEnumerable<JournalEntry> query = _journals;
@@ -285,7 +298,9 @@
         if (!string.IsNullOrWhiteSpace(_searchText))
         {
             var text = _searchText.Trim();
-            query = query.Where(j => (!string.IsNullOrEmpty(j.Title) && j.Title.Contains(text, StringComparison.OrdinalIgnoreCase)) || (!string.IsNullOrEmpty(j.Content) && j.Content.Contains(text, StringComparison.OrdinalIgnoreCase)));
+            query = query.Where(j =>
+                (!string.IsNullOrEmpty(j.Title) && j.Title.Contains(text, StringComparison.OrdinalIgnoreCase)) ||
+                (!string.IsNullOrEmpty(j.Content) && j.Content.Contains(text, StringComparison.OrdinalIgnoreCase)));
         }
 
         if (_startDate.HasValue)
@@ -313,12 +328,15 @@
             var tagText = _tagFilter.Trim();
             query = query.Where(j =>
                 j.Tags != null &&
-                j.Tags.Any(t => !string.IsNullOrEmpty(t) && t.Contains(tagText, StringComparison.OrdinalIgnoreCase)));
+                j.Tags.Any(t =>
+                    !string.IsNullOrEmpty(t) &&
+                    t.Contains(tagText, StringComparison.OrdinalIgnoreCase)));
         }
 
         return query.ToList();
     }
 
+    // Short preview for journal content
     private string GetPreview(string content)
     {
         if (string.IsNullOrEmpty(content))
@@ -327,6 +345,7 @@
         return content.Length > 20 ? content[..20] + "..." : content;
     }
 
+    // Clear all applied filters and reset page
     private void ClearFilters()
     {
         _searchText = string.Empty;
@@ -337,6 +356,7 @@
         _currentPage = 1;
     }
 
+    // Go to a specific page
     private void GoToPage(int page)
     {
         if (page < 1 || page > TotalPages)
@@ -345,18 +365,21 @@
         _currentPage = page;
     }
 
+    // Previous page
     private void PrevPage()
     {
         if (_currentPage > 1)
             _currentPage--;
     }
 
+    // Next page
     private void NextPage()
     {
         if (_currentPage < TotalPages)
             _currentPage++;
     }
 
+    // Create Calendar view
     private void CalendarView()
     {
         _calendarWeeks.Clear();
@@ -388,6 +411,7 @@
         }
     }
 
+    // Previous month in calendar
     private void PrevMonth()
     {
         var dt = new DateTime(_calendarYear, _calendarMonth, 1).AddMonths(-1);
@@ -396,6 +420,7 @@
         CalendarView();
     }
 
+    // Next month in calendar
     private void NextMonth()
     {
         var dt = new DateTime(_calendarYear, _calendarMonth, 1).AddMonths(1);
@@ -404,18 +429,22 @@
         CalendarView();
     }
 
+    // View journal details
     private void ViewJournal(int id)
     {
         Navigation.NavigateTo($"/journal/{id}");
     }
 
-
+    // Export filtered entries to PDF and save to Downloads
     private async Task ExportPdf()
     {
         var entries = FilteredJournals;
 
         if (entries == null || entries.Count == 0)
+        {
+            await Application.Current!.Windows[0].Page!.DisplayAlertAsync("Error", "No entries to export!", "OK");
             return;
+        }
 
         _isExporting = true;
 
@@ -441,5 +470,4 @@
             _isExporting = false;
         }
     }
-
 }

@@ -208,26 +208,44 @@ else
 }
 
 @code {
+    // Current logged in user
     private User? _currentUser;
+
+    // Flag to show loading 
     private bool _isLoading = true;
 
+    // Journals of all users
     private List<JournalEntry> _journals = new();
+
+    // Last 5 recent journals
     private List<JournalEntry> _recentJournals = new();
+
+    // Total number of entries
     private int _totalJournalCount;
+
+    // Most frequent mood 
     private string _mostFrequentMood = string.Empty;
 
+    // Mood distribution data for chart
     private Dictionary<string, double>? _moodDistribution;
+
+    // Flag to prevent multiple chart render
     private bool _chartRendered;
 
+    // Current and longest streak 
     private int _currentStreak;
     private int _longestStreak;
 
+    // Missed days 
     private List<DateTime> _missedDays = new();
 
+    // Average word count 
     private Dictionary<string, double> _averageWordCount = new();
 
+    // Tags frequency
     private Dictionary<string, int> _tagsFrequency = new();
 
+    // Initialize data for dashboard
     protected override async Task OnInitializedAsync()
     {
         _currentUser = await AuthService.GetCurrentUser();
@@ -236,28 +254,38 @@ else
             Navigation.NavigateTo("/login");
             return;
         }
-
+        // Fetch journals
         _journals = await JournalService.GetAllJournalsAsync(_currentUser.Id);
+        
+        // Total journals
         _totalJournalCount = _journals.Count;
 
+        // 5 Recent journals 
         _recentJournals = _journals.OrderByDescending(j => j.CreatedAt).Take(5).ToList();
 
+        // Most frequent mood
         _mostFrequentMood = AnalyticsService.GetMostFrequentMood(_journals) ?? string.Empty;
+        // Mood data for chart
         _moodDistribution = AnalyticsService.GetMoodDistribution(_journals);
-
+        // Current streak 
         _currentStreak = AnalyticsService.GetCurrentDailyStreak(_journals);
+        // Longest Streak
         _longestStreak = AnalyticsService.GetLongestStreak(_journals);
+        // Missed days 
         _missedDays = AnalyticsService.GetMissedDays(_journals);
-
+        // Word count for journals for chart
         _averageWordCount = AnalyticsService.GetAverageWordCountPerDay(_journals);
-
+        // Tags frequency of journals
         _tagsFrequency = AnalyticsService.GetTagFrequency(_journals);
 
+        // Set loading to false after loading data
         _isLoading = false;
     }
 
+    // Render charts once after data is loaded
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        // If chart is rendered then return
         if (_chartRendered) return;
         if (_moodDistribution == null || !_moodDistribution.Any() || _averageWordCount == null || !_averageWordCount.Any()) return;
 
@@ -268,6 +296,7 @@ else
 
         await InvokeAsync(StateHasChanged);
 
+        // Mood distribution chart
         await JS.InvokeVoidAsync(
             "renderMoodChart",
             "moodChart",
@@ -276,11 +305,12 @@ else
             "pie"
         );
 
-        var ordered = _averageWordCount.OrderBy(kvp => kvp.Key).Take(15).ToArray();
+        var ordered = _averageWordCount.OrderBy(count => count.Key).Take(15).ToArray();
 
-        var wordLabels = ordered.Select(kvp => kvp.Key).ToArray();
-        var wordValues = ordered.Select(kvp => kvp.Value).ToArray();
+        var wordLabels = ordered.Select(count => count.Key).ToArray();
+        var wordValues = ordered.Select(count => count.Value).ToArray();
 
+        // Word count trend chart
         await JS.InvokeVoidAsync(
             "renderWordCountTrend",
             "wordCountChart",
@@ -293,6 +323,7 @@ else
         var tagLabels = topTags.Select(tag => tag.Key).ToArray();
         var tagValues = topTags.Select(tag => (double)tag.Value).ToArray();
 
+        // Most used tags chart
         await JS.InvokeVoidAsync(
             "renderTagsChart",
             "tagsChart",

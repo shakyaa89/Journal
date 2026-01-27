@@ -11,6 +11,7 @@ namespace Journal.Services
 {
     public class PDFService : IPDFService
     {
+        // Generate PDF for a single journal entry
         public byte[] GeneratePdf(JournalEntry entry)
         {
             ArgumentNullException.ThrowIfNull(entry);
@@ -99,6 +100,7 @@ namespace Journal.Services
             return pdfBytes;
         }
 
+        // Generate PDF for multiple journal entries
         public byte[] GeneratePdf(IEnumerable<JournalEntry> entries)
         {
             ArgumentNullException.ThrowIfNull(entries);

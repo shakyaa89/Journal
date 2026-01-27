@@ -111,7 +111,6 @@
 
             <div id="editor"></div>
 
-            <div class="word-count">0 words</div>
         </div>
 
         <button class="btn primary-btn btn-save"
@@ -134,18 +133,27 @@
 </div>
 
 @code {
+    // Journal id from route
     [Parameter] public int Id { get; set; }
 
+    // Logged-in user 
     private User? _currentUser;
+    // Current journal
     private JournalEntry _journal = new();
+
+    // Error message 
     private string _errorMessage = string.Empty;
+    // Loading state
     private bool _isLoading;
 
+    // Selected tags and secondary moods for the current journal
     private readonly List<string> _selectedTags = new();
     private readonly List<string> _selectedSecondaryMoods = new();
 
+    // Custom tag
     private string _newTagText = string.Empty;
 
+    // All moods 
     private readonly List<string> _moods = new()
     {
         "Happy","Excited","Relaxed","Grateful","Confident",
@@ -153,6 +161,7 @@
         "Sad","Angry","Stressed","Lonely","Anxious"
     };
 
+    // Predefined tags
     private readonly List<string> _availableTags = new()
     {
         "Work","Career","Studies","Family","Friends","Relationships",
@@ -163,11 +172,13 @@
         "Planning","Reflection"
     };
 
+    // Load journal and user
     protected override async Task OnInitializedAsync()
     {
         _currentUser = await AuthService.GetCurrentUser();
         if (_currentUser == null)
         {
+            // If user is not logged in then redirect to login page
             Navigation.NavigateTo("/login");
             return;
         }
@@ -175,7 +186,7 @@
         _isLoading = true;
 
         var existing = await JournalService.GetJournalByIdAsync(Id);
-
+        // Redirect if journal does not exist or does not belong to current user
         if (existing == null || existing.UserId != _currentUser.Id)
         {
             _isLoading = false;
@@ -206,6 +217,7 @@
         _isLoading = false;
     }
 
+    // Initialize quill editor
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender)
@@ -215,6 +227,7 @@
         await JS.InvokeVoidAsync("setQuillHtml", _journal.Content ?? string.Empty);
     }
 
+    // Validate and update existing journal entry
     private async Task UpdateEntryAsync()
     {
         _errorMessage = string.Empty;
@@ -226,6 +239,12 @@
             string.IsNullOrWhiteSpace(_journal.Mood))
         {
             _errorMessage = "All fields must be filled.";
+            return;
+        }
+
+        if (_journal.Title.Length > 50)
+        {
+            _errorMessage = "Title too long";
             return;
         }
 
@@ -241,13 +260,18 @@
             return;
         }
 
+        // Update secondary moods
         _journal.SecondaryMood1 = _selectedSecondaryMoods[0];
         _journal.SecondaryMood2 = _selectedSecondaryMoods[1];
+        // Update timestamp 
         _journal.UpdatedAt = DateTime.UtcNow;
+        // Update tags
         _journal.Tags = _selectedTags.ToList();
+        // Update word count
         _journal.WordCount = Util.GetWordCount(_journal.Content);
         _isLoading = true;
-
+        
+        // Update journal entry in database
         var updated = await JournalService.UpdateJournalEntryAsync(
             _journal.Id,
             _journal.Title,
@@ -265,13 +289,16 @@
 
         if (updated == null)
         {
+            // Display error if update fails
             _errorMessage = "Update failed.";
             return;
         }
 
+        // Navigate to journal details after successful update
         Navigation.NavigateTo($"/journal/{_journal.Id}");
     }
 
+    // Toggle secondary moods
     private void ToggleSecondaryMood(string mood, ChangeEventArgs e)
     {
         var isChecked = e.Value is bool b && b;
@@ -287,6 +314,7 @@
         }
     }
 
+    // Toggle tags
     private void ToggleTag(string tag, ChangeEventArgs e)
     {
         var isChecked = e.Value is bool b && b;
@@ -302,6 +330,7 @@
         }
     }
 
+    // Add a new custom tag and select it
     private void AddCustomTag()
     {
         var tag = _newTagText?.Trim();
@@ -318,5 +347,6 @@
         _newTagText = string.Empty;
     }
 
+    // Navigate to journal details view
     private void GoBack() => Navigation.NavigateTo($"/journal/{_journal.Id}");
 }

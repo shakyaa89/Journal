@@ -53,18 +53,30 @@
 </div>
 
 @code {
+    // Registration form model
     private RegisterModel _registerModel = new();
+    // Error message
     private string _errorMessage = string.Empty;
+    // Registration loading state
     private bool _isRegistering;
 
+    // Handle registration process
     private async Task RegisterAsync()
     {
         _errorMessage = string.Empty;
         _isRegistering = true;
+
         try
         {
-            await AuthService.RegisterUserAsync(_registerModel.FullName, _registerModel.Email, _registerModel.Password);
-            await Application.Current!.Windows[0].Page!.DisplayAlert("Success", "Your account has been created!", "OK");
+            // Create new user 
+            await AuthService.RegisterUserAsync(
+                _registerModel.FullName,
+                _registerModel.Email,
+                _registerModel.Password
+            );
+            // Show successful registration
+            await Application.Current!.Windows[0].Page!.DisplayAlertAsync("Success", "Your account has been created!", "OK");
+            // Navigate to login page
             Navigation.NavigateTo("/login");
         }
         catch
@@ -77,6 +89,7 @@
         }
     }
 
+    // Registration form model 
     private class RegisterModel
     {
         [Required]

@@ -2,7 +2,7 @@
 @inject NavigationManager Navigation
 @inject IAuthService AuthService
 
-@if (loading)
+@if (_loading)
 {
     <div class="loading-container">
         <div class="loading-spinner"></div>
@@ -141,8 +141,10 @@ else
 }
 
 @code {
-    private bool loading = true;
+    // Loading state for landing page
+    private bool _loading = true;
 
+    // Random welcome quotes 
     private readonly List<string> quotes = new List<string>
     {
         "Write what feels heavy. Read what feels light",
@@ -152,21 +154,27 @@ else
         "This page is yours—be honest."
     };
 
+    // Stores the selected quote
     private string selectedQuote = string.Empty;
 
+    // Check login status and display quote if user is not logged in
     protected override async Task OnInitializedAsync()
     {
-        loading = true;
+        _loading = true;
+
         var currentUser = await AuthService.GetCurrentUser();
         if (currentUser != null)
         {
+            // If user is logged in then redirect to dashboard
             Navigation.NavigateTo("/dashboard");
             return;
         }
 
+        // Select a random quote to show on landing page
         var random = new Random();
         int randomIndex = random.Next(quotes.Count);
         selectedQuote = quotes[randomIndex];
-        loading = false;
+
+        _loading = false;
     }
 }

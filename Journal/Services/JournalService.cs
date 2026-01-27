@@ -1,7 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Journal.Models;
+﻿using Journal.Models;
 using Journal.Repositories;
-using System.Diagnostics;
 
 namespace Journal.Services
 {
@@ -14,6 +12,7 @@ namespace Journal.Services
             _journalRepository = journalRepository;
         }
 
+        // Add a new journal entry
         public async Task<JournalEntry> AddJournalEntryAsync(string title, string content, string mood, string secondaryMood1, string secondaryMood2, List<string>? tags, int wordCount, int userId)
         {
             var journal = new JournalEntry
@@ -40,7 +39,8 @@ namespace Journal.Services
 
         // Delete a journal entry
         public async Task<bool> DeleteJournalAsync(int id) => await _journalRepository.DeleteJournalEntry(id);
-        
+
+        // Update a journal entry
         public async Task<JournalEntry?> UpdateJournalEntryAsync(int id, string title, string content, string mood, string secondaryMood1, string secondaryMood2, List<string>? tags, int userId, int wordCount, DateTime updatedAt)
         {
             var existing = await _journalRepository.FetchJournalByIdAsync(id);

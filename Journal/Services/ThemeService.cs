@@ -5,6 +5,7 @@ namespace Journal.Services
     {
         private const string DefaultTheme = "dark";
 
+        // Get the current theme
         public Task<string> GetCurrentThemeAsync()
         {
             try
@@ -18,6 +19,7 @@ namespace Journal.Services
             }
         }
 
+        // Set a new theme
         public Task SetThemeAsync(string themeName)
         {
             if (string.IsNullOrWhiteSpace(themeName))
@@ -29,7 +31,7 @@ namespace Journal.Services
             }
             catch
             {
-                // swallow intentionally — theme failure should not crash app
+                System.Diagnostics.Debug.WriteLine("Failed to set theme preference.");
             }
 
             return Task.CompletedTask;

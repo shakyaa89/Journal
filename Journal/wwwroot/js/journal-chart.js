@@ -115,7 +115,7 @@ window.renderWordCountTrend = (canvasId, labels, values) => {
         data: {
             labels: labels, 
             datasets: [{
-                label: "Average words per entry",
+                label: "Words in this entry",
                 data: values,   
                 tension: 0.3,
                 fill: false,

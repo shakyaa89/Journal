@@ -1,10 +1,10 @@
 ﻿using Journal.Models;
-using System.Collections.ObjectModel;
 
 namespace Journal.Services
 {
     public class AnalyticsService : IAnalyticsService
     {
+        // Calculate Mood Distribution
         public Dictionary<string, double> GetMoodDistribution(List<JournalEntry> entries)
         {
             var positiveMoods = new List<string> { "Happy", "Excited", "Relaxed", "Grateful", "Confident", "Calm" };
@@ -30,17 +30,20 @@ namespace Journal.Services
 
             return new Dictionary<string, double>
             {
+                // Calculate percentages
                 { "Positive", Math.Round(positive * 100.0 / total, 2) },
                 { "Neutral",  Math.Round(neutral  * 100.0 / total, 2) },
                 { "Negative", Math.Round(negative * 100.0 / total, 2) }
             };
         }
 
+        // Get Most Frequent Mood
         public string? GetMostFrequentMood(List<JournalEntry> entries)
         {
             return entries.Where(e => !string.IsNullOrWhiteSpace(e.Mood)).GroupBy(e => e.Mood).OrderByDescending(g => g.Count()).FirstOrDefault()?.Key;
         }
 
+        // Calculate Current Daily Streak
         public int GetCurrentDailyStreak(List<JournalEntry> entries)
         {
             if (entries == null || entries.Count == 0) return 0;
@@ -60,6 +63,7 @@ namespace Journal.Services
             return streak;
         }
 
+        // Calculate Longest Daily Streak
         public int GetLongestStreak(List<JournalEntry> entries)
         {
             if (entries == null || entries.Count == 0) return 0;
@@ -82,6 +86,7 @@ namespace Journal.Services
             return longest;
         }
 
+        // Get Missed Days
         public List<DateTime> GetMissedDays(List<JournalEntry> entries)
         {
             var result = new List<DateTime>();
@@ -100,8 +105,10 @@ namespace Journal.Services
             return result;
         }
 
+        // Get Average Word Count Per Day
         public Dictionary<string, double> GetAverageWordCountPerDay(List<JournalEntry> entries) => entries.GroupBy(e => e.CreatedAt.Date).OrderBy(g => g.Key).ToDictionary(g => g.Key.ToString("yyyy-MM-dd"), g => g.Average(e => e.WordCount));
 
+        // Get Tag Frequency
         public Dictionary<string, int> GetTagFrequency(List<JournalEntry> entries)
         {
             if (entries == null || entries.Count == 0)

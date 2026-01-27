@@ -99,6 +99,8 @@
                 <option selected></option>
             </select>
 
+            <button class="ql-link"></button>
+
             <button class="ql-clean"></button>
         </div>
 
@@ -133,11 +135,13 @@
 </div>
 
 @code {
+    // journal data for input
     private JournalEntry _newJournal = new();
+    // current user variable
     private User? _currentUser;
-
+    // error message variable
     private string _errorMessage = string.Empty;
-
+    // Predefined tags
     private readonly List<string> _availableTags = new()
     {
         "Work", "Career", "Studies", "Family", "Friends", "Relationships",
@@ -147,7 +151,7 @@
         "Meditation", "Yoga", "Music", "Shopping", "Parenting", "Projects",
         "Planning", "Reflection"
     };
-
+    // All moods
     private readonly List<string> _moodsList = new()
     {
         "Happy", "Excited", "Relaxed", "Grateful", "Confident",
@@ -158,14 +162,18 @@
     private readonly List<string> _selectedSecondaryMoods = new();
     private readonly List<string> _selectedTags = new();
 
+    // Variable for custom tags
     private string _newTagText = string.Empty;
+
+    // Flag to check entry for today
     private bool _hasTodayEntry = false;
 
-
+    // Load user
     protected override async Task OnInitializedAsync()
     {
         _currentUser = await AuthService.GetCurrentUser();
 
+        // Check if user is logged in
         if (_currentUser == null)
         {
             Navigation.NavigateTo("/login");
@@ -177,6 +185,7 @@
         _hasTodayEntry = journals.Any(j => j.CreatedAt.Date == today);
     }
 
+    // Initialize quill editor 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -185,6 +194,7 @@
         }
     }
 
+    // Secondary moods selection
     private void ToggleSecondaryMood(string mood, ChangeEventArgs e)
     {
         if (!bool.TryParse(e.Value?.ToString(), out var isChecked))
@@ -192,6 +202,7 @@
 
         if (isChecked)
         {
+            // Add mood if not selected
             if (_selectedSecondaryMoods.Count < 2 && !_selectedSecondaryMoods.Contains(mood))
             {
                 _selectedSecondaryMoods.Add(mood);
@@ -203,6 +214,7 @@
         }
     }
 
+    // Tags selection
     private void ToggleTag(string tag, ChangeEventArgs e)
     {
         if (!bool.TryParse(e.Value?.ToString(), out var isChecked))
@@ -210,6 +222,7 @@
 
         if (isChecked)
         {
+            // Add tag if not selected
             if (!_selectedTags.Contains(tag))
             {
                 _selectedTags.Add(tag);
@@ -221,6 +234,7 @@
         }
     }
 
+    // Custom tags
     private void AddCustomTag()
     {
         var tag = _newTagText?.Trim();
@@ -241,12 +255,15 @@
         _newTagText = string.Empty;
     }
 
+    // Save journal entry
     private async Task SaveEntryAsync()
     {
         try
         {
+            // Get html content and store in journal object
             _newJournal.Content = await JS.InvokeAsync<string>("getQuillContent");
 
+            // Validation check
             var validationError = ValidateEntry();
             if (validationError != null)
             {
@@ -254,17 +271,22 @@
                 return;
             }
 
+            // Check if user is logged in or not
             if (_currentUser is null)
             {
                 _errorMessage = "User is not logged in.";
                 return;
             }
 
+            // Add secondary moods in the journal object
             _newJournal.SecondaryMood1 = _selectedSecondaryMoods[0];
             _newJournal.SecondaryMood2 = _selectedSecondaryMoods[1];
+            // Add tags in the journal object as list
             _newJournal.Tags = _selectedTags.ToList();
+            // Add word count in the journal object
             _newJournal.WordCount = Util.GetWordCount(_newJournal.Content);
 
+            // Add the journal in the database
             await JournalService.AddJournalEntryAsync(
                 _newJournal.Title,
                 _newJournal.Content,
@@ -276,16 +298,19 @@
                 _currentUser.Id
             );
 
+            // Reset the form after submission
             ResetForm();
             Navigation.NavigateTo("/journal/list");
         }
         catch (Exception ex)
         {
+            // Print in the output for diagnostics
             System.Diagnostics.Debug.WriteLine($"Error saving journal entry: {ex.Message}");
             _errorMessage = "An unexpected error occurred while saving your entry.";
         }
     }
 
+    // Validation for journal fields
     private string? ValidateEntry()
     {
         if (_hasTodayEntry)
@@ -303,9 +328,13 @@
         if (_selectedSecondaryMoods.Count != 2)
             return "Please select at most 2 secondary moods.";
 
+        if (_newJournal.Title.Length > 50)
+            return "Title too long.";
+
         return null;
     }
 
+    // Reset form 
     private void ResetForm()
     {
         _newJournal = new JournalEntry();
@@ -314,6 +343,4 @@
         _selectedTags.Clear();
         _newTagText = string.Empty;
     }
-
-    
 }

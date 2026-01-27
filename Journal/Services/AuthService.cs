@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using BCrypt.Net;
-using Journal.Models;
+﻿using Journal.Models;
 using Journal.Repositories;
 
 namespace Journal.Services
@@ -34,6 +32,7 @@ namespace Journal.Services
             return await _authRepository.AddUserAsync(user);
         }
 
+        // Login user
         public async Task<User?> LoginUserAsync(string email, string password)
         {
             User? user = await _authRepository.CheckUserExistence(email);
@@ -50,9 +49,10 @@ namespace Journal.Services
             }
         }
 
+        // Update user details
         public async Task<bool> UpdateUser(User user) => await _authRepository.UpdateUserAsync(user);
-        
 
+        // Get current logged-in user
         public async Task<User?> GetCurrentUser()
         {
             string userString = await SecureStorage.GetAsync("user") ?? "";
@@ -64,6 +64,7 @@ namespace Journal.Services
 
             return null;
         }
+        // Logout user
         public void LogoutUser() => SecureStorage.Remove("user");
         
     }

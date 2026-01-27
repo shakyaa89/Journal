@@ -1,7 +1,4 @@
 ﻿using Journal.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Journal.Services
 {

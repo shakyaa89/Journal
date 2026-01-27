@@ -1,6 +1,4 @@
-﻿// IJournalService
-
-using Journal.Models;
+﻿using Journal.Models;
 
 namespace Journal.Services
 {

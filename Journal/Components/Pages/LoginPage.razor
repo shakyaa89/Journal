@@ -1,8 +1,8 @@
 @page "/login"
 @using Journal.Services
+@using System.ComponentModel.DataAnnotations;
 @inject NavigationManager Navigation
 @inject IAuthService AuthService
-@using System.ComponentModel.DataAnnotations;
 
 <div class="login-page">
     <div class="login-container">
@@ -39,18 +39,28 @@
 </div>
 
 @code {
+    // Login form model
     private LoginModel _loginModel = new();
+    // Error message
     private string _errorMessage = string.Empty;
+    // Loading state
     private bool _isLoggingIn;
 
+    // Handle login submission
     private async Task HandleLogin()
     {
         _isLoggingIn = true;
+
         try
         {
+            // Login user
             var user = await AuthService.LoginUserAsync(_loginModel.Email, _loginModel.Password);
-            if (user != null) Navigation.NavigateTo("/dashboard");
-            else _errorMessage = "Invalid email or password.";
+
+            if (user != null)
+                // Navigate to dashboard on successful login
+                Navigation.NavigateTo("/dashboard");
+            else
+                _errorMessage = "Invalid email or password.";
         }
         catch
         {
@@ -62,6 +72,7 @@
         }
     }
 
+    // Login form fields
     public class LoginModel
     {
         [Required(ErrorMessage = "Email is required")]

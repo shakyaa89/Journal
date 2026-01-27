@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Journal.Services
+﻿namespace Journal.Services
 {
     public interface IThemeService
     {

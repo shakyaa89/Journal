@@ -82,6 +82,7 @@
                             <span class="meta-icon">
                                 <i class="fa-solid fa-rotate-right"></i>
                             </span>
+                            @_entry.UpdatedAt.ToLocalTime().ToString("dddd, MMM dd yyyy"),
                             @_entry.UpdatedAt.ToLocalTime().ToString("hh:mm tt")
                         </span>
                         <span class="meta-item">
@@ -127,27 +128,35 @@
     }
 </div>
 
+
 @code {
+    // Id from route parameter
     [Parameter] public int Id { get; set; }
 
+    // Export state 
     private bool _isExporting;
+    // Current journal entry
     private JournalEntry? _entry;
 
+    // Load journal entry
     protected override async Task OnInitializedAsync()
     {
         await LoadEntryAsync();
     }
 
+    // Navigate to edit page for this journal
     private void NavigateTo(int id)
     {
         Navigation.NavigateTo($"/journal/edit/{id}");
     }
 
+    // Fetch journal entry from service
     private async Task LoadEntryAsync()
     {
         _entry = await JournalService.GetJournalByIdAsync(Id);
     }
 
+    // Delete current journal after confirmation
     private async Task DeleteJournal(int id)
     {
         var confirmDelete = await ShowDeleteAlertAsync();
@@ -161,6 +170,7 @@
         Navigation.NavigateTo("/journal/list");
     }
 
+    // Show confirmation dialog before deleting
     private async Task<bool> ShowDeleteAlertAsync()
     {
         return await Application.Current!.Windows[0].Page!.DisplayAlertAsync(
@@ -171,6 +181,7 @@
         );
     }
 
+    // Export single journal entry as PDF to Downloads
     private async Task ExportPdf()
     {
         if (_entry is null || string.IsNullOrWhiteSpace(_entry.Content))
@@ -182,12 +193,11 @@
         {
             var pdfBytes = PDFService.GeneratePdf(_entry);
 
-            var safeTitle = string.IsNullOrWhiteSpace(_entry.Title) ?
-            "JournalEntry" 
-            : string.Concat(_entry.Title.Split(Path.GetInvalidFileNameChars()));
+            var safeTitle = string.IsNullOrWhiteSpace(_entry.Title)
+                ? "JournalEntry"
+                : string.Concat(_entry.Title.Split(Path.GetInvalidFileNameChars()));
 
             var downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
-
             var filePath = Path.Combine(downloadsPath, $"{safeTitle}.pdf");
 
             File.WriteAllBytes(filePath, pdfBytes);
@@ -205,3 +215,4 @@
         }
     }
 }
+
