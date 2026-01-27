@@ -157,13 +157,13 @@
         var deleted = await JournalService.DeleteJournalAsync(id);
         if (!deleted) return;
 
-        await Application.Current!.Windows[0].Page!.DisplayAlert("Success", "Journal deleted successfully.", "OK");
+        await Application.Current!.Windows[0].Page!.DisplayAlertAsync("Success", "Journal deleted successfully.", "OK");
         Navigation.NavigateTo("/journal/list");
     }
 
     private async Task<bool> ShowDeleteAlertAsync()
     {
-        return await Application.Current!.Windows[0].Page!.DisplayAlert(
+        return await Application.Current!.Windows[0].Page!.DisplayAlertAsync(
             "Confirm Deletion",
             "Are you sure you want to delete this journal?",
             "Yes",
@@ -192,12 +192,12 @@
 
             File.WriteAllBytes(filePath, pdfBytes);
 
-            await Application.Current!.Windows[0].Page!.DisplayAlert("Success", "PDF saved to Downloads folder.", "OK");
+            await Application.Current!.Windows[0].Page!.DisplayAlertAsync("Success", "PDF saved to Downloads folder.", "OK");
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Error exporting PDF: {ex.Message}");
-            await Application.Current!.Windows[0].Page!.DisplayAlert("Error", "Failed to export PDF", "OK");
+            await Application.Current!.Windows[0].Page!.DisplayAlertAsync("Error", "Failed to export PDF", "OK");
         }
         finally
         {

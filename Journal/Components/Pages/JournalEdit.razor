@@ -117,7 +117,7 @@
         <button class="btn primary-btn btn-save"
                 disabled="@_isLoading"
                 @onclick="UpdateEntryAsync">
-            @_isLoading ? "Updating..." : "Update Entry"
+            @(_isLoading ? "Updating..." : "Update Entry")
         </button>
 
         <button class="btn btn-cancel"
@@ -245,7 +245,7 @@
         _journal.SecondaryMood2 = _selectedSecondaryMoods[1];
         _journal.UpdatedAt = DateTime.UtcNow;
         _journal.Tags = _selectedTags.ToList();
-
+        _journal.WordCount = Util.GetWordCount(_journal.Content);
         _isLoading = true;
 
         var updated = await JournalService.UpdateJournalEntryAsync(
@@ -257,6 +257,7 @@
             _journal.SecondaryMood2,
             _journal.Tags,
             _currentUser.Id,
+            _journal.WordCount,
             _journal.UpdatedAt
         );
 

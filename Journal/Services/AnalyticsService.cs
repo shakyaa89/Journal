@@ -1,4 +1,5 @@
 ﻿using Journal.Models;
+using System.Collections.ObjectModel;
 
 namespace Journal.Services
 {
@@ -97,6 +98,17 @@ namespace Journal.Services
             }
 
             return result;
+        }
+
+        public Dictionary<string, double> GetAverageWordCountPerDay(List<JournalEntry> entries) => entries.GroupBy(e => e.CreatedAt.Date).OrderBy(g => g.Key).ToDictionary(g => g.Key.ToString("yyyy-MM-dd"), g => g.Average(e => e.WordCount));
+
+        public Dictionary<string, int> GetTagFrequency(List<JournalEntry> entries)
+        {
+            if (entries == null || entries.Count == 0)
+                return new Dictionary<string, int>();
+
+            return entries.Where(e => e.Tags != null).SelectMany(e => e.Tags!).Where(t => !string.IsNullOrWhiteSpace(t)).Select(t => t.Trim()).GroupBy(t => t, StringComparer.OrdinalIgnoreCase).OrderByDescending(g => g.Count()).ToDictionary(g => g.Key, g => g.Count(), StringComparer.OrdinalIgnoreCase);
+
         }
     }
 }

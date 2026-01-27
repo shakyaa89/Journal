@@ -41,7 +41,7 @@ namespace Journal.Services
         // Delete a journal entry
         public async Task<bool> DeleteJournalAsync(int id) => await _journalRepository.DeleteJournalEntry(id);
         
-        public async Task<JournalEntry?> UpdateJournalEntryAsync(int id, string title, string content, string mood, string secondaryMood1, string secondaryMood2, List<string>? tags, int userId, DateTime updatedAt)
+        public async Task<JournalEntry?> UpdateJournalEntryAsync(int id, string title, string content, string mood, string secondaryMood1, string secondaryMood2, List<string>? tags, int userId, int wordCount, DateTime updatedAt)
         {
             var existing = await _journalRepository.FetchJournalByIdAsync(id);
             if (existing == null || existing.UserId != userId)
@@ -53,6 +53,7 @@ namespace Journal.Services
             existing.SecondaryMood1 = secondaryMood1;
             existing.SecondaryMood2 = secondaryMood2;
             existing.Tags = tags;
+            existing.WordCount = wordCount;
             existing.UpdatedAt = updatedAt;
 
             return await _journalRepository.UpdateJournalEntryAsync(existing);

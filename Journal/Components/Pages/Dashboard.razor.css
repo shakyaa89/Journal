@@ -7,38 +7,6 @@
     background-color: var(--primary-bg);
 }
 
-/* Loading State */
-.loading-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    gap: 16px;
-    color: var(--muted);
-}
-
-.loading-spinner {
-    width: 48px;
-    height: 48px;
-    border: 4px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-    .loading-spinner.small {
-        width: 32px;
-        height: 32px;
-        border-width: 3px;
-    }
-
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
 /* Header */
 .dashboard-header {
     display: flex;
@@ -124,16 +92,19 @@
         color: var(--text);
     }
 
-/* Dashboard Grid */
-.dashboard-grid {
-    display: grid;
+.dashboard-main {
+    display: flex;
+    flex-direction: column;
     gap: 24px;
-    grid-template-columns: repeat(12, 1fr);
 }
 
-/* Stats Section */
+.dashboard-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+}
+
 .stats-section {
-    grid-column: 1 / -1;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 20px;
@@ -191,19 +162,14 @@
     text-transform: capitalize;
 }
 
-/* Chart Section */
-.chart-section {
-    grid-column: 1 / -1;
-}
-
-/* Recent Section */
-.recent-section {
-    grid-column: 1 / -1;
-}
-
-/* Missed Section */
+/* Chart & panel sections */
+.chart-section,
+.recent-section,
 .missed-section {
-    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0;
+    min-width: 280px;
 }
 
 /* Section Headers */
@@ -253,6 +219,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    flex: 1;
 }
 
 .chart-loading {
@@ -377,20 +344,6 @@
 }
 
 /* Responsive Design */
-@media (min-width: 768px) {
-    .chart-section {
-        grid-column: 1 / 8;
-    }
-
-    .recent-section {
-        grid-column: 8 / -1;
-    }
-
-    .missed-section {
-        grid-column: 1 / -1;
-    }
-}
-
 @media (max-width: 767px) {
     .dashboard-header {
         flex-direction: column;
@@ -406,13 +359,13 @@
             justify-content: center;
         }
 
-    .stats-section {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    }
-
     .stat-card {
         flex-direction: column;
         text-align: center;
+    }
+
+    .dashboard-row {
+        flex-direction: column;
     }
 
     .entry-card {
@@ -429,9 +382,5 @@
 @media (max-width: 480px) {
     .dashboard-container {
         padding: 20px 16px;
-    }
-
-    .stats-section {
-        grid-template-columns: 1fr;
     }
 }

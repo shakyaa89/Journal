@@ -35,7 +35,7 @@
             <li class="app-sidebar-item">
                 <a href="/journal/add" class="app-sidebar-link" @onclick='() => Navigate("/journal/add")'>
                     <i class="fa-solid fa-plus"></i>
-                    <span class="app-sidebar-text">New Entry</span>
+                    <span class="app-sidebar-text">Daily Entry</span>
                 </a>
             </li>
            
@@ -94,7 +94,7 @@
 
     private async Task<bool> ShowLogoutAlertAsync()
     {
-        bool confirmation = await (Application.Current!.Windows[0].Page!.DisplayAlertAsync(
+        bool confirmation = await (Application.Current!.Windows[0].Page!.DisplayAlert(
             title: "Confirm Logout",
             message: "Are you sure you want to logout?",
             accept: "Yes",

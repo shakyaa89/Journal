@@ -4,6 +4,8 @@
 @inject IJournalService JournalService
 @inject IAuthService AuthService
 @inject NavigationManager Navigation
+@inject IPDFService PDFService
+
 
 <div class="journal-list-page">
     <div class="list-header">
@@ -48,6 +50,8 @@
             </label>
 
             <button @onclick="ClearFilters" class="btn primary-btn">Clear filters</button>
+            <button @onclick="ExportPdf" class="btn primary-btn">Export entries as PDF</button>
+
         </div>
     </div>
 
@@ -178,8 +182,8 @@
             {
                 <div class="pagination">
                     <button class="page-btn"
-                            @(CurrentPage= =1 ? "disabled" : "" )
-                            @onclick ="PrevPage">
+                            disabled="@CurrentPage.Equals(1)"
+                            @onclick="PrevPage">
                         Prev
                     </button>
 
@@ -192,7 +196,7 @@
                     }
 
                     <button class="page-btn"
-                            @(CurrentPage= =TotalPages ? "disabled" : "" )
+                            disabled="@CurrentPage.Equals(TotalPages)"
                             @onclick ="NextPage">
                         Next
                     </button>
@@ -212,6 +216,8 @@
 @code {
     private User? _currentUser;
     private List<JournalEntry> _journals = new();
+
+    private bool _isExporting;
 
     private int _pageSize = 6;
     private int _currentPage = 1;
@@ -402,4 +408,38 @@
     {
         Navigation.NavigateTo($"/journal/{id}");
     }
+
+
+    private async Task ExportPdf()
+    {
+        var entries = FilteredJournals;
+
+        if (entries == null || entries.Count == 0)
+            return;
+
+        _isExporting = true;
+
+        try
+        {
+            var pdfBytes = PDFService.GeneratePdf(entries);
+
+            var fileName = $"JournalEntries-{DateTime.Now:yyyyMMddHHmmss}";
+            var downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
+
+            var filePath = Path.Combine(downloadsPath, $"{fileName}.pdf");
+
+            File.WriteAllBytes(filePath, pdfBytes);
+
+            await Application.Current!.Windows[0].Page!.DisplayAlertAsync("Success", "PDF saved to Downloads folder.", "OK");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error exporting PDF: {ex.Message}");
+        }
+        finally
+        {
+            _isExporting = false;
+        }
+    }
+
 }

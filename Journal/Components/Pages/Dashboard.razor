@@ -29,7 +29,8 @@ else
             </div>
         </div>
 
-        <div class="dashboard-grid">
+        <div class="dashboard-main">
+            <!-- Stats -->
             <div class="stats-section">
                 <div class="stat-card">
                     <div class="stat-icon"><i class="fa-solid fa-chart-simple" style="color: var(--accent)"></i></div>
@@ -66,66 +67,118 @@ else
                 </div>
             </div>
 
-            <div class="chart-section">
-                <div class="section-header">
-                    <h2 class="section-title">Mood Distribution</h2>
+            <div class="dashboard-row">
+                <div class="chart-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Mood Distribution</h2>
+                    </div>
+                    <div class="chart-container">
+                        @if (_totalJournalCount == 0 || _moodDistribution == null || !_moodDistribution.Any())
+                        {
+                            <div class="empty-state">
+                                <i class="fa-solid fa-chart-pie empty-icon" style="font-size: 40px; color: var(--accent);"></i>
+                                <p class="empty-text">No entries yet, so there’s no mood data to show.</p>
+                            </div>
+                        }
+                        else
+                        {
+                            @if (_chartRendered == false)
+                            {
+                                <div class="chart-loading">
+                                    <div class="loading-spinner small"></div>
+                                    <p>Loading chart...</p>
+                                </div>
+                            }
+
+                            <canvas id="moodChart"></canvas>
+                        }
+                    </div>
                 </div>
-                <div class="chart-container">
-                    @if (_totalJournalCount == 0 || _moodDistribution == null || !_moodDistribution.Any())
+
+                <div class="recent-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Recent Entries</h2>
+                        <span class="section-count">Last 5</span>
+                    </div>
+
+                    @if (_recentJournals.Any())
                     {
-                        <div class="empty-state">
-                            <i class="fa-solid fa-chart-pie empty-icon" style="font-size: 40px; color: var(--accent);"></i>
-                            <p class="empty-text">No entries yet, so there’s no mood data to show.</p>
+                        <div class="entries-list">
+                            @foreach (var journal in _recentJournals)
+                            {
+                                <div class="entry-card">
+                                    <div class="entry-header">
+                                        <h3 class="entry-title">@journal.Title</h3>
+                                        <span class="entry-date">@journal.CreatedAt.ToString("MMM dd, yyyy")</span>
+                                    </div>
+                                    <div class="entry-actions">
+                                        <a class="btn-link" href="@($"journal/{journal.Id}")">View</a>
+                                        <a class="btn-link" href="@($"/journal/edit/{journal.Id}")">Edit</a>
+                                    </div>
+                                </div>
+                            }
                         </div>
                     }
                     else
                     {
-                        @if (!_chartRendered)
-                        {
-                            <div class="chart-loading">
-                                <div class="loading-spinner small"></div>
-                                <p>Loading chart...</p>
-                            </div>
-                        }
-
-                        <canvas id="moodChart"></canvas>
+                        <div class="empty-state">
+                            <i class="fa-solid fa-note-sticky empty-icon" style="font-size: 40px; color: var(--accent);"></i>
+                            <p class="empty-text">No entries yet. Start journaling today!</p>
+                        </div>
                     }
                 </div>
             </div>
 
-            <div class="recent-section">
-                <div class="section-header">
-                    <h2 class="section-title">Recent Entries</h2>
-                    <span class="section-count">Last 5</span>
-                </div>
-
-                @if (_recentJournals.Any())
-                {
-                    <div class="entries-list">
-                        @foreach (var journal in _recentJournals)
+            <div class="dashboard-row">
+                <div class="chart-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Word Count Trend</h2>
+                    </div>
+                    <div class="chart-container">
+                        @if (_totalJournalCount == 0 || _averageWordCount == null || !_averageWordCount.Any())
                         {
-                            <div class="entry-card">
-                                <div class="entry-header">
-                                    <h3 class="entry-title">@journal.Title</h3>
-                                    <span class="entry-date">@journal.CreatedAt.ToString("MMM dd, yyyy")</span>
-                                </div>
-                                <div class="entry-actions">
-                                    <a class="btn-link" href="@($"journal/{journal.Id}")">View</a>
-                                    <a class="btn-link" href="@($"/journal/edit/{journal.Id}")">Edit</a>
-                                </div>
+                            <div class="empty-state">
+                                <i class="fa-solid fa-chart-line empty-icon" style="font-size: 40px; color: var(--accent);"></i>
+                                <p class="empty-text">No entries yet, so there’s no word count data to show.</p>
                             </div>
                         }
+                        else
+                        {
+                            @if (_chartRendered == false)
+                            {
+                                <div class="chart-loading">
+                                    <div class="loading-spinner small"></div>
+                                    <p>Loading chart...</p>
+                                </div>
+                            }
+
+                            <canvas id="wordCountChart"></canvas>
+                        }
                     </div>
-                }
-                else
-                {
-                    <div class="empty-state">
-                        <i class="fa-solid fa-note-sticky empty-icon" style="font-size: 40px; color: var(--accent);"></i>
-                        <p class="empty-text">No entries yet. Start journaling today!</p>
+                </div>
+
+                <div class="chart-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Most Used Tags</h2>
                     </div>
-                }
+
+                    <div class="chart-container">
+                        @if (_tagsFrequency == null || !_tagsFrequency.Any())
+                        {
+                            <div class="empty-state">
+                                <i class="fa-solid fa-tags empty-icon" style="font-size: 40px; color: var(--accent);"></i>
+                                <p class="empty-text">No tags yet, so there’s nothing to show.</p>
+                            </div>
+                        }
+                        else
+                        {
+                            <canvas id="tagsChart"></canvas>
+                        }
+                    </div>
+                </div>
             </div>
 
+            <!-- Missed Days -->
             @if (_missedDays.Any())
             {
                 <div class="missed-section">
@@ -171,6 +224,10 @@ else
 
     private List<DateTime> _missedDays = new();
 
+    private Dictionary<string, double> _averageWordCount = new();
+
+    private Dictionary<string, int> _tagsFrequency = new();
+
     protected override async Task OnInitializedAsync()
     {
         _currentUser = await AuthService.GetCurrentUser();
@@ -192,18 +249,24 @@ else
         _longestStreak = AnalyticsService.GetLongestStreak(_journals);
         _missedDays = AnalyticsService.GetMissedDays(_journals);
 
+        _averageWordCount = AnalyticsService.GetAverageWordCountPerDay(_journals);
+
+        _tagsFrequency = AnalyticsService.GetTagFrequency(_journals);
+
         _isLoading = false;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!firstRender || _chartRendered || _moodDistribution == null || !_moodDistribution.Any())
-            return;
+        if (_chartRendered) return;
+        if (_moodDistribution == null || !_moodDistribution.Any() || _averageWordCount == null || !_averageWordCount.Any()) return;
 
         var labels = _moodDistribution.Keys.ToArray();
         var values = _moodDistribution.Values.ToArray();
 
         _chartRendered = true;
+
+        await InvokeAsync(StateHasChanged);
 
         await JS.InvokeVoidAsync(
             "renderMoodChart",
@@ -211,6 +274,30 @@ else
             labels,
             values,
             "pie"
+        );
+
+        var ordered = _averageWordCount.OrderBy(kvp => kvp.Key).Take(15).ToArray();
+
+        var wordLabels = ordered.Select(kvp => kvp.Key).ToArray();
+        var wordValues = ordered.Select(kvp => kvp.Value).ToArray();
+
+        await JS.InvokeVoidAsync(
+            "renderWordCountTrend",
+            "wordCountChart",
+            wordLabels,
+            wordValues
+        );
+
+        var topTags = _tagsFrequency.OrderByDescending(tag => tag.Value).Take(10).ToArray();
+
+        var tagLabels = topTags.Select(tag => tag.Key).ToArray();
+        var tagValues = topTags.Select(tag => (double)tag.Value).ToArray();
+
+        await JS.InvokeVoidAsync(
+            "renderTagsChart",
+            "tagsChart",
+            tagLabels,
+            tagValues
         );
     }
 }

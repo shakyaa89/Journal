@@ -1,14 +1,13 @@
 ﻿@page "/journal/add"
 @using Journal.Models
 @using Journal.Services
-@using System.Text.RegularExpressions
 @inject NavigationManager Navigation
 @inject IJournalService JournalService
 @inject IAuthService AuthService
 @inject IJSRuntime JS
 
 <div class="journal-container">
-    <div class="journal-sidebar">
+    <div class="journal-sidebar @(_hasTodayEntry ? "sidebar-disable" : "")">
         <!-- Date & Time Section -->
         <div class="sidebar-card">
             <div class="card-header">
@@ -264,7 +263,7 @@
             _newJournal.SecondaryMood1 = _selectedSecondaryMoods[0];
             _newJournal.SecondaryMood2 = _selectedSecondaryMoods[1];
             _newJournal.Tags = _selectedTags.ToList();
-            _newJournal.WordCount = GetWordCount(_newJournal.Content);
+            _newJournal.WordCount = Util.GetWordCount(_newJournal.Content);
 
             await JournalService.AddJournalEntryAsync(
                 _newJournal.Title,
@@ -316,14 +315,5 @@
         _newTagText = string.Empty;
     }
 
-    private int GetWordCount(string? html)
-    {
-        if (string.IsNullOrWhiteSpace(html))
-            return 0;
-
-        var text = Regex.Replace(html, "<.*?>", " ");
-        text = Regex.Replace(text, @"\s+", " ").Trim();
-
-        return string.IsNullOrEmpty(text) ? 0 : text.Split(' ').Length;
-    }
+    
 }

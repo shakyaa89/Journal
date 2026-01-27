@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using static System.Net.Mime.MediaTypeNames;
+using System.Text.RegularExpressions;
+
 
 namespace Journal.Utils
 {
@@ -20,6 +23,17 @@ namespace Journal.Utils
                 return "fa-face-frown";
 
             return "fa-face-smile";
+        }
+
+        public static int GetWordCount(string? html)
+        {
+            if (string.IsNullOrWhiteSpace(html))
+                return 0;
+
+            var text = Regex.Replace(html, "<.*?>", " ");
+            text = Regex.Replace(text, @"\s+", " ").Trim();
+
+            return string.IsNullOrEmpty(text) ? 0 : text.Split(' ').Length;
         }
     }
 }

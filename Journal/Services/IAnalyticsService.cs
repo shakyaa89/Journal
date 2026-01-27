@@ -16,5 +16,10 @@ namespace Journal.Services
         public int GetLongestStreak(List<JournalEntry> entries);
 
         public List<DateTime> GetMissedDays(List<JournalEntry> entries);
+
+        Dictionary<string, double> GetAverageWordCountPerDay(List<JournalEntry> entries);
+
+        Dictionary<string, int> GetTagFrequency(List<JournalEntry> entries);
+
     }
 }
