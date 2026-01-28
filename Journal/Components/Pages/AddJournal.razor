@@ -263,6 +263,13 @@
             // Get html content and store in journal object
             _newJournal.Content = await JS.InvokeAsync<string>("getQuillContent");
 
+            // Error if content is empty
+            if(string.IsNullOrEmpty(_newJournal.Content))
+            {
+                _errorMessage = "Content should not be empty!";
+                return;
+            }
+
             // Validation check
             var validationError = ValidateEntry();
             if (validationError != null)
