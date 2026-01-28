@@ -24,20 +24,28 @@ namespace Journal
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 });
 
+            // Community license for quill.js
             QuestPDF.Settings.License = LicenseType.Community;
 
             builder.Services.AddMauiBlazorWebView();
 
+            // Register theme service
             builder.Services.AddScoped<IThemeService, ThemeService>();
+            // Register auth repository 
             builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+            // Register journal repository
             builder.Services.AddScoped<IJournalRepository, JournalRepository>();
+            // Register auth service
             builder.Services.AddScoped<IAuthService, AuthService>();
+            // Register journal service
             builder.Services.AddScoped<IJournalService, JournalService>();
+            // Register analytics service
             builder.Services.AddScoped <IAnalyticsService, AnalyticsService>();
+            // Register PDF service
             builder.Services.AddSingleton<IPDFService, PDFService>();
 
 
-
+            // Configure DbContext with PostgreSQL
             builder.Services.AddDbContext<AppDbContext>(options =>
                     options.UseNpgsql(builder.Configuration.GetConnectionString("defaultConnection")));
 

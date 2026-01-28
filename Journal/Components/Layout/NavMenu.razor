@@ -94,7 +94,7 @@
 
     private async Task<bool> ShowLogoutAlertAsync()
     {
-        bool confirmation = await (Application.Current!.Windows[0].Page!.DisplayAlert(
+        bool confirmation = await (Application.Current!.Windows[0].Page!.DisplayAlertAsync(
             title: "Confirm Logout",
             message: "Are you sure you want to logout?",
             accept: "Yes",

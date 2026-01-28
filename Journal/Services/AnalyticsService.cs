@@ -52,7 +52,7 @@ namespace Journal.Services
             var daysWithEntries = entries.Select(e => e.CreatedAt.Date).Distinct().ToHashSet();
 
             int streak = 0;
-            var current = today;
+            var current = daysWithEntries.Contains(today) ? today : daysWithEntries.Max();
 
             while (daysWithEntries.Contains(current))
             {
