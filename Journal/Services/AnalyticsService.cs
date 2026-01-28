@@ -7,34 +7,47 @@ namespace Journal.Services
         // Calculate Mood Distribution
         public Dictionary<string, double> GetMoodDistribution(List<JournalEntry> entries)
         {
-            var positiveMoods = new List<string> { "Happy", "Excited", "Relaxed", "Grateful", "Confident", "Calm" };
-            var neutralMoods = new List<string> { "Thoughtful", "Curious", "Nostalgic", "Bored" };
-            var negativeMoods = new List<string> { "Sad", "Angry", "Stressed", "Lonely", "Anxious" };
-
-            int positive = 0;
-            int neutral = 0;
-            int negative = 0;
-
-            foreach (var entry in entries)
+            try
             {
-                if (string.IsNullOrWhiteSpace(entry.Mood))
-                    continue;
+                var positiveMoods = new List<string> { "Happy", "Excited", "Relaxed", "Grateful", "Confident", "Calm" };
+                var neutralMoods = new List<string> { "Thoughtful", "Curious", "Nostalgic", "Bored" };
+                var negativeMoods = new List<string> { "Sad", "Angry", "Stressed", "Lonely", "Anxious" };
 
-                if (positiveMoods.Contains(entry.Mood)) positive++;
-                else if (neutralMoods.Contains(entry.Mood)) neutral++;
-                else if (negativeMoods.Contains(entry.Mood)) negative++;
+                int positive = 0;
+                int neutral = 0;
+                int negative = 0;
+
+                foreach (var entry in entries)
+                {
+                    if (string.IsNullOrWhiteSpace(entry.Mood))
+                        continue;
+
+                    if (positiveMoods.Contains(entry.Mood)) positive++;
+                    else if (neutralMoods.Contains(entry.Mood)) neutral++;
+                    else if (negativeMoods.Contains(entry.Mood)) negative++;
+                }
+
+                int total = positive + neutral + negative;
+                if (total == 0) total = 1;
+
+                return new Dictionary<string, double>
+                    {
+                        // Calculate percentages
+                        { "Positive", Math.Round(positive * 100.0 / total, 2) },
+                        { "Neutral",  Math.Round(neutral  * 100.0 / total, 2) },
+                        { "Negative", Math.Round(negative * 100.0 / total, 2) }
+                    };
+            }catch(Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error: {ex.Message}");
+                return new Dictionary<string, double>
+                    {
+                        { "Positive", 0 },
+                        { "Neutral",  0 },
+                        { "Negative", 0 }
+                    };
             }
-
-            int total = positive + neutral + negative;
-            if (total == 0) total = 1;
-
-            return new Dictionary<string, double>
-            {
-                // Calculate percentages
-                { "Positive", Math.Round(positive * 100.0 / total, 2) },
-                { "Neutral",  Math.Round(neutral  * 100.0 / total, 2) },
-                { "Negative", Math.Round(negative * 100.0 / total, 2) }
-            };
+            
         }
 
         // Get Most Frequent Mood
@@ -46,63 +59,86 @@ namespace Journal.Services
         // Calculate Current Daily Streak
         public int GetCurrentDailyStreak(List<JournalEntry> entries)
         {
-            if (entries == null || entries.Count == 0) return 0;
-
-            var today = DateTime.UtcNow.Date;
-            var daysWithEntries = entries.Select(e => e.CreatedAt.Date).Distinct().ToHashSet();
-
-            int streak = 0;
-            var current = daysWithEntries.Contains(today) ? today : daysWithEntries.Max();
-
-            while (daysWithEntries.Contains(current))
+            try
             {
-                streak++;
-                current = current.AddDays(-1);
-            }
+                if (entries == null || entries.Count == 0) return 0;
 
-            return streak;
+                var today = DateTime.UtcNow.Date;
+                var daysWithEntries = entries.Select(e => e.CreatedAt.Date).Distinct().ToHashSet();
+
+                int streak = 0;
+                var current = daysWithEntries.Contains(today) ? today : daysWithEntries.Max();
+
+                while (daysWithEntries.Contains(current))
+                {
+                    streak++;
+                    current = current.AddDays(-1);
+                }
+
+                return streak;
+            }
+            catch
+            {
+                System.Diagnostics.Debug.WriteLine("Error calculating current daily streak.");
+                return 0;
+            }
         }
 
         // Calculate Longest Daily Streak
         public int GetLongestStreak(List<JournalEntry> entries)
         {
-            if (entries == null || entries.Count == 0) return 0;
-
-            var dates = entries.Select(e => e.CreatedAt.Date).Distinct().OrderBy(d => d).ToList();
-
-            int longest = 0;
-            int current = 0;
-            DateTime? prev = null;
-
-            foreach (var date in dates)
+            try
             {
-                if (prev == null || date == prev.Value.AddDays(1)) current++;
-                else current = 1;
+                if (entries == null || entries.Count == 0) return 0;
 
-                if (current > longest) longest = current;
-                prev = date;
+                var dates = entries.Select(e => e.CreatedAt.Date).Distinct().OrderBy(d => d).ToList();
+
+                int longest = 0;
+                int current = 0;
+                DateTime? prev = null;
+
+                foreach (var date in dates)
+                {
+                    if (prev == null || date == prev.Value.AddDays(1)) current++;
+                    else current = 1;
+
+                    if (current > longest) longest = current;
+                    prev = date;
+                }
+
+                return longest;
             }
-
-            return longest;
+            catch
+            {
+                System.Diagnostics.Debug.WriteLine("Error calculating longest daily streak.");
+                return 0;
+            }
         }
 
         // Get Missed Days
         public List<DateTime> GetMissedDays(List<JournalEntry> entries)
         {
-            var result = new List<DateTime>();
-            if (entries == null || entries.Count == 0) return result;
-
-            var datesWithEntries = entries.Select(e => e.CreatedAt.Date).Distinct().OrderBy(d => d).ToList();
-            var start = datesWithEntries.First();
-            var end = DateTime.UtcNow.Date;
-            var set = datesWithEntries.ToHashSet();
-
-            for (var dt = start; dt <= end; dt = dt.AddDays(1))
+            try
             {
-                if (!set.Contains(dt)) result.Add(dt);
-            }
+                var result = new List<DateTime>();
+                if (entries == null || entries.Count == 0) return result;
 
-            return result;
+                var datesWithEntries = entries.Select(e => e.CreatedAt.Date).Distinct().OrderBy(d => d).ToList();
+                var start = datesWithEntries.First();
+                var end = DateTime.UtcNow.Date;
+                var set = datesWithEntries.ToHashSet();
+
+                for (var dt = start; dt <= end; dt = dt.AddDays(1))
+                {
+                    if (!set.Contains(dt)) result.Add(dt);
+                }
+
+                return result;
+            }
+            catch
+            {
+                return [];
+            }
         }
 
         // Get Average Word Count Per Day
@@ -111,11 +147,17 @@ namespace Journal.Services
         // Get Tag Frequency
         public Dictionary<string, int> GetTagFrequency(List<JournalEntry> entries)
         {
+            try
+            {
             if (entries == null || entries.Count == 0)
                 return new Dictionary<string, int>();
 
             return entries.Where(e => e.Tags != null).SelectMany(e => e.Tags!).Where(t => !string.IsNullOrWhiteSpace(t)).Select(t => t.Trim()).GroupBy(t => t, StringComparer.OrdinalIgnoreCase).OrderByDescending(g => g.Count()).ToDictionary(g => g.Key, g => g.Count(), StringComparer.OrdinalIgnoreCase);
-
+            }
+            catch
+            {
+                return [];
+            }
         }
     }
 }

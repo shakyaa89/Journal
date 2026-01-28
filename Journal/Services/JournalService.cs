@@ -15,19 +15,27 @@ namespace Journal.Services
         // Add a new journal entry
         public async Task<JournalEntry> AddJournalEntryAsync(string title, string content, string mood, string secondaryMood1, string secondaryMood2, List<string>? tags, int wordCount, int userId)
         {
-            var journal = new JournalEntry
+            try
             {
-                Title = title,
-                Content = content,
-                Mood = mood,
-                SecondaryMood1 = secondaryMood1,
-                SecondaryMood2 = secondaryMood2,
-                Tags = tags,
-                WordCount = wordCount,
-                UserId = userId
-            };
+                var journal = new JournalEntry
+                {
+                    Title = title,
+                    Content = content,
+                    Mood = mood,
+                    SecondaryMood1 = secondaryMood1,
+                    SecondaryMood2 = secondaryMood2,
+                    Tags = tags,
+                    WordCount = wordCount,
+                    UserId = userId
+                };
 
-            return await _journalRepository.AddJournalEntryAsync(journal);
+                return await _journalRepository.AddJournalEntryAsync(journal);
+            }
+            catch
+            {
+                System.Diagnostics.Debug.WriteLine("Error adding journal entry");
+                return new JournalEntry();
+            }
         }
 
 
@@ -43,20 +51,28 @@ namespace Journal.Services
         // Update a journal entry
         public async Task<JournalEntry?> UpdateJournalEntryAsync(int id, string title, string content, string mood, string secondaryMood1, string secondaryMood2, List<string>? tags, int userId, int wordCount, DateTime updatedAt)
         {
-            var existing = await _journalRepository.FetchJournalByIdAsync(id);
-            if (existing == null || existing.UserId != userId)
+            try
+            {
+                var existing = await _journalRepository.FetchJournalByIdAsync(id);
+                if (existing == null || existing.UserId != userId)
+                    return null;
+
+                existing.Title = title;
+                existing.Content = content;
+                existing.Mood = mood;
+                existing.SecondaryMood1 = secondaryMood1;
+                existing.SecondaryMood2 = secondaryMood2;
+                existing.Tags = tags;
+                existing.WordCount = wordCount;
+                existing.UpdatedAt = updatedAt;
+
+                return await _journalRepository.UpdateJournalEntryAsync(existing);
+            }
+            catch
+            {
+                System.Diagnostics.Debug.WriteLine("Error updating journal entry");
                 return null;
-
-            existing.Title = title;
-            existing.Content = content;
-            existing.Mood = mood;
-            existing.SecondaryMood1 = secondaryMood1;
-            existing.SecondaryMood2 = secondaryMood2;
-            existing.Tags = tags;
-            existing.WordCount = wordCount;
-            existing.UpdatedAt = updatedAt;
-
-            return await _journalRepository.UpdateJournalEntryAsync(existing);
+            }
         }
 
     }

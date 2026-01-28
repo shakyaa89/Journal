@@ -58,11 +58,11 @@ else
 
                 <div class="stat-card">
                     <div class="stat-icon">
-                        <i class="fa-solid @Util.GetMoodIcon(_mostFrequentMood)" style="color: var(--accent)"></i>
+                        <i class="fa-solid @(_mostFrequentMood == string.Empty ? "fa-meh" : Util.GetMoodIcon(_mostFrequentMood))" style="color: var(--accent)"></i>
                     </div>
                     <div class="stat-content">
                         <p class="stat-label">Top Mood</p>
-                        <p class="stat-value mood-text">@_mostFrequentMood</p>
+                        <p class="stat-value mood-text">@(_mostFrequentMood == string.Empty ? "-" : _mostFrequentMood)</p>
                     </div>
                 </div>
             </div>
